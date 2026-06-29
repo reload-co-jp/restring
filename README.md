@@ -1,94 +1,383 @@
-# Next.js Static Site Template
+# restring
 
-Next.js 16 + React 19 + TypeScript を使用した静的サイト生成のテンプレートリポジトリです。GitHub Pages へのデプロイが自動化されています。
+> Developer-oriented string processing and comparison tools.
 
-## 技術スタック
+---
 
-- **Next.js** 16 - App Router / Static Export
-- **React** 19
-- **TypeScript** 5
-- **ESLint** 9 - Flat Config
-- **Prettier** 3
+# Overview
 
-## このテンプレートの使い方
+restring は、文字列処理・比較・変換・解析を行う無料のWebツール集です。
 
-1. **「Use this template」ボタン**をクリックして新しいリポジトリを作成
-2. リポジトリをクローン
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
-   cd YOUR_REPO
-   ```
-3. 依存関係をインストール
-   ```bash
-   pnpm install
-   ```
-4. 開発サーバーを起動
-   ```bash
-   pnpm dev
-   ```
+SEOを重視し、各ツールは独立したURLを持ち、
+それぞれに解説ページ・FAQ・関連記事を用意します。
 
-## セットアップ後にやること
+目的
 
-### 1. `next.config.js` の修正
+- 開発者の日常業務を効率化
+- ブラウザだけで完結
+- 高速・広告が邪魔にならない
+- モバイル対応
+- AI時代でも使われ続ける実用ツール
 
-`basePath` をリポジトリ名に変更してください：
+---
 
-```js
-basePath: process.env.NODE_ENV === "production" ? "/YOUR_REPO_NAME" : "",
+# Target
+
+- Webエンジニア
+- バックエンドエンジニア
+- フロントエンドエンジニア
+- インフラエンジニア
+- QA
+- データ分析
+- 学生
+
+---
+
+# MVP
+
+## Text Compare
+
+2つの文字列を比較
+
+機能
+
+- 行単位比較
+- 単語単位比較
+- 文字単位比較
+- Inline表示
+- Side-by-side表示
+
+オプション
+
+- 空白無視
+- 改行無視
+- タブ無視
+- 大文字小文字無視
+
+---
+
+## JSON Compare
+
+- 構造比較
+- キー順無視
+- Pretty Print
+- JSON Validation
+
+---
+
+## Text Diff
+
+差分のみ抽出
+
+- Added
+- Removed
+- Changed
+
+---
+
+## Text Normalize
+
+文字列正規化
+
+- Trim
+- Collapse Spaces
+- Normalize Unicode
+- Convert Line Ending
+
+---
+
+## Invisible Character Viewer
+
+不可視文字の可視化
+
+対象
+
+- Space
+- Tab
+- CR
+- LF
+- NBSP
+- Zero Width Space
+
+---
+
+## Line Ending Converter
+
+改行コード変換
+
+- LF
+- CRLF
+- CR
+
+---
+
+## Case Converter
+
+- UPPERCASE
+- lowercase
+- camelCase
+- PascalCase
+- snake_case
+- kebab-case
+
+---
+
+## URL Encode / Decode
+
+- Encode
+- Decode
+
+---
+
+## Base64
+
+- Encode
+- Decode
+
+---
+
+## HTML Escape
+
+- Escape
+- Unescape
+
+---
+
+## Unicode Inspector
+
+入力文字から
+
+表示
+
+- Code Point
+- UTF-8
+- UTF-16
+- UTF-32
+- Unicode Name
+- Block
+
+---
+
+# Future Tools
+
+## String
+
+- Reverse
+- Sort
+- Shuffle
+- Remove Duplicate Lines
+- Count Characters
+- Count Words
+- Count Bytes
+
+---
+
+## JSON
+
+- Formatter
+- Minifier
+- Schema Generator
+- Patch Generator
+- Merge Patch
+
+---
+
+## CSV
+
+- CSV Compare
+- CSV Viewer
+- CSV to JSON
+- JSON to CSV
+
+---
+
+## XML
+
+- XML Formatter
+- XML Compare
+- XPath Tester
+
+---
+
+## YAML
+
+- YAML Formatter
+- YAML Validator
+- YAML ⇔ JSON
+
+---
+
+## Markdown
+
+- Preview
+- Diff
+- Formatter
+
+---
+
+## SQL
+
+- Formatter
+- Diff
+- Pretty Print
+
+---
+
+## Regex
+
+- Tester
+- Cheat Sheet
+- Generator
+
+---
+
+# Common UI
+
+全ツール共通
+
+- Dark Mode
+- Copy Button
+- Download
+- Share URL
+- Drag & Drop
+- Sample Data
+- Reset
+- Auto Run
+
+---
+
+# Search
+
+全ツール検索
+
+例
+
+```
+json
+unicode
+diff
+camel
 ```
 
-### 2. `app/layout.tsx` の修正
+---
 
-メタデータとサイト情報を更新してください：
+# SEO
 
-```tsx
-export const metadata: Metadata = {
-  title: "Your Site Title",
-  description: "Your site description",
-}
-```
-
-### 3. GitHub Pages の設定
-
-1. リポジトリの **Settings** → **Pages** へ移動
-2. **Source** を「GitHub Actions」に設定
-
-## ディレクトリ構成
+各ツールは
 
 ```
-.
-├── app/
-│   ├── layout.tsx      # ルートレイアウト
-│   ├── page.tsx        # ホームページ
-│   └── reset.css       # CSSリセット
-├── .github/
-│   └── workflows/
-│       ├── lint.yml    # リント自動実行
-│       └── deploy.yml  # GitHub Pages 自動デプロイ
-├── next.config.js      # Next.js 設定
-├── tsconfig.json       # TypeScript 設定
-├── eslint.config.mjs   # ESLint 設定
-└── .prettierrc.json    # Prettier 設定
+/text-compare
+/json-compare
+/base64
+/unicode
 ```
 
-## スクリプト
+のように独立ページを持つ。
 
-| コマンド | 説明 |
-|---------|------|
-| `pnpm dev` | 開発サーバーを起動 |
-| `pnpm build` | 静的サイトをビルド（`/out` に出力） |
-| `pnpm lint` | ESLint を実行 |
-| `pnpm format` | Prettier でコードをフォーマット |
-| `pnpm typecheck` | TypeScript の型チェック |
+各ページ
 
-## 機能
+- タイトル
+- Description
+- FAQ
+- How to
+- Examples
+- Related Tools
 
-- **静的サイト生成** - `next build` で `/out` に HTML を出力
-- **自動デプロイ** - main ブランチへの push で GitHub Pages に自動デプロイ
-- **自動リント** - push 時に ESLint / Prettier チェックを実行
-- **依存関係の自動更新** - Dependabot による週次チェック
-- **エディタ設定** - VS Code での自動フォーマット設定済み
+---
 
-## ライセンス
+# Blog
 
-ISC
+コンテンツ
+
+- Unicodeとは
+- Diffとは
+- JSON比較方法
+- Base64とは
+- UTF-8とは
+
+---
+
+# Performance
+
+- JavaScriptのみで動作
+- API不要
+- クライアントサイド処理
+- オフライン対応(PWA対応予定)
+
+---
+
+# Accessibility
+
+- WCAG AA
+- キーボード操作
+- Screen Reader対応
+- 色だけで判別しない
+
+---
+
+# Analytics
+
+収集
+
+- Tool Usage
+- Popular Tools
+- Search Query
+
+※入力テキストは送信しない
+
+---
+
+# Privacy
+
+- 入力文字列はサーバー送信しない
+- Cookie最小限
+- GDPR対応可能設計
+
+---
+
+# Tech Stack
+
+Frontend
+
+- Next.js
+- React
+- TypeScript
+
+UI
+
+- TailwindCSS
+- shadcn/ui
+
+Diff
+
+- diff
+- jsdiff
+
+JSON
+
+- jsonc-parser
+
+State
+
+- Zustand
+
+SEO
+
+- next-sitemap
+- Schema.org
+
+Deploy
+
+- Cloudflare Pages
+- Vercel
+
+---
+
+# Design Principles
+
+- Fast
+- Minimal
+- Mobile First
+- Keyboard Friendly
+- No Login
+- Free Forever

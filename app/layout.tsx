@@ -1,16 +1,65 @@
 import Link from "next/link"
+import { Metadata } from "next"
 import { Title } from "components/elements/layout"
+import { siteDescription, siteName, siteUrl } from "components/seo"
 import { ToolTabs } from "components/tool-tabs"
 import "./reset.css"
 
-export const metadata = {
-  title: "restring",
-  description: "開発者向け文字列処理・比較ツール集。",
+export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
+  applicationName: siteName,
+  title: {
+    default: "restring | 開発者向け文字列処理・比較ツール",
+    template: "%s | restring",
+  },
+  description: siteDescription,
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "restring | 開発者向け文字列処理・比較ツール",
+    description: siteDescription,
+    url: "/",
+    siteName,
+    locale: "ja_JP",
+    type: "website",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
+  twitter: {
+    card: "summary",
+    title: "restring | 開発者向け文字列処理・比較ツール",
+    description: siteDescription,
+  },
+}
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteName,
+  url: siteUrl,
+  description: siteDescription,
+  inLanguage: "ja",
 }
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="ja">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+          type="application/ld+json"
+        />
+      </head>
       <body>
         <header
           style={{

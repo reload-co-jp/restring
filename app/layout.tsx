@@ -1,9 +1,11 @@
+import Link from "next/link"
 import { Title } from "components/elements/layout"
+import { ToolTabs } from "components/tool-tabs"
 import "./reset.css"
 
 export const metadata = {
-  title: "Page title",
-  description: "Page description",
+  title: "restring",
+  description: "開発者向け文字列処理・比較ツール集。",
 }
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
@@ -12,18 +14,23 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
       <body>
         <header
           style={{
-            backgroundColor: "#333",
-            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-            padding: ".5rem 1rem",
-            position: "relative",
+            backgroundColor: "#111827",
+            borderBottom: "1px solid #334155",
+            padding: ".75rem 1rem",
+            position: "sticky",
+            top: 0,
+            zIndex: 1,
           }}
         >
-          <Title>Page title</Title>
+          <Link className="brandLink" href="/">
+            <Title>restring</Title>
+          </Link>
+          <ToolTabs />
         </header>
         <main
           style={{
-            background: "#222",
-            minHeight: "calc(100dvh - 5.625rem)",
+            background: "#0f172a",
+            minHeight: "calc(100dvh - 6.25rem)",
             padding: "1rem",
           }}
         >
@@ -31,13 +38,13 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         </main>
         <footer
           style={{
-            backgroundColor: "#333",
-            boxShadow: "0 -4px 6px rgba(0, 0, 0, 0.1)",
+            backgroundColor: "#111827",
+            borderTop: "1px solid #334155",
             fontSize: ".75rem",
             padding: "1rem",
           }}
         >
-          <p>&copy; My organization</p>
+          <p>&copy; restring</p>
         </footer>
       </body>
     </html>

@@ -127,6 +127,42 @@ select {
   border-bottom-color: #1e293b;
 }
 
+.featureSection {
+  display: grid;
+  gap: .875rem;
+}
+
+.featureSection h2 {
+  color: #f8fafc;
+  font-size: 1rem;
+}
+
+.featureGrid {
+  display: grid;
+  gap: .875rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.featureLink {
+  background: #111827;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #cbd5e1;
+  display: grid;
+  gap: .375rem;
+  min-height: 7rem;
+  padding: 1rem;
+  text-decoration: none;
+}
+
+.featureLink:hover {
+  border-color: #3b82f6;
+}
+
+.featureLink strong {
+  color: #f8fafc;
+}
+
 .twoColumn,
 .utilityGrid {
   display: grid;
@@ -233,6 +269,7 @@ select {
 
 @media (max-width: 760px) {
   .twoColumn,
+  .featureGrid,
   .utilityGrid,
   .unicodeRow {
     grid-template-columns: 1fr;

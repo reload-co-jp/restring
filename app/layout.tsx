@@ -1,9 +1,13 @@
 import Link from "next/link"
 import { Metadata } from "next"
+import Script from "next/script"
 import { Title } from "components/elements/layout"
 import { siteDescription, siteName, siteUrl } from "components/seo"
 import { ToolTabs } from "components/tool-tabs"
 import "./reset.css"
+
+const googleAnalyticsId = "G-2M289CH9TQ"
+const isProduction = process.env.NODE_ENV === "production"
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -61,6 +65,22 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         />
       </head>
       <body>
+        {isProduction && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-analytics" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${googleAnalyticsId}');
+              `}
+            </Script>
+          </>
+        )}
         <header
           style={{
             backgroundColor: "#111827",

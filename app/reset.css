@@ -98,20 +98,21 @@ select {
 
 .toolTabs {
   display: flex;
-  gap: .375rem;
+  gap: .25rem;
   overflow-x: auto;
+  padding-bottom: .125rem;
   scrollbar-width: thin;
 }
 
 .toolTab {
-  background: #020617;
-  border: 1px solid #334155;
-  border-radius: 6px 6px 0 0;
+  background: transparent;
+  border-radius: 6px;
   color: #cbd5e1;
   flex: 0 0 auto;
   font-size: .875rem;
-  min-height: 2.5rem;
-  padding: .625rem .875rem;
+  min-height: 2.25rem;
+  padding: .5rem .75rem;
+  position: relative;
   text-decoration: none;
   white-space: nowrap;
 }
@@ -119,12 +120,18 @@ select {
 .toolTab:hover,
 .toolTab.active {
   background: #1e293b;
-  border-color: #3b82f6;
   color: #f8fafc;
 }
 
-.toolTab.active {
-  border-bottom-color: #1e293b;
+.toolTab.active::after {
+  background: #3b82f6;
+  border-radius: 999px;
+  bottom: .25rem;
+  content: "";
+  height: 2px;
+  left: .75rem;
+  position: absolute;
+  right: .75rem;
 }
 
 .featureSection {

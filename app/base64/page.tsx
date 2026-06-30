@@ -1,5 +1,6 @@
 import { Base64Tool } from "components/tools"
 import { createPageMetadata } from "components/seo"
+import { ToolArticle } from "components/tool-article"
 
 export const metadata = createPageMetadata({
   title: "Base64",
@@ -7,4 +8,10 @@ export const metadata = createPageMetadata({
   path: "/base64/",
 })
 
-export default Base64Tool
+const Page = () => (
+  <ToolArticle href="/base64/">
+    <Base64Tool />
+  </ToolArticle>
+)
+
+export default Page

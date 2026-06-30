@@ -315,7 +315,7 @@ const Result: FC<{ name: string; value: string }> = ({ name, value }) => (
 
 const useTextDiff = () => {
   const [left, setLeft] = useState("hello\nworld")
-  const [right, setRight] = useState("hello\nrestring")
+  const [right, setRight] = useState("hello\nRestring")
   const [unit, setUnit] = useState<CompareUnit>("line")
   const [view, setView] = useState<CompareView>("inline")
   const [ignoreWhitespace, setIgnoreWhitespace] = useState(false)
@@ -414,8 +414,8 @@ const CompareControls: FC<{ state: ReturnType<typeof useTextDiff> }> = ({
 )
 
 export const JsonCompareTool: FC = () => {
-  const [left, setLeft] = useState('{"name":"restring","tools":["diff"]}')
-  const [right, setRight] = useState('{"tools":["diff"],"name":"restring"}')
+  const [left, setLeft] = useState('{"name":"Restring","tools":["diff"]}')
+  const [right, setRight] = useState('{"tools":["diff"],"name":"Restring"}')
   const leftJson = parseJson(left)
   const rightJson = parseJson(right)
   const prettyLeft = leftJson.error ? leftJson.error : JSON.stringify(leftJson.data, null, 2)
@@ -468,7 +468,7 @@ export const TextDiffTool: FC = () => {
 }
 
 export const TextNormalizeTool: FC = () => {
-  const [value, setValue] = useState("  Hello   restring\r\n")
+  const [value, setValue] = useState("  Hello   Restring\r\n")
   return (
     <Panel title="テキスト正規化">
       <Textarea label="入力" onChange={setValue} value={value} />
@@ -488,7 +488,7 @@ export const InvisibleCharacterViewerTool: FC = () => {
 }
 
 export const LineEndingConverterTool: FC = () => {
-  const [value, setValue] = useState("Hello\r\nrestring\r\n")
+  const [value, setValue] = useState("Hello\r\nRestring\r\n")
   const [lineEnding, setLineEnding] = useState<LineEnding>("LF")
   return (
     <Panel title="改行コード変換">
@@ -506,7 +506,7 @@ export const LineEndingConverterTool: FC = () => {
 }
 
 export const CaseConverterTool: FC = () => {
-  const [value, setValue] = useState("hello restring tool")
+  const [value, setValue] = useState("hello Restring tool")
   const [caseMode, setCaseMode] = useState<CaseMode>("camel")
   return (
     <Panel title="ケース変換">
@@ -527,7 +527,7 @@ export const CaseConverterTool: FC = () => {
 }
 
 export const UrlEncodeDecodeTool: FC = () => {
-  const [value, setValue] = useState("hello restring?x=1&y=2")
+  const [value, setValue] = useState("hello Restring?x=1&y=2")
   return (
     <Panel title="URLエンコード・デコード">
       <Textarea label="入力" onChange={setValue} value={value} />
@@ -538,7 +538,7 @@ export const UrlEncodeDecodeTool: FC = () => {
 }
 
 export const Base64Tool: FC = () => {
-  const [value, setValue] = useState("hello restring")
+  const [value, setValue] = useState("hello Restring")
   return (
     <Panel title="Base64">
       <Textarea label="入力" onChange={setValue} value={value} />
@@ -549,7 +549,7 @@ export const Base64Tool: FC = () => {
 }
 
 export const HtmlEscapeTool: FC = () => {
-  const [value, setValue] = useState('<a href="/restring">hello</a>')
+  const [value, setValue] = useState('<a href="/Restring">hello</a>')
   return (
     <Panel title="HTMLエスケープ">
       <Textarea label="入力" onChange={setValue} value={value} />

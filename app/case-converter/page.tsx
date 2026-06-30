@@ -1,5 +1,6 @@
 import { CaseConverterTool } from "components/tools"
 import { createPageMetadata } from "components/seo"
+import { ToolArticle } from "components/tool-article"
 
 export const metadata = createPageMetadata({
   title: "ケース変換",
@@ -7,4 +8,10 @@ export const metadata = createPageMetadata({
   path: "/case-converter/",
 })
 
-export default CaseConverterTool
+const Page = () => (
+  <ToolArticle href="/case-converter/">
+    <CaseConverterTool />
+  </ToolArticle>
+)
+
+export default Page

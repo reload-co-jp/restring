@@ -9,15 +9,15 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   applicationName: siteName,
   title: {
-    default: "restring | 開発者向け文字列処理・比較ツール",
-    template: "%s | restring",
+    default: "Restring | 開発者向け文字列処理・比較ツール",
+    template: "%s | Restring",
   },
   description: siteDescription,
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "restring | 開発者向け文字列処理・比較ツール",
+    title: "Restring | 開発者向け文字列処理・比較ツール",
     description: siteDescription,
     url: "/",
     siteName,
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "restring | 開発者向け文字列処理・比較ツール",
+    title: "Restring | 開発者向け文字列処理・比較ツール",
     description: siteDescription,
   },
 }
@@ -72,7 +72,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
           }}
         >
           <Link className="brandLink" href="/">
-            <Title>restring</Title>
+            <Title>Restring</Title>
           </Link>
           <ToolTabs />
         </header>
@@ -93,7 +93,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             padding: "1rem",
           }}
         >
-          <p>&copy; restring</p>
+          <p>&copy; Restring</p>
         </footer>
       </body>
     </html>

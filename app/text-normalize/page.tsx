@@ -1,5 +1,6 @@
 import { TextNormalizeTool } from "components/tools"
 import { createPageMetadata } from "components/seo"
+import { ToolArticle } from "components/tool-article"
 
 export const metadata = createPageMetadata({
   title: "テキスト正規化",
@@ -7,4 +8,10 @@ export const metadata = createPageMetadata({
   path: "/text-normalize/",
 })
 
-export default TextNormalizeTool
+const Page = () => (
+  <ToolArticle href="/text-normalize/">
+    <TextNormalizeTool />
+  </ToolArticle>
+)
+
+export default Page

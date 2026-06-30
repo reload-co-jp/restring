@@ -1,13 +1,156 @@
 export const toolLinks = [
-  { href: "/text-compare/", title: "テキスト比較", description: "2つの文字列を行・単語・文字単位で比較。インライン表示と左右表示に対応。" },
-  { href: "/json-compare/", title: "JSON比較", description: "JSONを検証し、整形表示。キー順を無視して構造比較。" },
-  { href: "/text-diff/", title: "テキスト差分", description: "追加・削除された差分だけ抽出。" },
-  { href: "/text-normalize/", title: "テキスト正規化", description: "前後空白削除、連続スペース圧縮、Unicode正規化、改行統一。" },
-  { href: "/invisible-character-viewer/", title: "不可視文字ビューア", description: "スペース、タブ、CR、LF、NBSP、ゼロ幅スペースを可視化。" },
-  { href: "/line-ending-converter/", title: "改行コード変換", description: "LF、CRLF、CRへ改行コードを変換。" },
-  { href: "/case-converter/", title: "ケース変換", description: "UPPERCASE、lowercase、camelCase、PascalCase、snake_case、kebab-caseへ変換。" },
-  { href: "/url-encode-decode/", title: "URLエンコード・デコード", description: "URLコンポーネントをエンコード・デコード。" },
-  { href: "/base64/", title: "Base64", description: "Base64文字列をエンコード・デコード。" },
-  { href: "/html-escape/", title: "HTMLエスケープ", description: "HTML特殊文字をエスケープ・アンエスケープ。" },
-  { href: "/unicode-inspector/", title: "Unicodeインスペクタ", description: "コードポイント、UTF表現、文字名、Unicodeブロックを確認。" },
+  {
+    href: "/text-compare/",
+    title: "テキスト比較",
+    description: "2つの文字列を行・単語・文字単位で比較。インライン表示と左右表示に対応。",
+    usage: [
+      "比較元と比較先へ文字列を貼り付ける。",
+      "行単位、単語単位、文字単位から比較粒度を選ぶ。",
+      "必要に応じてスペース、改行、タブ、大文字小文字を無視する。",
+    ],
+    mechanism: [
+      "入力を指定粒度で分割し、共通部分と追加・削除部分を計算。",
+      "インライン表示では差分箇所を色分けし、左右表示では正規化後の内容を並べる。",
+    ],
+  },
+  {
+    href: "/json-compare/",
+    title: "JSON比較",
+    description: "JSONを検証し、整形表示。キー順を無視して構造比較。",
+    usage: [
+      "JSON AとJSON Bへ比較対象を貼り付ける。",
+      "構文エラーがある場合はエラーメッセージを確認する。",
+      "整形済みJSONと構造一致・不一致を確認する。",
+    ],
+    mechanism: [
+      "JSON.parseで構文検証し、成功した値をインデント付きで表示。",
+      "オブジェクトのキーを再帰的にソートしてから比較するため、キー順だけの違いは無視。",
+    ],
+  },
+  {
+    href: "/text-diff/",
+    title: "テキスト差分",
+    description: "追加・削除された差分だけ抽出。",
+    usage: [
+      "比較元と比較先を入力する。",
+      "比較粒度と無視オプションを選ぶ。",
+      "追加・削除された要素だけ確認する。",
+    ],
+    mechanism: [
+      "テキスト比較と同じ差分計算を使い、同一部分を除外。",
+      "差分結果を追加・削除ラベル付きで抽出表示。",
+    ],
+  },
+  {
+    href: "/text-normalize/",
+    title: "テキスト正規化",
+    description: "前後空白削除、連続スペース圧縮、Unicode正規化、改行統一。",
+    usage: [
+      "入力欄へ整えたい文字列を貼り付ける。",
+      "出力欄で正規化結果を確認する。",
+      "コピーまたは保存で再利用する。",
+    ],
+    mechanism: [
+      "UnicodeをNFCへ正規化。",
+      "連続する空白を1文字に圧縮し、CRLF/CRをLFへ統一して前後空白を削除。",
+    ],
+  },
+  {
+    href: "/invisible-character-viewer/",
+    title: "不可視文字ビューア",
+    description: "スペース、タブ、CR、LF、NBSP、ゼロ幅スペースを可視化。",
+    usage: [
+      "不可視文字を含む文字列を入力する。",
+      "出力欄でスペース、タブ、改行などの位置を確認する。",
+      "コピーして調査メモやレビューに使う。",
+    ],
+    mechanism: [
+      "文字列を1文字ずつ走査し、不可視文字を読みやすい名前へ置換。",
+      "通常文字はそのまま残すため、混入箇所を文脈付きで確認可能。",
+    ],
+  },
+  {
+    href: "/line-ending-converter/",
+    title: "改行コード変換",
+    description: "LF、CRLF、CRへ改行コードを変換。",
+    usage: [
+      "変換したいテキストを入力する。",
+      "LF、CRLF、CRから出力形式を選ぶ。",
+      "結果をコピーまたは保存する。",
+    ],
+    mechanism: [
+      "入力中のCRLF/CRを一度LFへ統一。",
+      "選択された改行コードへLFを置換して出力。",
+    ],
+  },
+  {
+    href: "/case-converter/",
+    title: "ケース変換",
+    description: "UPPERCASE、lowercase、camelCase、PascalCase、snake_case、kebab-caseへ変換。",
+    usage: [
+      "変換したい文字列を入力する。",
+      "出力したいケース形式を選ぶ。",
+      "変数名、ファイル名、URL slug作成に使う。",
+    ],
+    mechanism: [
+      "空白、ハイフン、アンダースコア、camelCase境界で単語へ分割。",
+      "単語を小文字化し、選択形式に応じて連結・大文字化。",
+    ],
+  },
+  {
+    href: "/url-encode-decode/",
+    title: "URLエンコード・デコード",
+    description: "URLコンポーネントをエンコード・デコード。",
+    usage: [
+      "URLパラメータや日本語文字列を入力する。",
+      "エンコード結果とデコード結果を確認する。",
+      "API検証やクエリ文字列作成に使う。",
+    ],
+    mechanism: [
+      "encodeURIComponentでURLに安全な表現へ変換。",
+      "decodeURIComponentでパーセントエンコード文字列を復元。",
+    ],
+  },
+  {
+    href: "/base64/",
+    title: "Base64",
+    description: "Base64文字列をエンコード・デコード。",
+    usage: [
+      "文字列またはBase64文字列を入力する。",
+      "エンコード結果とデコード結果を確認する。",
+      "設定値や軽量データの確認に使う。",
+    ],
+    mechanism: [
+      "UTF-8バイト列をBase64へ変換。",
+      "Base64入力はバイト列へ戻し、UTF-8文字列として復元。",
+    ],
+  },
+  {
+    href: "/html-escape/",
+    title: "HTMLエスケープ",
+    description: "HTML特殊文字をエスケープ・アンエスケープ。",
+    usage: [
+      "HTMLとして扱いたい文字列を入力する。",
+      "エスケープ結果とアンエスケープ結果を確認する。",
+      "記事、テンプレート、コード例の表示前確認に使う。",
+    ],
+    mechanism: [
+      "&、<、>、ダブルクォート、シングルクォートをHTMLエンティティへ置換。",
+      "既知のHTMLエンティティは対応する文字へ戻す。",
+    ],
+  },
+  {
+    href: "/unicode-inspector/",
+    title: "Unicodeインスペクタ",
+    description: "コードポイント、UTF表現、文字名、Unicodeブロックを確認。",
+    usage: [
+      "調べたい文字列を入力する。",
+      "各文字のコードポイント、UTF-8、UTF-16、UTF-32を確認する。",
+      "文字化け、異体字、不可視文字の調査に使う。",
+    ],
+    mechanism: [
+      "入力をUnicodeコードポイント単位で分解。",
+      "各文字をUTF表現へ変換し、代表的なUnicodeブロック名と併せて表示。",
+    ],
+  },
 ]

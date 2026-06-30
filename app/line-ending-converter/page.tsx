@@ -1,5 +1,6 @@
 import { LineEndingConverterTool } from "components/tools"
 import { createPageMetadata } from "components/seo"
+import { ToolArticle } from "components/tool-article"
 
 export const metadata = createPageMetadata({
   title: "改行コード変換",
@@ -7,4 +8,10 @@ export const metadata = createPageMetadata({
   path: "/line-ending-converter/",
 })
 
-export default LineEndingConverterTool
+const Page = () => (
+  <ToolArticle href="/line-ending-converter/">
+    <LineEndingConverterTool />
+  </ToolArticle>
+)
+
+export default Page

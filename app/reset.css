@@ -163,6 +163,37 @@ select {
   color: #f8fafc;
 }
 
+.toolPage {
+  display: grid;
+  gap: 1rem;
+}
+
+.articleSection {
+  background: #111827;
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #cbd5e1;
+  display: grid;
+  gap: .75rem;
+  padding: 1rem;
+}
+
+.articleSection h2 {
+  color: #f8fafc;
+  font-size: 1rem;
+}
+
+.articleSection ol,
+.articleSection ul {
+  display: grid;
+  gap: .5rem;
+  padding-left: 1.25rem;
+}
+
+.articleSection li {
+  line-height: 1.6;
+}
+
 .twoColumn,
 .utilityGrid {
   display: grid;

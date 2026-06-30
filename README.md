@@ -1,4 +1,4 @@
-# restring
+# Restring
 
 > Developer-oriented string processing and comparison tools.
 
@@ -6,7 +6,7 @@
 
 # Overview
 
-restring は、文字列処理・比較・変換・解析を行う無料のWebツール集です。
+Restring は、文字列処理・比較・変換・解析を行う無料のWebツール集です。
 
 SEOを重視し、各ツールは独立したURLを持ち、
 それぞれに解説ページ・FAQ・関連記事を用意します。

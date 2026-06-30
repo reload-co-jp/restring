@@ -1,5 +1,6 @@
 import { TextCompareTool } from "components/tools"
 import { createPageMetadata } from "components/seo"
+import { ToolArticle } from "components/tool-article"
 
 export const metadata = createPageMetadata({
   title: "テキスト比較",
@@ -7,4 +8,10 @@ export const metadata = createPageMetadata({
   path: "/text-compare/",
 })
 
-export default TextCompareTool
+const Page = () => (
+  <ToolArticle href="/text-compare/">
+    <TextCompareTool />
+  </ToolArticle>
+)
+
+export default Page

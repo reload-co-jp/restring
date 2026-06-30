@@ -1,5 +1,6 @@
 import { HtmlEscapeTool } from "components/tools"
 import { createPageMetadata } from "components/seo"
+import { ToolArticle } from "components/tool-article"
 
 export const metadata = createPageMetadata({
   title: "HTMLエスケープ",
@@ -7,4 +8,10 @@ export const metadata = createPageMetadata({
   path: "/html-escape/",
 })
 
-export default HtmlEscapeTool
+const Page = () => (
+  <ToolArticle href="/html-escape/">
+    <HtmlEscapeTool />
+  </ToolArticle>
+)
+
+export default Page

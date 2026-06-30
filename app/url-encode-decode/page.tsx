@@ -1,5 +1,6 @@
 import { UrlEncodeDecodeTool } from "components/tools"
 import { createPageMetadata } from "components/seo"
+import { ToolArticle } from "components/tool-article"
 
 export const metadata = createPageMetadata({
   title: "URLエンコード・デコード",
@@ -7,4 +8,10 @@ export const metadata = createPageMetadata({
   path: "/url-encode-decode/",
 })
 
-export default UrlEncodeDecodeTool
+const Page = () => (
+  <ToolArticle href="/url-encode-decode/">
+    <UrlEncodeDecodeTool />
+  </ToolArticle>
+)
+
+export default Page

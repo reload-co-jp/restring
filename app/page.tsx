@@ -28,7 +28,7 @@ const Page: FC = () => (
       type="application/ld+json"
     />
     <section className="intro">
-      <h1>restring</h1>
+      <h1>Restring</h1>
       <p>開発者向け文字列処理・比較ツール集。</p>
     </section>
     <section className="featureSection" aria-labelledby="features-title">

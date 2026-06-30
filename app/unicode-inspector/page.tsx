@@ -1,5 +1,6 @@
 import { UnicodeInspectorTool } from "components/tools"
 import { createPageMetadata } from "components/seo"
+import { ToolArticle } from "components/tool-article"
 
 export const metadata = createPageMetadata({
   title: "Unicodeインスペクタ",
@@ -7,4 +8,10 @@ export const metadata = createPageMetadata({
   path: "/unicode-inspector/",
 })
 
-export default UnicodeInspectorTool
+const Page = () => (
+  <ToolArticle href="/unicode-inspector/">
+    <UnicodeInspectorTool />
+  </ToolArticle>
+)
+
+export default Page

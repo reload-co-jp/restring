@@ -1,5 +1,6 @@
 import { JsonCompareTool } from "components/tools"
 import { createPageMetadata } from "components/seo"
+import { ToolArticle } from "components/tool-article"
 
 export const metadata = createPageMetadata({
   title: "JSON比較",
@@ -7,4 +8,10 @@ export const metadata = createPageMetadata({
   path: "/json-compare/",
 })
 
-export default JsonCompareTool
+const Page = () => (
+  <ToolArticle href="/json-compare/">
+    <JsonCompareTool />
+  </ToolArticle>
+)
+
+export default Page

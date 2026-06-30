@@ -12,6 +12,12 @@ export const toolLinks = [
       "入力を指定粒度で分割し、共通部分と追加・削除部分を計算。",
       "インライン表示では差分箇所を色分けし、左右表示では正規化後の内容を並べる。",
     ],
+    shell: [
+      {
+        label: "行単位で比較",
+        command: "diff -u before.txt after.txt",
+      },
+    ],
   },
   {
     href: "/json-compare/",
@@ -25,6 +31,12 @@ export const toolLinks = [
     mechanism: [
       "JSON.parseで構文検証し、成功した値をインデント付きで表示。",
       "オブジェクトのキーを再帰的にソートしてから比較するため、キー順だけの違いは無視。",
+    ],
+    shell: [
+      {
+        label: "キー順を揃えて比較",
+        command: "diff -u <(jq -S . a.json) <(jq -S . b.json)",
+      },
     ],
   },
   {
@@ -40,6 +52,12 @@ export const toolLinks = [
       "テキスト比較と同じ差分計算を使い、同一部分を除外。",
       "差分結果を追加・削除ラベル付きで抽出表示。",
     ],
+    shell: [
+      {
+        label: "追加・削除行だけ表示",
+        command: "diff -u before.txt after.txt | sed -n '/^[+-][^+-]/p'",
+      },
+    ],
   },
   {
     href: "/text-normalize/",
@@ -53,6 +71,13 @@ export const toolLinks = [
     mechanism: [
       "UnicodeをNFCへ正規化。",
       "連続する空白を1文字に圧縮し、CRLF/CRをLFへ統一して前後空白を削除。",
+    ],
+    shell: [
+      {
+        label: "空白・改行・Unicodeを正規化",
+        command:
+          "python3 -c 'import re,sys,unicodedata; s=sys.stdin.read().replace(\"\\r\\n\",\"\\n\").replace(\"\\r\",\"\\n\"); s=unicodedata.normalize(\"NFC\",s); print(re.sub(r\"[^\\S\\r\\n]+\",\" \",s).strip())' < input.txt",
+      },
     ],
   },
   {
@@ -68,6 +93,13 @@ export const toolLinks = [
       "文字列を1文字ずつ走査し、不可視文字を読みやすい名前へ置換。",
       "通常文字はそのまま残すため、混入箇所を文脈付きで確認可能。",
     ],
+    shell: [
+      {
+        label: "不可視文字を名前へ置換",
+        command:
+          "python3 -c 'import sys; m={\" \":\"<Space>\",\"\\t\":\"<Tab>\",\"\\r\":\"<CR>\",\"\\n\":\"<LF>\\n\",\"\\u00a0\":\"<NBSP>\",\"\\u200b\":\"<ZWSP>\"}; print(\"\".join(m.get(c,c) for c in sys.stdin.read()))' < input.txt",
+      },
+    ],
   },
   {
     href: "/line-ending-converter/",
@@ -81,6 +113,13 @@ export const toolLinks = [
     mechanism: [
       "入力中のCRLF/CRを一度LFへ統一。",
       "選択された改行コードへLFを置換して出力。",
+    ],
+    shell: [
+      {
+        label: "CRLFへ変換",
+        command:
+          "python3 -c 'import sys; s=sys.stdin.read().replace(\"\\r\\n\",\"\\n\").replace(\"\\r\",\"\\n\"); sys.stdout.write(s.replace(\"\\n\",\"\\r\\n\"))' < input.txt > output.txt",
+      },
     ],
   },
   {
@@ -96,6 +135,13 @@ export const toolLinks = [
       "空白、ハイフン、アンダースコア、camelCase境界で単語へ分割。",
       "単語を小文字化し、選択形式に応じて連結・大文字化。",
     ],
+    shell: [
+      {
+        label: "snake_caseへ変換",
+        command:
+          "python3 -c 'import re,sys; s=sys.stdin.read().strip(); s=re.sub(r\"([a-z0-9])([A-Z])\",r\"\\1 \\2\",s); print(\"_\".join(w.lower() for w in re.split(r\"[\\s_-]+\",s) if w))'",
+      },
+    ],
   },
   {
     href: "/url-encode-decode/",
@@ -109,6 +155,18 @@ export const toolLinks = [
     mechanism: [
       "encodeURIComponentでURLに安全な表現へ変換。",
       "decodeURIComponentでパーセントエンコード文字列を復元。",
+    ],
+    shell: [
+      {
+        label: "URLエンコード",
+        command:
+          "python3 -c 'import sys,urllib.parse; print(urllib.parse.quote(sys.stdin.read().strip(), safe=\"\"))'",
+      },
+      {
+        label: "URLデコード",
+        command:
+          "python3 -c 'import sys,urllib.parse; print(urllib.parse.unquote(sys.stdin.read().strip()))'",
+      },
     ],
   },
   {
@@ -124,6 +182,18 @@ export const toolLinks = [
       "UTF-8バイト列をBase64へ変換。",
       "Base64入力はバイト列へ戻し、UTF-8文字列として復元。",
     ],
+    shell: [
+      {
+        label: "Base64エンコード",
+        command:
+          "python3 -c 'import base64,sys; print(base64.b64encode(sys.stdin.buffer.read()).decode())'",
+      },
+      {
+        label: "Base64デコード",
+        command:
+          "python3 -c 'import base64,sys; sys.stdout.buffer.write(base64.b64decode(sys.stdin.read()))'",
+      },
+    ],
   },
   {
     href: "/html-escape/",
@@ -138,6 +208,18 @@ export const toolLinks = [
       "&、<、>、ダブルクォート、シングルクォートをHTMLエンティティへ置換。",
       "既知のHTMLエンティティは対応する文字へ戻す。",
     ],
+    shell: [
+      {
+        label: "HTMLエスケープ",
+        command:
+          "python3 -c 'import html,sys; print(html.escape(sys.stdin.read(), quote=True))'",
+      },
+      {
+        label: "HTMLアンエスケープ",
+        command:
+          "python3 -c 'import html,sys; print(html.unescape(sys.stdin.read()))'",
+      },
+    ],
   },
   {
     href: "/unicode-inspector/",
@@ -151,6 +233,13 @@ export const toolLinks = [
     mechanism: [
       "入力をUnicodeコードポイント単位で分解。",
       "各文字をUTF表現へ変換し、代表的なUnicodeブロック名と併せて表示。",
+    ],
+    shell: [
+      {
+        label: "コードポイントと文字名を表示",
+        command:
+          "python3 -c 'import sys,unicodedata; [print(f\"{c}\\tU+{ord(c):04X}\\t{unicodedata.name(c, \"UNKNOWN\")}\") for c in sys.stdin.read()]'",
+      },
     ],
   },
 ]

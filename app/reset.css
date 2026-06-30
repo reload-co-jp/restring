@@ -201,6 +201,26 @@ select {
   line-height: 1.6;
 }
 
+.shellList {
+  display: grid;
+  gap: .75rem;
+}
+
+.shellItem {
+  display: grid;
+  gap: .375rem;
+}
+
+.shellItem p {
+  color: #e2e8f0;
+  font-weight: 700;
+}
+
+.shellItem pre {
+  min-height: 0;
+  white-space: pre;
+}
+
 .twoColumn,
 .utilityGrid {
   display: grid;

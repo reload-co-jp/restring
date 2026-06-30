@@ -15,6 +15,7 @@ export const toolLinks = [
     shell: [
       {
         label: "行単位で比較",
+        environment: "diff（macOS/Linux標準搭載が多い）",
         command: "diff -u before.txt after.txt",
       },
     ],
@@ -35,6 +36,7 @@ export const toolLinks = [
     shell: [
       {
         label: "キー順を揃えて比較",
+        environment: "jq、diff、bash/zshなどプロセス置換に対応したシェル",
         command: "diff -u <(jq -S . a.json) <(jq -S . b.json)",
       },
     ],
@@ -55,6 +57,7 @@ export const toolLinks = [
     shell: [
       {
         label: "追加・削除行だけ表示",
+        environment: "diff、sed（macOS/Linux標準搭載が多い）",
         command: "diff -u before.txt after.txt | sed -n '/^[+-][^+-]/p'",
       },
     ],
@@ -75,6 +78,7 @@ export const toolLinks = [
     shell: [
       {
         label: "空白・改行・Unicodeを正規化",
+        environment: "Python 3",
         command:
           "python3 -c 'import re,sys,unicodedata; s=sys.stdin.read().replace(\"\\r\\n\",\"\\n\").replace(\"\\r\",\"\\n\"); s=unicodedata.normalize(\"NFC\",s); print(re.sub(r\"[^\\S\\r\\n]+\",\" \",s).strip())' < input.txt",
       },
@@ -96,6 +100,7 @@ export const toolLinks = [
     shell: [
       {
         label: "不可視文字を名前へ置換",
+        environment: "Python 3",
         command:
           "python3 -c 'import sys; m={\" \":\"<Space>\",\"\\t\":\"<Tab>\",\"\\r\":\"<CR>\",\"\\n\":\"<LF>\\n\",\"\\u00a0\":\"<NBSP>\",\"\\u200b\":\"<ZWSP>\"}; print(\"\".join(m.get(c,c) for c in sys.stdin.read()))' < input.txt",
       },
@@ -117,6 +122,7 @@ export const toolLinks = [
     shell: [
       {
         label: "CRLFへ変換",
+        environment: "Python 3",
         command:
           "python3 -c 'import sys; s=sys.stdin.read().replace(\"\\r\\n\",\"\\n\").replace(\"\\r\",\"\\n\"); sys.stdout.write(s.replace(\"\\n\",\"\\r\\n\"))' < input.txt > output.txt",
       },
@@ -138,6 +144,7 @@ export const toolLinks = [
     shell: [
       {
         label: "snake_caseへ変換",
+        environment: "Python 3",
         command:
           "python3 -c 'import re,sys; s=sys.stdin.read().strip(); s=re.sub(r\"([a-z0-9])([A-Z])\",r\"\\1 \\2\",s); print(\"_\".join(w.lower() for w in re.split(r\"[\\s_-]+\",s) if w))'",
       },
@@ -159,11 +166,13 @@ export const toolLinks = [
     shell: [
       {
         label: "URLエンコード",
+        environment: "Python 3",
         command:
           "python3 -c 'import sys,urllib.parse; print(urllib.parse.quote(sys.stdin.read().strip(), safe=\"\"))'",
       },
       {
         label: "URLデコード",
+        environment: "Python 3",
         command:
           "python3 -c 'import sys,urllib.parse; print(urllib.parse.unquote(sys.stdin.read().strip()))'",
       },
@@ -185,11 +194,13 @@ export const toolLinks = [
     shell: [
       {
         label: "Base64エンコード",
+        environment: "Python 3",
         command:
           "python3 -c 'import base64,sys; print(base64.b64encode(sys.stdin.buffer.read()).decode())'",
       },
       {
         label: "Base64デコード",
+        environment: "Python 3",
         command:
           "python3 -c 'import base64,sys; sys.stdout.buffer.write(base64.b64decode(sys.stdin.read()))'",
       },
@@ -211,11 +222,13 @@ export const toolLinks = [
     shell: [
       {
         label: "HTMLエスケープ",
+        environment: "Python 3",
         command:
           "python3 -c 'import html,sys; print(html.escape(sys.stdin.read(), quote=True))'",
       },
       {
         label: "HTMLアンエスケープ",
+        environment: "Python 3",
         command:
           "python3 -c 'import html,sys; print(html.unescape(sys.stdin.read()))'",
       },
@@ -237,6 +250,7 @@ export const toolLinks = [
     shell: [
       {
         label: "コードポイントと文字名を表示",
+        environment: "Python 3",
         command:
           "python3 -c 'import sys,unicodedata; [print(f\"{c}\\tU+{ord(c):04X}\\t{unicodedata.name(c, \"UNKNOWN\")}\") for c in sys.stdin.read()]'",
       },

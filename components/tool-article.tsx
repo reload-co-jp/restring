@@ -94,11 +94,12 @@ export const ToolArticle: FC<{ children: ReactNode; href: string }> = ({
       </section>
       {tool.shell.length > 0 && (
         <section className="articleSection">
-          <h2>シェルワンライナー</h2>
+          <h2>手元でやるには</h2>
           <div className="shellList">
             {tool.shell.map((item) => (
               <div className="shellItem" key={item.command}>
                 <p>{item.label}</p>
+                <span>必要環境: {item.environment}</span>
                 <pre>
                   <code>{item.command}</code>
                 </pre>

@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 
-export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://restring.dev"
+export const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://restring.reload.co.jp"
 
 export const siteName = "restring"
 

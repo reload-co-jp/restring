@@ -265,7 +265,7 @@ export const Panel: FC<{ title: string; children: ReactNode }> = ({
   children,
 }) => (
   <section className="panel">
-    <h1>{title}</h1>
+    <h2>{title}</h2>
     {children}
   </section>
 )

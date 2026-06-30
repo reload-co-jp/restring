@@ -91,7 +91,7 @@ select {
   padding: 1rem;
 }
 
-.panel h1 {
+.panel h2 {
   color: #f8fafc;
   font-size: 1rem;
 }
@@ -173,6 +173,32 @@ select {
 .toolPage {
   display: grid;
   gap: 1rem;
+}
+
+.toolIntro {
+  color: #cbd5e1;
+  display: grid;
+  gap: .75rem;
+}
+
+.toolIntro h1 {
+  color: #f8fafc;
+  font-size: 1.5rem;
+}
+
+.toolIntro h2 {
+  color: #f8fafc;
+  font-size: 1rem;
+}
+
+.toolIntro ol {
+  display: grid;
+  gap: .5rem;
+  padding-left: 1.25rem;
+}
+
+.toolIntro li {
+  line-height: 1.6;
 }
 
 .articleSection {

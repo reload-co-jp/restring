@@ -75,8 +75,9 @@ export const ToolArticle: FC<{ children: ReactNode; href: string }> = ({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         type="application/ld+json"
       />
-      {children}
-      <section className="articleSection">
+      <section className="toolIntro">
+        <h1>{tool.title}</h1>
+        <p>{tool.description}</p>
         <h2>使い方</h2>
         <ol>
           {tool.usage.map((item) => (
@@ -84,6 +85,7 @@ export const ToolArticle: FC<{ children: ReactNode; href: string }> = ({
           ))}
         </ol>
       </section>
+      {children}
       <section className="articleSection">
         <h2>仕組み</h2>
         <ul>

@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "Restring | 開発者向け文字列処理・比較ツール",
     description: siteDescription,
   },

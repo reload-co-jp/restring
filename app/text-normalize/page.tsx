@@ -3,8 +3,9 @@ import { createPageMetadata } from "components/seo"
 import { ToolArticle } from "components/tool-article"
 
 export const metadata = createPageMetadata({
-  title: "テキスト正規化",
-  description: "空白削除、スペース圧縮、Unicode正規化、改行統一。",
+  title: "テキスト正規化 - 空白・改行・Unicode一括整形",
+  description:
+    "前後の空白削除、連続スペースの圧縮、改行コード統一、Unicode正規化（NFC）をオンラインで一括実行。コピペで崩れたテキストやデータクレンジングの下処理に。",
   path: "/text-normalize/",
 })
 

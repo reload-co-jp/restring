@@ -10,6 +10,13 @@ export const siteDescription =
 
 export const absoluteUrl = (path = "/") => new URL(path, siteUrl).toString()
 
+const ogImage = {
+  url: "/opengraph-image",
+  width: 1200,
+  height: 630,
+  alt: "Restring | 開発者向け文字列処理・比較ツール",
+}
+
 export const createPageMetadata = ({
   description,
   path,
@@ -31,10 +38,12 @@ export const createPageMetadata = ({
     siteName,
     locale: "ja_JP",
     type: "website",
+    images: [ogImage],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title,
     description,
+    images: [ogImage],
   },
 })

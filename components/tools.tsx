@@ -260,6 +260,72 @@ const safeBase64Decode = (value: string) => {
   }
 }
 
+const decodeBase64Url = (value: string) => {
+  const base64 = value.replace(/-/g, "+").replace(/_/g, "/")
+  const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=")
+
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(padded, "base64").toString("utf-8")
+  }
+
+  const bytes = Uint8Array.from(atob(padded), (char) => char.charCodeAt(0))
+  return new TextDecoder().decode(bytes)
+}
+
+const parseJwt = (value: string) => {
+  const parts = value.trim().split(".")
+
+  if (parts.length !== 3) {
+    return {
+      error: "JWTはHeader.Payload.Signatureの3部構成が必要",
+      header: "",
+      payload: "",
+      signature: "",
+      claims: [] as Array<[string, string]>,
+    }
+  }
+
+  try {
+    const header = JSON.parse(decodeBase64Url(parts[0]))
+    const payload = JSON.parse(decodeBase64Url(parts[1]))
+    const now = Math.floor(Date.now() / 1000)
+    const claims: Array<[string, string]> = []
+
+    const pushTimeClaim = (key: "exp" | "nbf" | "iat", label: string) => {
+      if (typeof payload[key] !== "number") return
+      const date = new Date(payload[key] * 1000).toISOString()
+      claims.push([label, `${payload[key]} (${date})`])
+    }
+
+    pushTimeClaim("exp", "有効期限 exp")
+    pushTimeClaim("nbf", "有効開始 nbf")
+    pushTimeClaim("iat", "発行時刻 iat")
+
+    if (typeof payload.exp === "number") {
+      claims.push(["期限状態", payload.exp < now ? "期限切れ" : "期限内"])
+    }
+    if (typeof payload.nbf === "number") {
+      claims.push(["開始状態", payload.nbf > now ? "まだ有効化前" : "有効化済み"])
+    }
+
+    return {
+      error: "",
+      header: JSON.stringify(header, null, 2),
+      payload: JSON.stringify(payload, null, 2),
+      signature: parts[2],
+      claims,
+    }
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "JWT解析失敗",
+      header: "",
+      payload: "",
+      signature: parts[2] ?? "",
+      claims: [] as Array<[string, string]>,
+    }
+  }
+}
+
 export const Panel: FC<{ title: string; children: ReactNode }> = ({
   title,
   children,
@@ -443,6 +509,41 @@ export const JsonCompareTool: FC = () => {
         <pre>{prettyLeft}</pre>
         <pre>{prettyRight}</pre>
       </div>
+    </Panel>
+  )
+}
+
+export const JwtDecoderTool: FC = () => {
+  const [value, setValue] = useState(
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlJlc3RyaW5nIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjQxMDI0NDQ4MDB9.signature",
+  )
+  const result = parseJwt(value)
+
+  return (
+    <Panel title="JWT解析">
+      <Textarea label="JWT" onChange={setValue} value={value} />
+      <p className="warn">署名検証は行わない。HeaderとPayloadのデコード専用。</p>
+      {result.error ? (
+        <pre>{result.error}</pre>
+      ) : (
+        <>
+          {result.claims.length > 0 && (
+            <div className="claimList">
+              {result.claims.map(([label, text]) => (
+                <div className="claimItem" key={label}>
+                  <strong>{label}</strong>
+                  <span>{text}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="twoColumn">
+            <Result name="jwt-header.json" value={result.header} />
+            <Result name="jwt-payload.json" value={result.payload} />
+          </div>
+          <Result name="jwt-signature.txt" value={result.signature} />
+        </>
+      )}
     </Panel>
   )
 }

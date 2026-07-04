@@ -18,6 +18,11 @@ https://restring.reload.co.jp
   - JSON Validation
   - Pretty Print
   - キー順を無視した構造比較
+- `/jwt-decoder/` JWT解析
+  - Header、Payload、Signatureに分解
+  - Base64URLデコード
+  - exp、nbf、iatなどの時刻クレーム確認
+  - 署名検証は行わない
 - `/text-diff/` テキスト差分
   - 追加・削除された差分だけ抽出
 - `/text-normalize/` テキスト正規化

@@ -42,6 +42,29 @@ export const toolLinks = [
     ],
   },
   {
+    href: "/jwt-decoder/",
+    title: "JWT解析",
+    description: "JWTのHeader、Payload、署名部分を分解し、exp、nbf、iatなどのクレームを確認。",
+    usage: [
+      "JWT文字列を入力する。",
+      "HeaderとPayloadのJSONを確認する。",
+      "exp、nbf、iatなどの時刻クレームと有効期限状態を確認する。",
+    ],
+    mechanism: [
+      "JWTをドット区切りでHeader、Payload、Signatureへ分割。",
+      "HeaderとPayloadをBase64URLデコードし、JSONとして整形表示。",
+      "署名検証は行わないため、正当性確認には公開鍵または共有シークレットで別途検証が必要。",
+    ],
+    shell: [
+      {
+        label: "HeaderとPayloadをデコード",
+        environment: "Python 3",
+        command:
+          "python3 -c 'import base64,json,sys; t=sys.stdin.read().strip().split(\".\"); dec=lambda s: json.dumps(json.loads(base64.urlsafe_b64decode(s+\"=\"*((4-len(s)%4)%4))),ensure_ascii=False,indent=2); print(\"Header:\\n\"+dec(t[0])+\"\\nPayload:\\n\"+dec(t[1]))'",
+      },
+    ],
+  },
+  {
     href: "/text-diff/",
     title: "テキスト差分",
     description: "追加・削除された差分だけ抽出。",

@@ -6,7 +6,7 @@ export const siteUrl =
 export const siteName = "Restring"
 
 export const siteDescription =
-  "開発者向け文字列処理・比較ツール集。テキスト比較、JSON比較、Base64、URLエンコード、HTMLエスケープ、Unicode確認をブラウザで実行。"
+  "開発者向け文字列処理・比較ツール集。テキスト比較、JSON比較、JWT解析、Base64、URLエンコード、HTMLエスケープ、Unicode確認をブラウザで実行。"
 
 export const absoluteUrl = (path = "/") => new URL(path, siteUrl).toString()
 

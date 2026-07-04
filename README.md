@@ -22,7 +22,7 @@ https://restring.reload.co.jp
   - Header、Payload、Signatureに分解
   - Base64URLデコード
   - exp、nbf、iatなどの時刻クレーム確認
-  - 署名検証は行わない
+  - HS256、HS384、HS512のHMAC署名検証
 - `/text-diff/` テキスト差分
   - 追加・削除された差分だけ抽出
 - `/text-normalize/` テキスト正規化

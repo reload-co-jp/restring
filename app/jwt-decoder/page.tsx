@@ -4,7 +4,7 @@ import { ToolArticle } from "components/tool-article"
 
 export const metadata = createPageMetadata({
   title: "JWT解析",
-  description: "JWTのHeader、Payload、署名部分を分解し、exp、nbf、iatなどのクレームを確認。",
+  description: "JWTのHeader、Payload、署名部分を分解し、時刻クレーム確認とHMAC署名検証を行う。",
   path: "/jwt-decoder/",
 })
 

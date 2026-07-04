@@ -1,6 +1,6 @@
 "use client"
 
-import { ChangeEvent, FC, ReactNode, useMemo, useState } from "react"
+import { ChangeEvent, FC, ReactNode, useEffect, useMemo, useState } from "react"
 
 type DiffPart = {
   text: string
@@ -272,6 +272,13 @@ const decodeBase64Url = (value: string) => {
   return new TextDecoder().decode(bytes)
 }
 
+const toBase64Url = (bytes: ArrayBuffer) => {
+  const chars = Array.from(new Uint8Array(bytes), (byte) =>
+    String.fromCharCode(byte),
+  ).join("")
+  return btoa(chars).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "")
+}
+
 const parseJwt = (value: string) => {
   const parts = value.trim().split(".")
 
@@ -324,6 +331,40 @@ const parseJwt = (value: string) => {
       claims: [] as Array<[string, string]>,
     }
   }
+}
+
+const verifyJwtSignature = async (token: string, secret: string) => {
+  const parts = token.trim().split(".")
+
+  if (parts.length !== 3) return "JWTは3部構成が必要"
+  if (!secret) return "秘密鍵を入力すると署名検証できる"
+
+  const header = JSON.parse(decodeBase64Url(parts[0]))
+  const algorithmMap: Record<string, "SHA-256" | "SHA-384" | "SHA-512"> = {
+    HS256: "SHA-256",
+    HS384: "SHA-384",
+    HS512: "SHA-512",
+  }
+  const hash = algorithmMap[header.alg]
+
+  if (!hash) {
+    return `${header.alg ?? "unknown"} は未対応。対応: HS256 / HS384 / HS512`
+  }
+
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(secret),
+    { name: "HMAC", hash },
+    false,
+    ["sign"],
+  )
+  const signature = await crypto.subtle.sign(
+    "HMAC",
+    key,
+    new TextEncoder().encode(`${parts[0]}.${parts[1]}`),
+  )
+
+  return toBase64Url(signature) === parts[2] ? "署名一致" : "署名不一致"
 }
 
 export const Panel: FC<{ title: string; children: ReactNode }> = ({
@@ -515,14 +556,37 @@ export const JsonCompareTool: FC = () => {
 
 export const JwtDecoderTool: FC = () => {
   const [value, setValue] = useState(
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlJlc3RyaW5nIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjQxMDI0NDQ4MDB9.signature",
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IlJlc3RyaW5nIiwiaWF0IjoxNTE2MjM5MDIyLCJleHAiOjQxMDI0NDQ4MDB9.lSacD8mcneUOosKS6cU2e_oVWy5cNGp4d6eYWNyLbQw",
   )
+  const [secret, setSecret] = useState("secret")
+  const [verification, setVerification] = useState("検証待ち")
   const result = parseJwt(value)
+
+  useEffect(() => {
+    let canceled = false
+
+    verifyJwtSignature(value, secret)
+      .then((message) => {
+        if (!canceled) setVerification(message)
+      })
+      .catch((error: unknown) => {
+        if (!canceled) {
+          setVerification(error instanceof Error ? error.message : "署名検証失敗")
+        }
+      })
+
+    return () => {
+      canceled = true
+    }
+  }, [secret, value])
 
   return (
     <Panel title="JWT解析">
       <Textarea label="JWT" onChange={setValue} value={value} />
-      <p className="warn">署名検証は行わない。HeaderとPayloadのデコード専用。</p>
+      <Textarea label="HMAC秘密鍵 (HS256/HS384/HS512)" onChange={setSecret} rows={3} value={secret} />
+      <p className={verification === "署名一致" ? "ok" : "warn"}>
+        署名検証: {verification}
+      </p>
       {result.error ? (
         <pre>{result.error}</pre>
       ) : (

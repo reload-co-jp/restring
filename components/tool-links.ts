@@ -44,16 +44,18 @@ export const toolLinks = [
   {
     href: "/jwt-decoder/",
     title: "JWT解析",
-    description: "JWTのHeader、Payload、署名部分を分解し、exp、nbf、iatなどのクレームを確認。",
+    description: "JWTのHeader、Payload、署名部分を分解し、時刻クレーム確認とHMAC署名検証を行う。",
     usage: [
       "JWT文字列を入力する。",
       "HeaderとPayloadのJSONを確認する。",
       "exp、nbf、iatなどの時刻クレームと有効期限状態を確認する。",
+      "HS256、HS384、HS512の場合はHMAC秘密鍵を入力して署名一致を確認する。",
     ],
     mechanism: [
       "JWTをドット区切りでHeader、Payload、Signatureへ分割。",
       "HeaderとPayloadをBase64URLデコードし、JSONとして整形表示。",
-      "署名検証は行わないため、正当性確認には公開鍵または共有シークレットで別途検証が必要。",
+      "HMAC系アルゴリズムはWeb Crypto APIで署名を再計算し、JWT内の署名と比較。",
+      "RS256やES256など公開鍵方式の署名検証は未対応。",
     ],
     shell: [
       {
@@ -61,6 +63,12 @@ export const toolLinks = [
         environment: "Python 3",
         command:
           "python3 -c 'import base64,json,sys; t=sys.stdin.read().strip().split(\".\"); dec=lambda s: json.dumps(json.loads(base64.urlsafe_b64decode(s+\"=\"*((4-len(s)%4)%4))),ensure_ascii=False,indent=2); print(\"Header:\\n\"+dec(t[0])+\"\\nPayload:\\n\"+dec(t[1]))'",
+      },
+      {
+        label: "HS256署名を検証",
+        environment: "Python 3、HMAC秘密鍵",
+        command:
+          "python3 -c 'import base64,hmac,hashlib,sys; token=sys.stdin.read().strip(); secret=b\"secret\"; h,p,s=token.split(\".\"); sig=base64.urlsafe_b64encode(hmac.new(secret,f\"{h}.{p}\".encode(),hashlib.sha256).digest()).decode().rstrip(\"=\"); print(\"署名一致\" if sig==s else \"署名不一致\")'",
       },
     ],
   },

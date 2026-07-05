@@ -43,8 +43,9 @@ export const toolLinks = [
   },
   {
     href: "/jwt-decoder/",
-    title: "JWT解析",
-    description: "JWTのHeader、Payload、署名部分を分解し、時刻クレーム確認とHMAC署名検証を行う。",
+    title: "JWTデコード・解析",
+    description:
+      "JWT（JSON Web Token）をオンラインでデコードし、Header・Payload・署名を分解表示。exp・iatなど有効期限確認とHS256/HS384/HS512のHMAC署名検証に対応。",
     usage: [
       "JWT文字列を入力する。",
       "HeaderとPayloadのJSONを確認する。",
@@ -75,7 +76,8 @@ export const toolLinks = [
   {
     href: "/text-diff/",
     title: "テキスト差分",
-    description: "追加・削除された差分だけ抽出。",
+    description:
+      "2つのテキストから追加・削除された差分だけをオンラインで抽出。diffの追加行・削除行のみ確認したい変更点洗い出しに。",
     usage: [
       "比較元と比較先を入力する。",
       "比較粒度と無視オプションを選ぶ。",
@@ -140,7 +142,8 @@ export const toolLinks = [
   {
     href: "/line-ending-converter/",
     title: "改行コード変換",
-    description: "LF、CRLF、CRへ改行コードを変換。",
+    description:
+      "改行コード（LF・CRLF・CR）をオンラインで相互変換。WindowsとmacOS/Linux間の改行トラブル、Gitの差分崩れ解消に。",
     usage: [
       "変換したいテキストを入力する。",
       "LF、CRLF、CRから出力形式を選ぶ。",
@@ -184,7 +187,8 @@ export const toolLinks = [
   {
     href: "/url-encode-decode/",
     title: "URLエンコード・デコード",
-    description: "URLコンポーネントをエンコード・デコード。",
+    description:
+      "URLやクエリパラメータをオンラインでエンコード・デコード。パーセントエンコーディングと日本語変換に対応。",
     usage: [
       "URLパラメータや日本語文字列を入力する。",
       "エンコード結果とデコード結果を確認する。",
@@ -212,7 +216,8 @@ export const toolLinks = [
   {
     href: "/base64/",
     title: "Base64",
-    description: "Base64文字列をエンコード・デコード。",
+    description:
+      "Base64文字列をオンラインでエンコード・デコード。UTF-8対応で日本語も文字化けなし。Basic認証やデータURIの確認に。",
     usage: [
       "文字列またはBase64文字列を入力する。",
       "エンコード結果とデコード結果を確認する。",
@@ -240,7 +245,8 @@ export const toolLinks = [
   {
     href: "/html-escape/",
     title: "HTMLエスケープ",
-    description: "HTML特殊文字をエスケープ・アンエスケープ。",
+    description:
+      "HTML特殊文字（&・<・>・引用符）をオンラインでエスケープ・アンエスケープ。コード例やテンプレート作成、表示崩れ調査に。",
     usage: [
       "HTMLとして扱いたい文字列を入力する。",
       "エスケープ結果とアンエスケープ結果を確認する。",
@@ -268,7 +274,8 @@ export const toolLinks = [
   {
     href: "/unicode-inspector/",
     title: "Unicodeインスペクタ",
-    description: "コードポイント、UTF表現、文字名、Unicodeブロックを確認。",
+    description:
+      "文字のUnicodeコードポイント、UTF-8・UTF-16・UTF-32表現、文字名をオンラインで確認。文字化けや異体字、絵文字の調査に。",
     usage: [
       "調べたい文字列を入力する。",
       "各文字のコードポイント、UTF-8、UTF-16、UTF-32を確認する。",

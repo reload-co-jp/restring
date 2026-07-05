@@ -389,6 +389,122 @@ const formatEpochResult = (ms: number) => ({
   milliseconds: Math.round(ms).toString(),
 })
 
+type SqlMode = "select" | "insert" | "update" | "create"
+
+const formatSqlValue = (raw: string) => {
+  const trimmed = raw.trim()
+  if (trimmed === "" || /^null$/i.test(trimmed)) return "NULL"
+  if (/^-?\d+(\.\d+)?$/.test(trimmed)) return trimmed
+  if (/^(true|false)$/i.test(trimmed)) return trimmed.toUpperCase()
+  return `'${trimmed.replace(/'/g, "''")}'`
+}
+
+const parseKeyValueLines = (raw: string) =>
+  raw
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const index = line.indexOf(":")
+      if (index === -1) return null
+      return { key: line.slice(0, index).trim(), value: line.slice(index + 1).trim() }
+    })
+    .filter((item): item is { key: string; value: string } => item !== null)
+
+const parseLines = (raw: string) =>
+  raw
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+
+const buildSelectSql = (
+  table: string,
+  columns: string,
+  where: string,
+  orderBy: string,
+) => {
+  const cols = columns.trim() || "*"
+  const whereClauses = parseLines(where)
+  const lines = [`SELECT ${cols}`, `FROM ${table.trim() || "table_name"}`]
+  if (whereClauses.length > 0) lines.push(`WHERE ${whereClauses.join("\n  AND ")}`)
+  if (orderBy.trim()) lines.push(`ORDER BY ${orderBy.trim()}`)
+  return `${lines.join("\n")};`
+}
+
+const buildInsertSql = (table: string, pairsRaw: string) => {
+  const pairs = parseKeyValueLines(pairsRaw)
+  const columns = pairs.map((pair) => pair.key).join(", ")
+  const values = pairs.map((pair) => formatSqlValue(pair.value)).join(", ")
+  return `INSERT INTO ${table.trim() || "table_name"} (${columns})\nVALUES (${values});`
+}
+
+const buildUpdateSql = (table: string, pairsRaw: string, where: string) => {
+  const pairs = parseKeyValueLines(pairsRaw)
+  const setClause = pairs
+    .map((pair) => `${pair.key} = ${formatSqlValue(pair.value)}`)
+    .join(",\n  ")
+  const whereClauses = parseLines(where)
+  const lines = [`UPDATE ${table.trim() || "table_name"}`, `SET ${setClause}`]
+  if (whereClauses.length > 0) lines.push(`WHERE ${whereClauses.join("\n  AND ")}`)
+  return `${lines.join("\n")};`
+}
+
+const buildCreateTableSql = (table: string, columnDefs: string) => {
+  const lines = parseLines(columnDefs)
+  const body = lines.map((line) => `  ${line}`).join(",\n")
+  return `CREATE TABLE ${table.trim() || "table_name"} (\n${body}\n);`
+}
+
+const fallbackTimeZones = [
+  "UTC",
+  "Asia/Tokyo",
+  "Asia/Shanghai",
+  "Asia/Seoul",
+  "Asia/Singapore",
+  "Asia/Kolkata",
+  "Asia/Dubai",
+  "Europe/London",
+  "Europe/Paris",
+  "Europe/Berlin",
+  "Europe/Moscow",
+  "America/New_York",
+  "America/Chicago",
+  "America/Denver",
+  "America/Los_Angeles",
+  "America/Sao_Paulo",
+  "Australia/Sydney",
+  "Pacific/Auckland",
+]
+
+const getAllTimeZones = (): string[] => {
+  if (typeof Intl.supportedValuesOf === "function") {
+    try {
+      return Intl.supportedValuesOf("timeZone")
+    } catch {
+      return fallbackTimeZones
+    }
+  }
+  return fallbackTimeZones
+}
+
+const formatInTimeZone = (date: Date, timeZone: string) => {
+  try {
+    return new Intl.DateTimeFormat("ja-JP", {
+      timeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+      timeZoneName: "shortOffset",
+    }).format(date)
+  } catch {
+    return "不明なタイムゾーン"
+  }
+}
+
 export const Panel: FC<{ title: string; children: ReactNode }> = ({
   title,
   children,
@@ -783,7 +899,12 @@ export const UnicodeInspectorTool: FC = () => {
 }
 
 export const EpochConverterTool: FC = () => {
-  const [value, setValue] = useState(String(Math.floor(Date.now() / 1000)))
+  const [value, setValue] = useState("")
+
+  useEffect(() => {
+    setValue(Math.floor(Date.now() / 1000).toString())
+  }, [])
+
   const ms = parseFlexibleEpoch(value)
   const result = ms === null ? null : formatEpochResult(ms)
 
@@ -831,6 +952,189 @@ export const EpochConverterTool: FC = () => {
           数値（エポック秒・ミリ秒）または日時文字列（例: 2024-01-01T00:00:00Z）を入力
         </p>
       )}
+    </Panel>
+  )
+}
+
+export const TimezoneConverterTool: FC = () => {
+  const allTimeZones = useMemo(() => getAllTimeZones(), [])
+  const [query, setQuery] = useState("Tokyo")
+  const [dateTimeValue, setDateTimeValue] = useState("")
+  const [zonesValue, setZonesValue] = useState(
+    "Asia/Tokyo, America/New_York, Europe/London, UTC",
+  )
+  const [now, setNow] = useState<Date | null>(null)
+
+  useEffect(() => {
+    const current = new Date()
+    setDateTimeValue(`${current.toISOString().slice(0, 19)}Z`)
+    setNow(current)
+  }, [])
+
+  const matchedZones = useMemo(() => {
+    const trimmed = query.trim().toLowerCase()
+    const zones = trimmed
+      ? allTimeZones.filter((zone) => zone.toLowerCase().includes(trimmed))
+      : allTimeZones
+    return zones.slice(0, 20)
+  }, [allTimeZones, query])
+
+  const baseDate = new Date(dateTimeValue.trim())
+  const baseDateValid = !Number.isNaN(baseDate.getTime())
+  const targetZones = zonesValue
+    .split(",")
+    .map((zone) => zone.trim())
+    .filter(Boolean)
+
+  return (
+    <>
+      <Panel title="タイムゾーン検索">
+        <Textarea
+          label="タイムゾーン名検索（例: Tokyo, America, Europe）"
+          onChange={setQuery}
+          rows={1}
+          value={query}
+        />
+        <div className="claimList">
+          {matchedZones.map((zone) => (
+            <div className="claimItem" key={zone}>
+              <strong>{zone}</strong>
+              <span>{now ? formatInTimeZone(now, zone) : "読み込み中"}</span>
+            </div>
+          ))}
+          {matchedZones.length === 0 && (
+            <p className="warn">該当タイムゾーンなし</p>
+          )}
+        </div>
+      </Panel>
+      <Panel title="タイムゾーン変換">
+        <div className="toolbar">
+          <ActionButton
+            onClick={() => setDateTimeValue(`${new Date().toISOString().slice(0, 19)}Z`)}
+          >
+            現在時刻（UTC）
+          </ActionButton>
+        </div>
+        <Textarea
+          label="基準日時（例: 2024-01-01T12:00:00Z）"
+          onChange={setDateTimeValue}
+          rows={1}
+          value={dateTimeValue}
+        />
+        <Textarea
+          label="変換先タイムゾーン（カンマ区切り）"
+          onChange={setZonesValue}
+          rows={2}
+          value={zonesValue}
+        />
+        {baseDateValid ? (
+          <div className="claimList">
+            {targetZones.map((zone) => (
+              <div className="claimItem" key={zone}>
+                <strong>{zone}</strong>
+                <span>{formatInTimeZone(baseDate, zone)}</span>
+              </div>
+            ))}
+            {targetZones.length === 0 && (
+              <p className="warn">変換先タイムゾーンを入力</p>
+            )}
+          </div>
+        ) : (
+          <p className="warn">日時が不正</p>
+        )}
+      </Panel>
+    </>
+  )
+}
+
+export const SqlBuilderTool: FC = () => {
+  const [mode, setMode] = useState<SqlMode>("select")
+  const [table, setTable] = useState("users")
+  const [columns, setColumns] = useState("id, name, email")
+  const [where, setWhere] = useState("status = 'active'")
+  const [orderBy, setOrderBy] = useState("created_at DESC")
+  const [insertPairs, setInsertPairs] = useState(
+    "name: Restring\nemail: hello@example.com",
+  )
+  const [updatePairs, setUpdatePairs] = useState("name: Restring")
+  const [updateWhere, setUpdateWhere] = useState("id = 1")
+  const [columnDefs, setColumnDefs] = useState(
+    "id INT PRIMARY KEY\nname VARCHAR(255) NOT NULL\ncreated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+  )
+
+  const sql =
+    mode === "select"
+      ? buildSelectSql(table, columns, where, orderBy)
+      : mode === "insert"
+        ? buildInsertSql(table, insertPairs)
+        : mode === "update"
+          ? buildUpdateSql(table, updatePairs, updateWhere)
+          : buildCreateTableSql(table, columnDefs)
+
+  return (
+    <Panel title="SQL文簡易作成">
+      <div className="toolbar">
+        <select
+          onChange={(event) => setMode(event.target.value as SqlMode)}
+          value={mode}
+        >
+          <option value="select">SELECT</option>
+          <option value="insert">INSERT</option>
+          <option value="update">UPDATE</option>
+          <option value="create">CREATE TABLE</option>
+        </select>
+      </div>
+      <Textarea label="テーブル名" onChange={setTable} rows={1} value={table} />
+      {mode === "select" && (
+        <>
+          <Textarea
+            label="カラム（カンマ区切り、空なら*）"
+            onChange={setColumns}
+            rows={1}
+            value={columns}
+          />
+          <Textarea
+            label="WHERE条件（1行1条件、AND連結）"
+            onChange={setWhere}
+            rows={3}
+            value={where}
+          />
+          <Textarea label="ORDER BY" onChange={setOrderBy} rows={1} value={orderBy} />
+        </>
+      )}
+      {mode === "insert" && (
+        <Textarea
+          label="カラム: 値（1行1ペア）"
+          onChange={setInsertPairs}
+          rows={5}
+          value={insertPairs}
+        />
+      )}
+      {mode === "update" && (
+        <>
+          <Textarea
+            label="カラム: 値（1行1ペア）"
+            onChange={setUpdatePairs}
+            rows={5}
+            value={updatePairs}
+          />
+          <Textarea
+            label="WHERE条件（1行1条件、AND連結）"
+            onChange={setUpdateWhere}
+            rows={3}
+            value={updateWhere}
+          />
+        </>
+      )}
+      {mode === "create" && (
+        <Textarea
+          label="カラム定義（1行1カラム）"
+          onChange={setColumnDefs}
+          rows={6}
+          value={columnDefs}
+        />
+      )}
+      <Result name="query.sql" value={sql} />
     </Panel>
   )
 }

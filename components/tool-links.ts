@@ -323,4 +323,55 @@ export const toolLinks = [
       },
     ],
   },
+  {
+    href: "/timezone-converter/",
+    title: "タイムゾーン検索・変換",
+    description:
+      "IANAタイムゾーン名をオンラインで検索し、基準日時を複数タイムゾーンの現地時刻へ一括変換。UTCオフセット確認や海外拠点との会議調整、サーバーログの時刻確認に。",
+    usage: [
+      "都市名や地域名（例: Tokyo、America）でタイムゾーンを検索する。",
+      "基準日時（ISO 8601形式）を入力する。",
+      "変換先タイムゾーンをカンマ区切りで入力し、各地の現地時刻を確認する。",
+    ],
+    mechanism: [
+      "Intl.supportedValuesOfでブラウザ搭載のIANAタイムゾーン一覧を取得し、入力語で部分一致検索。",
+      "Intl.DateTimeFormatで基準日時を各タイムゾーンの現地時刻とUTCオフセットへ変換。",
+    ],
+    shell: [
+      {
+        label: "タイムゾーン名を検索",
+        environment: "Python 3",
+        command:
+          "python3 -c 'import zoneinfo,sys; [print(z) for z in sorted(zoneinfo.available_timezones()) if sys.argv[1].lower() in z.lower()]' Tokyo",
+      },
+      {
+        label: "指定タイムゾーンの現在時刻を表示",
+        environment: "date（macOS/Linux標準搭載）",
+        command: "TZ=Asia/Tokyo date",
+      },
+    ],
+  },
+  {
+    href: "/sql-builder/",
+    title: "SQL文簡易作成",
+    description:
+      "SELECT・INSERT・UPDATE・CREATE TABLE文をオンラインで組み立て。テーブル名、カラム、WHERE条件を入力するだけでSQLクエリを自動生成。値のクォート付与にも対応。",
+    usage: [
+      "SELECT、INSERT、UPDATE、CREATE TABLEから作成するSQL文を選ぶ。",
+      "テーブル名、カラム、WHERE条件など必要項目を入力する。",
+      "生成されたSQL文をコピーまたは保存する。",
+    ],
+    mechanism: [
+      "入力値の型（数値・真偽値・NULL・文字列）を判定し、文字列のみシングルクォートで囲みエスケープ。",
+      "選択したSQL文の種類に応じてSELECT・INSERT・UPDATE・CREATE TABLE構文を組み立て。",
+    ],
+    shell: [
+      {
+        label: "INSERT文をPythonで組み立て",
+        environment: "Python 3",
+        command:
+          "python3 -c \"cols=['name','email']; vals=['Restring','hello@example.com']; print(f\\\"INSERT INTO users ({', '.join(cols)}) VALUES ({', '.join(repr(v) for v in vals)});\\\")\"",
+      },
+    ],
+  },
 ]

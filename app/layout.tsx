@@ -2,7 +2,12 @@ import Link from "next/link"
 import { Metadata } from "next"
 import Script from "next/script"
 import { Title } from "components/elements/layout"
-import { siteDescription, siteName, siteUrl } from "components/seo"
+import {
+  defaultOgImage,
+  siteDescription,
+  siteName,
+  siteUrl,
+} from "components/seo"
 import { ToolTabs } from "components/tool-tabs"
 import "./reset.css"
 
@@ -27,6 +32,7 @@ export const metadata: Metadata = {
     siteName,
     locale: "ja_JP",
     type: "website",
+    images: [defaultOgImage],
   },
   robots: {
     index: true,
@@ -43,6 +49,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Restring | 開発者向け文字列処理・比較ツール",
     description: siteDescription,
+    images: [defaultOgImage],
   },
 }
 

@@ -367,6 +367,28 @@ const verifyJwtSignature = async (token: string, secret: string) => {
   return toBase64Url(signature) === parts[2] ? "署名一致" : "署名不一致"
 }
 
+const parseFlexibleEpoch = (raw: string) => {
+  const trimmed = raw.trim()
+  if (trimmed === "") return null
+
+  if (/^-?\d+$/.test(trimmed)) {
+    const numeric = Number(trimmed)
+    const ms = Math.abs(numeric) >= 1e12 ? numeric : numeric * 1000
+    return Number.isNaN(ms) ? null : ms
+  }
+
+  const parsed = new Date(trimmed)
+  return Number.isNaN(parsed.getTime()) ? null : parsed.getTime()
+}
+
+const formatEpochResult = (ms: number) => ({
+  iso: new Date(ms).toISOString(),
+  utc: new Date(ms).toUTCString(),
+  local: new Date(ms).toLocaleString("ja-JP", { timeZoneName: "short" }),
+  seconds: Math.floor(ms / 1000).toString(),
+  milliseconds: Math.round(ms).toString(),
+})
+
 export const Panel: FC<{ title: string; children: ReactNode }> = ({
   title,
   children,
@@ -756,6 +778,59 @@ export const UnicodeInspectorTool: FC = () => {
           </div>
         ))}
       </div>
+    </Panel>
+  )
+}
+
+export const EpochConverterTool: FC = () => {
+  const [value, setValue] = useState(String(Math.floor(Date.now() / 1000)))
+  const ms = parseFlexibleEpoch(value)
+  const result = ms === null ? null : formatEpochResult(ms)
+
+  return (
+    <Panel title="エポック時間変換">
+      <div className="toolbar">
+        <ActionButton onClick={() => setValue(Math.floor(Date.now() / 1000).toString())}>
+          現在時刻（秒）
+        </ActionButton>
+        <ActionButton onClick={() => setValue(Date.now().toString())}>
+          現在時刻（ミリ秒）
+        </ActionButton>
+      </div>
+      <Textarea
+        label="Unixエポック秒・ミリ秒 または 日時文字列"
+        onChange={setValue}
+        rows={2}
+        value={value}
+      />
+      {result ? (
+        <div className="claimList">
+          <div className="claimItem">
+            <strong>秒</strong>
+            <span>{result.seconds}</span>
+          </div>
+          <div className="claimItem">
+            <strong>ミリ秒</strong>
+            <span>{result.milliseconds}</span>
+          </div>
+          <div className="claimItem">
+            <strong>ISO 8601</strong>
+            <span>{result.iso}</span>
+          </div>
+          <div className="claimItem">
+            <strong>UTC</strong>
+            <span>{result.utc}</span>
+          </div>
+          <div className="claimItem">
+            <strong>ローカル</strong>
+            <span>{result.local}</span>
+          </div>
+        </div>
+      ) : (
+        <p className="warn">
+          数値（エポック秒・ミリ秒）または日時文字列（例: 2024-01-01T00:00:00Z）を入力
+        </p>
+      )}
     </Panel>
   )
 }

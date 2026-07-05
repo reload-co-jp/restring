@@ -294,4 +294,33 @@ export const toolLinks = [
       },
     ],
   },
+  {
+    href: "/epoch-converter/",
+    title: "エポック時間変換",
+    description:
+      "Unixエポック秒・ミリ秒と日時をオンラインで相互変換。ISO 8601、UTC、ローカル時刻表示に対応。ログのタイムスタンプ調査やAPIレスポンス確認に。",
+    usage: [
+      "エポック秒・ミリ秒、または日時文字列を入力する。",
+      "現在時刻ボタンで今の時刻を秒・ミリ秒表記でセットする。",
+      "秒、ミリ秒、ISO 8601、UTC、ローカル時刻の変換結果を確認する。",
+    ],
+    mechanism: [
+      "入力が整数のみの場合はエポック値とみなし、桁数からミリ秒・秒を判定して日時へ変換。",
+      "整数以外の場合は日時文字列としてDate解析し、エポック秒・ミリ秒へ変換。",
+    ],
+    shell: [
+      {
+        label: "エポック秒を日時へ変換",
+        environment: "Python 3",
+        command:
+          "python3 -c 'import sys,datetime; print(datetime.datetime.fromtimestamp(int(sys.argv[1]), datetime.timezone.utc).isoformat())' 1700000000",
+      },
+      {
+        label: "日時をエポック秒へ変換",
+        environment: "Python 3",
+        command:
+          "python3 -c 'import sys,datetime; print(int(datetime.datetime.fromisoformat(sys.argv[1]).timestamp()))' 2024-01-01T00:00:00+00:00",
+      },
+    ],
+  },
 ]

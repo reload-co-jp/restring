@@ -389,6 +389,36 @@ const formatEpochResult = (ms: number) => ({
   milliseconds: Math.round(ms).toString(),
 })
 
+const locateJsonError = (value: string, message: string) => {
+  const positionMatch = message.match(/position (\d+)/)
+  if (positionMatch) {
+    const position = Number(positionMatch[1])
+    const before = value.slice(0, position)
+    const lastNewline = before.lastIndexOf("\n")
+    return { line: before.split("\n").length, column: position - lastNewline }
+  }
+
+  const lineColumnMatch = message.match(/line (\d+) column (\d+)/)
+  if (lineColumnMatch) {
+    return { line: Number(lineColumnMatch[1]), column: Number(lineColumnMatch[2]) }
+  }
+
+  return null
+}
+
+const validateJson = (value: string) => {
+  if (value.trim() === "") {
+    return { valid: false, error: "入力が空", formatted: "", location: null as ReturnType<typeof locateJsonError> }
+  }
+  try {
+    const data = JSON.parse(value)
+    return { valid: true, error: "", formatted: JSON.stringify(data, null, 2), location: null as ReturnType<typeof locateJsonError> }
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "JSONが不正"
+    return { valid: false, error: message, formatted: "", location: locateJsonError(value, message) }
+  }
+}
+
 type SqlMode = "select" | "insert" | "update" | "create"
 
 const formatSqlValue = (raw: string) => {
@@ -1135,6 +1165,28 @@ export const SqlBuilderTool: FC = () => {
         />
       )}
       <Result name="query.sql" value={sql} />
+    </Panel>
+  )
+}
+
+export const JsonValidatorTool: FC = () => {
+  const [value, setValue] = useState(
+    '{"name": "Restring", "tools": ["diff", "compare"]}',
+  )
+  const result = validateJson(value)
+
+  return (
+    <Panel title="JSON構文チェック">
+      <Textarea label="JSON" onChange={setValue} rows={10} value={value} />
+      <p className={result.valid ? "ok" : "warn"}>
+        {result.valid ? "有効なJSON" : `構文エラー: ${result.error}`}
+      </p>
+      {!result.valid && result.location && (
+        <p className="warn">
+          {result.location.line}行目 {result.location.column}列目付近を確認
+        </p>
+      )}
+      {result.valid && <Result name="formatted.json" value={result.formatted} />}
     </Panel>
   )
 }

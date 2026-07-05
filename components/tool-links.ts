@@ -374,4 +374,26 @@ export const toolLinks = [
       },
     ],
   },
+  {
+    href: "/json-validator/",
+    title: "JSON構文チェック",
+    description:
+      "JSONをオンラインで構文検証。構文エラー時はエラー箇所の行番号・列番号を表示し、有効な場合は整形済みJSONを出力。設定ファイルやAPIレスポンスの構文確認に。",
+    usage: [
+      "検証したいJSONを入力する。",
+      "構文エラーがある場合はエラーメッセージと該当行・列を確認する。",
+      "有効な場合は整形済みJSONをコピーまたは保存する。",
+    ],
+    mechanism: [
+      "JSON.parseで構文検証し、失敗時はエラーメッセージ中のposition情報から行番号・列番号を算出。",
+      "成功時はインデント付きで整形して表示。",
+    ],
+    shell: [
+      {
+        label: "JSON構文を検証",
+        environment: "jq、Python 3（jqが無い場合）",
+        command: "jq empty input.json && echo valid || echo invalid",
+      },
+    ],
+  },
 ]

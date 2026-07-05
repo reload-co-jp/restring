@@ -389,6 +389,52 @@ const formatEpochResult = (ms: number) => ({
   milliseconds: Math.round(ms).toString(),
 })
 
+type RegexMatch = {
+  match: string
+  index: number
+  groups: Array<string | undefined>
+}
+
+type RegexResult = {
+  valid: boolean
+  error: string
+  matches: RegexMatch[]
+  replaced: string
+}
+
+const testRegex = (
+  pattern: string,
+  flags: string,
+  input: string,
+  replacement: string,
+): RegexResult => {
+  try {
+    const execFlags = flags.includes("g") ? flags : `${flags}g`
+    const execRegex = new RegExp(pattern, execFlags)
+    const matches: RegexMatch[] = []
+    let match: RegExpExecArray | null
+    let guard = 0
+
+    while ((match = execRegex.exec(input)) !== null && guard < 1000) {
+      matches.push({ match: match[0], index: match.index, groups: match.slice(1) })
+      if (match[0] === "") execRegex.lastIndex += 1
+      guard += 1
+    }
+
+    const replaceRegex = new RegExp(pattern, execFlags)
+    const replaced = input.replace(replaceRegex, replacement)
+
+    return { valid: true, error: "", matches, replaced }
+  } catch (error) {
+    return {
+      valid: false,
+      error: error instanceof Error ? error.message : "正規表現が不正",
+      matches: [],
+      replaced: "",
+    }
+  }
+}
+
 const locateJsonError = (value: string, message: string) => {
   const positionMatch = message.match(/position (\d+)/)
   if (positionMatch) {
@@ -1187,6 +1233,55 @@ export const JsonValidatorTool: FC = () => {
         </p>
       )}
       {result.valid && <Result name="formatted.json" value={result.formatted} />}
+    </Panel>
+  )
+}
+
+export const RegexTesterTool: FC = () => {
+  const [pattern, setPattern] = useState("\\d+")
+  const [flags, setFlags] = useState("g")
+  const [input, setInput] = useState("注文番号: 12345, 数量: 6")
+  const [replacement, setReplacement] = useState("#")
+
+  const result = testRegex(pattern, flags, input, replacement)
+
+  return (
+    <Panel title="正規表現確認">
+      <Textarea label="パターン" onChange={setPattern} rows={1} value={pattern} />
+      <Textarea label="フラグ（例: gi, m, s）" onChange={setFlags} rows={1} value={flags} />
+      <Textarea label="テスト文字列" onChange={setInput} rows={5} value={input} />
+      {result.valid ? (
+        <>
+          <p className={result.matches.length > 0 ? "ok" : "warn"}>
+            {result.matches.length}件マッチ
+          </p>
+          <div className="claimList">
+            {result.matches.map((item, matchIndex) => (
+              <div className="claimItem" key={`${item.index}-${matchIndex}`}>
+                <strong>
+                  {matchIndex + 1}: &quot;{item.match}&quot;（位置 {item.index}）
+                </strong>
+                <span>
+                  {item.groups.length > 0
+                    ? `グループ: ${item.groups
+                        .map((group, groupIndex) => `$${groupIndex + 1}=${group ?? "undefined"}`)
+                        .join(", ")}`
+                    : "グループなし"}
+                </span>
+              </div>
+            ))}
+          </div>
+          <Textarea
+            label="置換文字列（$1, $2でグループ参照）"
+            onChange={setReplacement}
+            rows={1}
+            value={replacement}
+          />
+          <Result name="replaced.txt" value={result.replaced} />
+        </>
+      ) : (
+        <p className="warn">正規表現エラー: {result.error}</p>
+      )}
     </Panel>
   )
 }

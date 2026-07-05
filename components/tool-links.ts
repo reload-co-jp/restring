@@ -396,4 +396,26 @@ export const toolLinks = [
       },
     ],
   },
+  {
+    href: "/regex-tester/",
+    title: "正規表現確認",
+    description:
+      "正規表現パターンをオンラインでテスト。マッチ箇所・位置・キャプチャグループを一覧表示し、置換結果も確認。バリデーション作成やログ抽出パターンの検証に。",
+    usage: [
+      "正規表現パターンとフラグ（g、i、m、sなど）を入力する。",
+      "テスト文字列を入力し、マッチ箇所・位置・キャプチャグループを確認する。",
+      "置換文字列を入力し、置換結果を確認する。",
+    ],
+    mechanism: [
+      "RegExpオブジェクトを生成し、execを繰り返してマッチ箇所・位置・キャプチャグループを収集。",
+      "同じパターンでreplaceを実行し、置換結果を生成。",
+    ],
+    shell: [
+      {
+        label: "正規表現でマッチ抽出",
+        environment: "Python 3",
+        command: "python3 -c \"import re,sys; print(re.findall(r'\\d+', sys.stdin.read()))\" <<< 'order 12345 qty 6'",
+      },
+    ],
+  },
 ]

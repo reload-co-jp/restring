@@ -5,6 +5,7 @@ import { Title } from "components/elements/layout"
 import {
   defaultOgImage,
   siteDescription,
+  siteKeywords,
   siteName,
   siteUrl,
 } from "components/seo"
@@ -22,8 +23,15 @@ export const metadata: Metadata = {
     template: "%s | Restring",
   },
   description: siteDescription,
+  keywords: siteKeywords,
+  category: "developer tools",
+  creator: siteName,
+  publisher: siteName,
   alternates: {
     canonical: "/",
+    languages: {
+      ja: "/",
+    },
   },
   openGraph: {
     title: "Restring | 開発者向け文字列処理・比較ツール",
@@ -60,6 +68,11 @@ const structuredData = {
   url: siteUrl,
   description: siteDescription,
   inLanguage: "ja",
+  publisher: {
+    "@type": "Organization",
+    name: siteName,
+    url: siteUrl,
+  },
 }
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {

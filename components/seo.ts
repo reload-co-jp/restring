@@ -8,6 +8,18 @@ export const siteName = "Restring"
 export const siteDescription =
   "開発者向け文字列処理・比較ツール集。テキスト比較、JSON比較、JWT解析、Base64、URLエンコード、HTMLエスケープ、Unicode確認をブラウザで実行。"
 
+export const siteKeywords = [
+  "文字列処理",
+  "テキスト比較",
+  "JSON比較",
+  "JWT解析",
+  "Base64",
+  "URLエンコード",
+  "HTMLエスケープ",
+  "Unicode",
+  "開発者ツール",
+]
+
 export const absoluteUrl = (path = "/") => new URL(path, siteUrl).toString()
 
 export const defaultOgImage = {
@@ -29,10 +41,19 @@ export const createPageMetadata = ({
   path: string
   title: string
 }): Metadata => ({
-  title,
+  title: {
+    absolute: createTitleWithSiteName(title, path),
+  },
   description,
+  keywords: siteKeywords,
+  category: "developer tools",
+  creator: siteName,
+  publisher: siteName,
   alternates: {
     canonical: path,
+    languages: {
+      ja: path,
+    },
   },
   openGraph: {
     title: createTitleWithSiteName(title, path),

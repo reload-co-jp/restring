@@ -3,6 +3,8 @@ export const toolLinks = [
     href: "/text-compare/",
     title: "テキスト比較",
     description: "2つの文字列を行・単語・文字単位で比較。インライン表示と左右表示に対応。",
+    introduction:
+      "2つのテキストを貼り付けるだけで差分を確認できる比較ツール。コード、設定ファイル、原稿などの変更点を行・単語・文字単位で素早く見つけられる。",
     usage: [
       "比較元と比較先へ文字列を貼り付ける。",
       "行単位、単語単位、文字単位から比較粒度を選ぶ。",
@@ -24,6 +26,8 @@ export const toolLinks = [
     href: "/json-compare/",
     title: "JSON比較",
     description: "JSONを検証し、整形表示。キー順を無視して構造比較。",
+    introduction:
+      "2つのJSONを整形しながら構造差分を確認できるツール。APIレスポンス、設定ファイル、ログの比較でキー順に惑わされず中身の違いを確認できる。",
     usage: [
       "JSON AとJSON Bへ比較対象を貼り付ける。",
       "構文エラーがある場合はエラーメッセージを確認する。",
@@ -46,6 +50,8 @@ export const toolLinks = [
     title: "JWTデコード・解析",
     description:
       "JWT（JSON Web Token）をオンラインでデコードし、Header・Payload・署名を分解表示。exp・iatなど有効期限確認とHS256/HS384/HS512のHMAC署名検証に対応。",
+    introduction:
+      "JWTをブラウザ上で分解し、Header・Payload・署名を確認できる解析ツール。認証トークンのクレーム確認、有効期限調査、HMAC署名検証に使える。",
     usage: [
       "JWT文字列を入力する。",
       "HeaderとPayloadのJSONを確認する。",
@@ -78,6 +84,8 @@ export const toolLinks = [
     title: "テキスト差分",
     description:
       "2つのテキストから追加・削除された差分だけをオンラインで抽出。diffの追加行・削除行のみ確認したい変更点洗い出しに。",
+    introduction:
+      "比較結果から追加・削除部分だけを抜き出す差分抽出ツール。レビュー前の変更点整理や、長い文章から変更箇所だけ確認したい場面に向く。",
     usage: [
       "比較元と比較先を入力する。",
       "比較粒度と無視オプションを選ぶ。",
@@ -99,6 +107,8 @@ export const toolLinks = [
     href: "/text-normalize/",
     title: "テキスト正規化",
     description: "前後空白削除、連続スペース圧縮、Unicode正規化、改行統一。",
+    introduction:
+      "余分な空白、改行コード、Unicode表現をまとめて整えるテキスト正規化ツール。コピペ由来の揺れやデータ投入前の表記ぶれを減らせる。",
     usage: [
       "入力欄へ整えたい文字列を貼り付ける。",
       "出力欄で正規化結果を確認する。",
@@ -121,6 +131,8 @@ export const toolLinks = [
     href: "/invisible-character-viewer/",
     title: "不可視文字ビューア",
     description: "スペース、タブ、CR、LF、NBSP、ゼロ幅スペースを可視化。",
+    introduction:
+      "見た目では判別しにくい空白、タブ、改行、ゼロ幅スペースを可視化する調査ツール。差分不一致や文字列比較エラーの原因探しに使える。",
     usage: [
       "不可視文字を含む文字列を入力する。",
       "出力欄でスペース、タブ、改行などの位置を確認する。",
@@ -144,6 +156,8 @@ export const toolLinks = [
     title: "改行コード変換",
     description:
       "改行コード（LF・CRLF・CR）をオンラインで相互変換。WindowsとmacOS/Linux間の改行トラブル、Gitの差分崩れ解消に。",
+    introduction:
+      "LF、CRLF、CRの改行コードを相互変換するツール。OS間のファイル受け渡し、Git差分のノイズ削減、CSVやログの整形に役立つ。",
     usage: [
       "変換したいテキストを入力する。",
       "LF、CRLF、CRから出力形式を選ぶ。",
@@ -166,6 +180,8 @@ export const toolLinks = [
     href: "/case-converter/",
     title: "ケース変換",
     description: "UPPERCASE、lowercase、camelCase、PascalCase、snake_case、kebab-caseへ変換。",
+    introduction:
+      "文字列を複数の命名規則へ一括変換するケース変換ツール。変数名、ファイル名、URLスラッグ、APIフィールド名の作成を短時間で済ませられる。",
     usage: [
       "変換したい文字列を入力する。",
       "出力したいケース形式を選ぶ。",
@@ -189,6 +205,8 @@ export const toolLinks = [
     title: "URLエンコード・デコード",
     description:
       "URLやクエリパラメータをオンラインでエンコード・デコード。パーセントエンコーディングと日本語変換に対応。",
+    introduction:
+      "URLコンポーネントを安全な表現へ変換し、エンコード済み文字列を元に戻すツール。日本語URL、クエリ文字列、ログ内URLの確認に使える。",
     usage: [
       "URLパラメータや日本語文字列を入力する。",
       "エンコード結果とデコード結果を確認する。",
@@ -218,6 +236,8 @@ export const toolLinks = [
     title: "Base64",
     description:
       "Base64文字列をオンラインでエンコード・デコード。UTF-8対応で日本語も文字化けなし。Basic認証やデータURIの確認に。",
+    introduction:
+      "文字列とBase64表現を相互変換するツール。Basic認証値、設定値、軽量データ、APIレスポンス内のBase64文字列を素早く確認できる。",
     usage: [
       "文字列またはBase64文字列を入力する。",
       "エンコード結果とデコード結果を確認する。",
@@ -247,6 +267,8 @@ export const toolLinks = [
     title: "HTMLエスケープ",
     description:
       "HTML特殊文字（&・<・>・引用符）をオンラインでエスケープ・アンエスケープ。コード例やテンプレート作成、表示崩れ調査に。",
+    introduction:
+      "HTML特殊文字をエンティティへ変換し、エスケープ済み文字列を復元するツール。コード例の掲載、テンプレート作成、表示崩れ調査に使える。",
     usage: [
       "HTMLとして扱いたい文字列を入力する。",
       "エスケープ結果とアンエスケープ結果を確認する。",
@@ -276,6 +298,8 @@ export const toolLinks = [
     title: "Unicodeインスペクタ",
     description:
       "文字のUnicodeコードポイント、UTF-8・UTF-16・UTF-32表現、文字名をオンラインで確認。文字化けや異体字、絵文字の調査に。",
+    introduction:
+      "入力文字をUnicodeコードポイント単位で解析するインスペクタ。文字化け、異体字、絵文字、不可視文字の正体をコード表現から確認できる。",
     usage: [
       "調べたい文字列を入力する。",
       "各文字のコードポイント、UTF-8、UTF-16、UTF-32を確認する。",
@@ -299,6 +323,8 @@ export const toolLinks = [
     title: "エポック時間変換",
     description:
       "Unixエポック秒・ミリ秒と日時をオンラインで相互変換。ISO 8601、UTC、ローカル時刻表示に対応。ログのタイムスタンプ調査やAPIレスポンス確認に。",
+    introduction:
+      "Unixエポック秒・ミリ秒と日時表現を相互変換するツール。ログ、DB、APIレスポンスに含まれるタイムスタンプを人間が読める時刻へ変換できる。",
     usage: [
       "エポック秒・ミリ秒、または日時文字列を入力する。",
       "現在時刻ボタンで今の時刻を秒・ミリ秒表記でセットする。",
@@ -328,6 +354,8 @@ export const toolLinks = [
     title: "タイムゾーン検索・変換",
     description:
       "IANAタイムゾーン名をオンラインで検索し、基準日時を複数タイムゾーンの現地時刻へ一括変換。UTCオフセット確認や海外拠点との会議調整、サーバーログの時刻確認に。",
+    introduction:
+      "IANAタイムゾーンを検索し、同じ日時を複数地域の現地時刻へ変換するツール。UTCオフセット確認、海外チームとの調整、ログ調査に使える。",
     usage: [
       "都市名や地域名（例: Tokyo、America）でタイムゾーンを検索する。",
       "基準日時（ISO 8601形式）を入力する。",
@@ -356,6 +384,8 @@ export const toolLinks = [
     title: "SQL文簡易作成",
     description:
       "SELECT・INSERT・UPDATE・CREATE TABLE文をオンラインで組み立て。テーブル名、カラム、WHERE条件を入力するだけでSQLクエリを自動生成。値のクォート付与にも対応。",
+    introduction:
+      "入力項目からSELECT、INSERT、UPDATE、CREATE TABLE文を組み立てるSQL作成ツール。定型クエリの下書きや検証用SQLの作成時間を短縮できる。",
     usage: [
       "SELECT、INSERT、UPDATE、CREATE TABLEから作成するSQL文を選ぶ。",
       "テーブル名、カラム、WHERE条件など必要項目を入力する。",
@@ -379,6 +409,8 @@ export const toolLinks = [
     title: "JSON構文チェック",
     description:
       "JSONをオンラインで構文検証。構文エラー時はエラー箇所の行番号・列番号を表示し、有効な場合は整形済みJSONを出力。設定ファイルやAPIレスポンスの構文確認に。",
+    introduction:
+      "JSONの構文エラーを検出し、正常なJSONは読みやすく整形する検証ツール。設定ファイル、APIレスポンス、ログ断片の確認に使える。",
     usage: [
       "検証したいJSONを入力する。",
       "構文エラーがある場合はエラーメッセージと該当行・列を確認する。",
@@ -401,6 +433,8 @@ export const toolLinks = [
     title: "正規表現確認",
     description:
       "正規表現パターンをオンラインでテスト。マッチ箇所・位置・キャプチャグループを一覧表示し、置換結果も確認。バリデーション作成やログ抽出パターンの検証に。",
+    introduction:
+      "正規表現パターンをテスト文字列に当て、マッチ位置、キャプチャ、置換結果を確認できるツール。バリデーションやログ抽出条件の調整に向く。",
     usage: [
       "正規表現パターンとフラグ（g、i、m、sなど）を入力する。",
       "テスト文字列を入力し、マッチ箇所・位置・キャプチャグループを確認する。",

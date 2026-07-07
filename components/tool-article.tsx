@@ -77,7 +77,7 @@ export const ToolArticle: FC<{ children: ReactNode; href: string }> = ({
       />
       <section className="toolIntro">
         <h1>{tool.title}</h1>
-        <p>{tool.description}</p>
+        <p className="toolIntroduction">{tool.introduction}</p>
         <h2>使い方</h2>
         <ol>
           {tool.usage.map((item) => (

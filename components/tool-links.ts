@@ -2,7 +2,8 @@ export const toolLinks = [
   {
     href: "/text-compare/",
     title: "テキスト比較",
-    description: "2つの文字列を行・単語・文字単位で比較。インライン表示と左右表示に対応。",
+    description:
+      "2つの文字列を行・単語・文字単位で比較。インライン表示と左右表示に対応。",
     introduction:
       "2つのテキストを貼り付けるだけで差分を確認できる比較ツール。コード、設定ファイル、原稿などの変更点を行・単語・文字単位で素早く見つけられる。",
     usage: [
@@ -69,13 +70,13 @@ export const toolLinks = [
         label: "HeaderとPayloadをデコード",
         environment: "Python 3",
         command:
-          "python3 -c 'import base64,json,sys; t=sys.stdin.read().strip().split(\".\"); dec=lambda s: json.dumps(json.loads(base64.urlsafe_b64decode(s+\"=\"*((4-len(s)%4)%4))),ensure_ascii=False,indent=2); print(\"Header:\\n\"+dec(t[0])+\"\\nPayload:\\n\"+dec(t[1]))'",
+          'python3 -c \'import base64,json,sys; t=sys.stdin.read().strip().split("."); dec=lambda s: json.dumps(json.loads(base64.urlsafe_b64decode(s+"="*((4-len(s)%4)%4))),ensure_ascii=False,indent=2); print("Header:\\n"+dec(t[0])+"\\nPayload:\\n"+dec(t[1]))\'',
       },
       {
         label: "HS256署名を検証",
         environment: "Python 3、HMAC秘密鍵",
         command:
-          "python3 -c 'import base64,hmac,hashlib,sys; token=sys.stdin.read().strip(); secret=b\"secret\"; h,p,s=token.split(\".\"); sig=base64.urlsafe_b64encode(hmac.new(secret,f\"{h}.{p}\".encode(),hashlib.sha256).digest()).decode().rstrip(\"=\"); print(\"署名一致\" if sig==s else \"署名不一致\")'",
+          'python3 -c \'import base64,hmac,hashlib,sys; token=sys.stdin.read().strip(); secret=b"secret"; h,p,s=token.split("."); sig=base64.urlsafe_b64encode(hmac.new(secret,f"{h}.{p}".encode(),hashlib.sha256).digest()).decode().rstrip("="); print("署名一致" if sig==s else "署名不一致")\'',
       },
     ],
   },
@@ -123,7 +124,7 @@ export const toolLinks = [
         label: "空白・改行・Unicodeを正規化",
         environment: "Python 3",
         command:
-          "python3 -c 'import re,sys,unicodedata; s=sys.stdin.read().replace(\"\\r\\n\",\"\\n\").replace(\"\\r\",\"\\n\"); s=unicodedata.normalize(\"NFC\",s); print(re.sub(r\"[^\\S\\r\\n]+\",\" \",s).strip())' < input.txt",
+          'python3 -c \'import re,sys,unicodedata; s=sys.stdin.read().replace("\\r\\n","\\n").replace("\\r","\\n"); s=unicodedata.normalize("NFC",s); print(re.sub(r"[^\\S\\r\\n]+"," ",s).strip())\' < input.txt',
       },
     ],
   },
@@ -147,7 +148,7 @@ export const toolLinks = [
         label: "不可視文字を名前へ置換",
         environment: "Python 3",
         command:
-          "python3 -c 'import sys; m={\" \":\"<Space>\",\"\\t\":\"<Tab>\",\"\\r\":\"<CR>\",\"\\n\":\"<LF>\\n\",\"\\u00a0\":\"<NBSP>\",\"\\u200b\":\"<ZWSP>\"}; print(\"\".join(m.get(c,c) for c in sys.stdin.read()))' < input.txt",
+          'python3 -c \'import sys; m={" ":"<Space>","\\t":"<Tab>","\\r":"<CR>","\\n":"<LF>\\n","\\u00a0":"<NBSP>","\\u200b":"<ZWSP>"}; print("".join(m.get(c,c) for c in sys.stdin.read()))\' < input.txt',
       },
     ],
   },
@@ -172,14 +173,15 @@ export const toolLinks = [
         label: "CRLFへ変換",
         environment: "Python 3",
         command:
-          "python3 -c 'import sys; s=sys.stdin.read().replace(\"\\r\\n\",\"\\n\").replace(\"\\r\",\"\\n\"); sys.stdout.write(s.replace(\"\\n\",\"\\r\\n\"))' < input.txt > output.txt",
+          'python3 -c \'import sys; s=sys.stdin.read().replace("\\r\\n","\\n").replace("\\r","\\n"); sys.stdout.write(s.replace("\\n","\\r\\n"))\' < input.txt > output.txt',
       },
     ],
   },
   {
     href: "/case-converter/",
     title: "ケース変換",
-    description: "UPPERCASE、lowercase、camelCase、PascalCase、snake_case、kebab-caseへ変換。",
+    description:
+      "UPPERCASE、lowercase、camelCase、PascalCase、snake_case、kebab-caseへ変換。",
     introduction:
       "文字列を複数の命名規則へ一括変換するケース変換ツール。変数名、ファイル名、URLスラッグ、APIフィールド名の作成を短時間で済ませられる。",
     usage: [
@@ -196,7 +198,7 @@ export const toolLinks = [
         label: "snake_caseへ変換",
         environment: "Python 3",
         command:
-          "python3 -c 'import re,sys; s=sys.stdin.read().strip(); s=re.sub(r\"([a-z0-9])([A-Z])\",r\"\\1 \\2\",s); print(\"_\".join(w.lower() for w in re.split(r\"[\\s_-]+\",s) if w))'",
+          'python3 -c \'import re,sys; s=sys.stdin.read().strip(); s=re.sub(r"([a-z0-9])([A-Z])",r"\\1 \\2",s); print("_".join(w.lower() for w in re.split(r"[\\s_-]+",s) if w))\'',
       },
     ],
   },
@@ -294,6 +296,24 @@ export const toolLinks = [
     ],
   },
   {
+    href: "/html-special-characters/",
+    title: "HTML特殊文字一覧",
+    description:
+      "HTML特殊文字と文字参照の対応表。表示文字、名前付き文字参照、数値文字参照、用途を確認。",
+    introduction:
+      "HTMLでそのまま書くと解釈が変わる文字や、記号としてよく使う文字参照を一覧で確認できるページ。エスケープ前後の対応確認、記事やテンプレートの修正に使える。",
+    usage: [
+      "変換したい文字を一覧表から探す。",
+      "HTMLに書く場合は名前付き文字参照または数値文字参照を使う。",
+      "文章中でコードや記号を安全に表示したい箇所へ貼り付ける。",
+    ],
+    mechanism: [
+      "HTMLでは&、<、>、引用符などが構文として解釈されるため、文字参照で表す。",
+      "名前付き文字参照と数値文字参照はどちらもブラウザで対応する文字として表示される。",
+    ],
+    shell: [],
+  },
+  {
     href: "/unicode-inspector/",
     title: "Unicodeインスペクタ",
     description:
@@ -314,7 +334,7 @@ export const toolLinks = [
         label: "コードポイントと文字名を表示",
         environment: "Python 3",
         command:
-          "python3 -c 'import sys,unicodedata; [print(f\"{c}\\tU+{ord(c):04X}\\t{unicodedata.name(c, \"UNKNOWN\")}\") for c in sys.stdin.read()]'",
+          'python3 -c \'import sys,unicodedata; [print(f"{c}\\tU+{ord(c):04X}\\t{unicodedata.name(c, "UNKNOWN")}") for c in sys.stdin.read()]\'',
       },
     ],
   },
@@ -448,7 +468,8 @@ export const toolLinks = [
       {
         label: "正規表現でマッチ抽出",
         environment: "Python 3",
-        command: "python3 -c \"import re,sys; print(re.findall(r'\\d+', sys.stdin.read()))\" <<< 'order 12345 qty 6'",
+        command:
+          "python3 -c \"import re,sys; print(re.findall(r'\\d+', sys.stdin.read()))\" <<< 'order 12345 qty 6'",
       },
     ],
   },

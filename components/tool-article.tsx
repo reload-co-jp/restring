@@ -39,9 +39,14 @@ const relatedToolHrefs: Record<string, string[]> = {
   "/url-encode-decode/": ["/base64/", "/html-escape/", "/jwt-decoder/"],
   "/base64/": ["/jwt-decoder/", "/url-encode-decode/", "/json-validator/"],
   "/html-escape/": [
+    "/html-special-characters/",
     "/url-encode-decode/",
     "/unicode-inspector/",
-    "/text-normalize/",
+  ],
+  "/html-special-characters/": [
+    "/html-escape/",
+    "/unicode-inspector/",
+    "/url-encode-decode/",
   ],
   "/unicode-inspector/": [
     "/invisible-character-viewer/",

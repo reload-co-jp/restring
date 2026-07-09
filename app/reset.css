@@ -294,6 +294,44 @@ select {
   line-height: 1.6;
 }
 
+.entityTableWrap {
+  overflow-x: auto;
+}
+
+.entityTable {
+  border-collapse: collapse;
+  min-width: 760px;
+  width: 100%;
+}
+
+.entityTable th,
+.entityTable td {
+  border: 1px solid #334155;
+  line-height: 1.6;
+  padding: 0.625rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.entityTable th {
+  background: #1e293b;
+  color: #f8fafc;
+  font-size: 0.875rem;
+}
+
+.entityTable code {
+  color: #bfdbfe;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.entityCharacter {
+  color: #f8fafc;
+  font-size: 1.125rem;
+  font-weight: 700;
+  text-align: center;
+  white-space: pre;
+}
+
 .shellList {
   display: grid;
   gap: 0.75rem;

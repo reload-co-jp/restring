@@ -294,6 +294,28 @@ select {
   line-height: 1.6;
 }
 
+.faqList {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.faqItem {
+  border: 1px solid #334155;
+  border-radius: 8px;
+  display: grid;
+  gap: 0.375rem;
+  padding: 0.875rem;
+}
+
+.faqItem h3 {
+  color: #f8fafc;
+  font-size: 0.95rem;
+}
+
+.faqItem p {
+  line-height: 1.7;
+}
+
 .entityTableWrap {
   overflow-x: auto;
 }

@@ -648,19 +648,6 @@ export const ToolArticle: FC<{ children: ReactNode; href: string }> = ({
           </div>
         </section>
       )}
-      {seoText && (
-        <section className="articleSection">
-          <h2>よくある質問</h2>
-          <div className="faqList">
-            {seoText.questions.map((item) => (
-              <section className="faqItem" key={item.question}>
-                <h3>{item.question}</h3>
-                <p>{item.answer}</p>
-              </section>
-            ))}
-          </div>
-        </section>
-      )}
       {relatedTools.length > 0 && (
         <section className="articleSection">
           <h2>関連ツール</h2>
@@ -674,6 +661,19 @@ export const ToolArticle: FC<{ children: ReactNode; href: string }> = ({
                 <strong>{relatedTool.title}</strong>
                 <span>{relatedTool.description}</span>
               </Link>
+            ))}
+          </div>
+        </section>
+      )}
+      {seoText && (
+        <section className="articleSection faqSection">
+          <h2>よくある質問</h2>
+          <div className="faqList">
+            {seoText.questions.map((item) => (
+              <section className="faqItem" key={item.question}>
+                <h3>{item.question}</h3>
+                <p>{item.answer}</p>
+              </section>
             ))}
           </div>
         </section>

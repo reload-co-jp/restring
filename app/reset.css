@@ -1,13 +1,20 @@
 * {
   box-sizing: border-box;
-  font-family: sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   margin: 0;
 }
 
 :root {
-  background: #0f172a;
-  color: #e2e8f0;
-  color-scheme: dark;
+  background: #f6f5f0;
+  color: #202124;
+  color-scheme: light;
+  --code-font: "SFMono-Regular", "SF Mono", Consolas, "Liberation Mono", Menlo,
+    monospace;
 }
 
 body {
@@ -21,21 +28,16 @@ textarea {
   font: inherit;
 }
 
-button,
-select,
-textarea {
-  border-radius: 6px;
-}
-
 textarea,
 pre,
 select {
-  background: #020617;
-  border: 1px solid #334155;
-  color: #e2e8f0;
+  background: #fffdfa;
+  border: 1px solid #9a9a90;
+  color: #202124;
 }
 
 textarea {
+  font-family: var(--code-font);
   line-height: 1.5;
   min-height: 8rem;
   padding: 0.75rem;
@@ -44,12 +46,17 @@ textarea {
 }
 
 pre {
+  font-family: var(--code-font);
   line-height: 1.5;
   min-height: 4rem;
   overflow: auto;
   padding: 0.75rem;
   white-space: pre-wrap;
   word-break: break-word;
+}
+
+code {
+  font-family: var(--code-font);
 }
 
 select {
@@ -65,51 +72,50 @@ select {
 }
 
 .intro {
-  color: #cbd5e1;
+  color: #4b4b46;
   display: grid;
   gap: 0.375rem;
 }
 
 .intro h1,
 .toolIntro h1 {
-  color: #f8fafc;
-  display: grid;
-  font-size: 3rem;
+  color: #202124;
+  display: inline-grid;
+  font-size: 2rem;
   font-weight: 700;
   gap: 0.5rem;
-  justify-items: center;
+  justify-items: start;
   line-height: 1.3;
-  padding: 5rem 0;
-  text-align: center;
+  padding: 2rem 0 0.75rem;
+  text-align: left;
 }
 
 .intro h1::after,
 .toolIntro h1::after {
-  background: #3b82f6;
-  border-radius: 999px;
+  background: #202124;
   content: "";
-  height: 4px;
-  width: 3.5rem;
+  height: 2px;
+  width: 100%;
 }
 
 .brandLink {
   display: inline-block;
-  color: #f8fafc;
+  color: #202124;
+  font-family: var(--code-font);
   margin-bottom: 0.75rem;
   text-decoration: none;
 }
 
 .panel {
-  background: #111827;
-  border: 1px solid #334155;
-  border-radius: 8px;
+  background: #fffdfa;
+  border: 1px solid #9a9a90;
   display: grid;
   gap: 0.875rem;
   padding: 1rem;
 }
 
 .panel h2 {
-  color: #f8fafc;
+  color: #202124;
   font-size: 1rem;
 }
 
@@ -122,8 +128,7 @@ select {
 
 .toolTab {
   background: transparent;
-  border-radius: 6px;
-  color: #cbd5e1;
+  color: #4b4b46;
   font-size: 0.8125rem;
   min-height: 2rem;
   padding: 0.375rem 0.625rem;
@@ -134,13 +139,12 @@ select {
 
 .toolTab:hover,
 .toolTab.active {
-  background: #1e293b;
-  color: #f8fafc;
+  background: #e7e4dc;
+  color: #202124;
 }
 
 .toolTab.active::after {
-  background: #3b82f6;
-  border-radius: 999px;
+  background: #202124;
   bottom: 0.25rem;
   content: "";
   height: 2px;
@@ -155,7 +159,7 @@ select {
 }
 
 .featureSection h2 {
-  color: #f8fafc;
+  color: #202124;
   font-size: 1rem;
 }
 
@@ -166,10 +170,9 @@ select {
 }
 
 .featureLink {
-  background: #111827;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  color: #cbd5e1;
+  background: #fffdfa;
+  border: 1px solid #9a9a90;
+  color: #4b4b46;
   display: grid;
   gap: 0.375rem;
   min-height: 7rem;
@@ -178,11 +181,11 @@ select {
 }
 
 .featureLink:hover {
-  border-color: #3b82f6;
+  border-color: #202124;
 }
 
 .featureLink strong {
-  color: #f8fafc;
+  color: #202124;
 }
 
 .toolPage {
@@ -192,14 +195,14 @@ select {
 }
 
 .toolIntro {
-  color: #cbd5e1;
+  color: #4b4b46;
   display: grid;
   gap: 0.75rem;
 }
 
 .breadcrumb {
   align-items: center;
-  color: #94a3b8;
+  color: #676760;
   display: flex;
   flex-wrap: wrap;
   font-size: 0.875rem;
@@ -207,7 +210,7 @@ select {
 }
 
 .breadcrumb a {
-  color: #93c5fd;
+  color: #202124;
   text-decoration: none;
 }
 
@@ -216,15 +219,14 @@ select {
 }
 
 .toolIntro h2 {
-  color: #f8fafc;
+  color: #202124;
   font-size: 1rem;
 }
 
 .toolIntroduction {
-  background: #111827;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  color: #dbeafe;
+  background: #fffdfa;
+  border: 1px solid #9a9a90;
+  color: #2f2f2b;
   font-size: 1rem;
   line-height: 1.8;
   padding: 1rem;
@@ -241,17 +243,16 @@ select {
 }
 
 .articleSection {
-  background: #111827;
-  border: 1px solid #334155;
-  border-radius: 8px;
-  color: #cbd5e1;
+  background: #fffdfa;
+  border: 1px solid #9a9a90;
+  color: #4b4b46;
   display: grid;
   gap: 0.75rem;
   padding: 1rem;
 }
 
 .articleSection h2 {
-  color: #f8fafc;
+  color: #202124;
   font-size: 1rem;
 }
 
@@ -273,9 +274,8 @@ select {
 }
 
 .relatedToolLink {
-  border: 1px solid #334155;
-  border-radius: 8px;
-  color: #cbd5e1;
+  border: 1px solid #9a9a90;
+  color: #4b4b46;
   display: grid;
   gap: 0.375rem;
   padding: 0.875rem;
@@ -283,11 +283,11 @@ select {
 }
 
 .relatedToolLink:hover {
-  border-color: #3b82f6;
+  border-color: #202124;
 }
 
 .relatedToolLink strong {
-  color: #f8fafc;
+  color: #202124;
 }
 
 .relatedToolLink span {
@@ -296,24 +296,28 @@ select {
 
 .faqList {
   display: grid;
-  gap: 0.875rem;
+  gap: 0.5rem;
 }
 
 .faqItem {
-  border: 1px solid #334155;
-  border-radius: 8px;
+  border: 1px solid #9a9a90;
   display: grid;
-  gap: 0.375rem;
-  padding: 0.875rem;
+  gap: 0.25rem;
+  padding: 0.625rem;
+}
+
+.faqSection {
+  font-size: 0.875rem;
+  gap: 0.5rem;
 }
 
 .faqItem h3 {
-  color: #f8fafc;
-  font-size: 0.95rem;
+  color: #202124;
+  font-size: 0.875rem;
 }
 
 .faqItem p {
-  line-height: 1.7;
+  line-height: 1.6;
 }
 
 .entityTableWrap {
@@ -328,7 +332,7 @@ select {
 
 .entityTable th,
 .entityTable td {
-  border: 1px solid #334155;
+  border: 1px solid #9a9a90;
   line-height: 1.6;
   padding: 0.625rem;
   text-align: left;
@@ -336,18 +340,19 @@ select {
 }
 
 .entityTable th {
-  background: #1e293b;
-  color: #f8fafc;
+  background: #e7e4dc;
+  color: #202124;
   font-size: 0.875rem;
 }
 
 .entityTable code {
-  color: #bfdbfe;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  color: #202124;
+  font-family: var(--code-font);
 }
 
 .entityCharacter {
-  color: #f8fafc;
+  color: #202124;
+  font-family: var(--code-font);
   font-size: 1.125rem;
   font-weight: 700;
   text-align: center;
@@ -365,12 +370,12 @@ select {
 }
 
 .shellItem p {
-  color: #e2e8f0;
+  color: #202124;
   font-weight: 700;
 }
 
 .shellItem span {
-  color: #94a3b8;
+  color: #676760;
   font-size: 0.875rem;
 }
 
@@ -391,7 +396,7 @@ select {
 }
 
 .field {
-  color: #cbd5e1;
+  color: #4b4b46;
   display: grid;
   gap: 0.375rem;
   font-size: 0.875rem;
@@ -407,27 +412,26 @@ select {
 
 .toolbar label {
   align-items: center;
-  color: #cbd5e1;
+  color: #4b4b46;
   display: inline-flex;
   gap: 0.375rem;
   min-height: 2.25rem;
 }
 
 .iconButton {
-  background: #2563eb;
-  border: 1px solid #3b82f6;
-  color: #eff6ff;
+  background: #202124;
+  border: 1px solid #202124;
+  color: #fffdfa;
   cursor: pointer;
   min-height: 2.25rem;
   padding: 0 0.75rem;
 }
 
 .iconButton:hover {
-  background: #1d4ed8;
+  background: #3f3f3a;
 }
 
 .diffOutput mark {
-  border-radius: 3px;
   color: inherit;
   padding: 0.0625rem 0.1875rem;
 }
@@ -437,24 +441,24 @@ select {
 }
 
 .added {
-  background: #14532d;
+  background: #d8ead7;
 }
 
 .removed {
-  background: #7f1d1d;
+  background: #ead7d3;
   text-decoration: line-through;
 }
 
 .changed {
-  background: #713f12;
+  background: #efe6c6;
 }
 
 .ok {
-  color: #86efac;
+  color: #1f6b3a;
 }
 
 .warn {
-  color: #fca5a5;
+  color: #9d2f22;
 }
 
 .claimList {
@@ -464,20 +468,21 @@ select {
 }
 
 .claimItem {
-  background: #020617;
-  border: 1px solid #334155;
-  border-radius: 6px;
+  background: #fffdfa;
+  border: 1px solid #9a9a90;
   display: grid;
   gap: 0.25rem;
   padding: 0.75rem;
 }
 
 .claimItem strong {
-  color: #f8fafc;
+  color: #202124;
+  font-family: var(--code-font);
 }
 
 .claimItem span {
-  color: #cbd5e1;
+  color: #4b4b46;
+  font-family: var(--code-font);
   overflow-wrap: anywhere;
 }
 
@@ -493,9 +498,8 @@ select {
 
 .unicodeRow {
   align-items: center;
-  background: #020617;
-  border: 1px solid #334155;
-  border-radius: 6px;
+  background: #fffdfa;
+  border: 1px solid #9a9a90;
   display: grid;
   gap: 0.5rem;
   grid-template-columns: 4rem repeat(6, minmax(0, 1fr));
@@ -504,6 +508,7 @@ select {
 
 .unicodeRow span,
 .unicodeRow strong {
+  font-family: var(--code-font);
   overflow-wrap: anywhere;
 }
 

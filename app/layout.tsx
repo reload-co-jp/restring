@@ -103,8 +103,8 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         )}
         <header
           style={{
-            backgroundColor: "#111827",
-            borderBottom: "1px solid #334155",
+            backgroundColor: "#fffdfa",
+            borderBottom: "1px solid #9a9a90",
             padding: ".75rem 1rem",
             position: "sticky",
             top: 0,
@@ -118,7 +118,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         </header>
         <main
           style={{
-            background: "#0f172a",
+            background: "#f6f5f0",
             margin: "0 auto",
             maxWidth: "1180px",
             minHeight: "calc(100dvh - 6.25rem)",
@@ -130,8 +130,8 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
         </main>
         <footer
           style={{
-            backgroundColor: "#111827",
-            borderTop: "1px solid #334155",
+            backgroundColor: "#fffdfa",
+            borderTop: "1px solid #9a9a90",
             fontSize: ".75rem",
             padding: "1rem",
           }}

@@ -450,7 +450,7 @@ export const toolLinks = [
   },
   {
     href: "/regex-tester/",
-    title: "正規表現確認",
+    title: "正規表現チェック",
     description:
       "正規表現パターンをオンラインでテスト。マッチ箇所・位置・キャプチャグループを一覧表示し、置換結果も確認。バリデーション作成やログ抽出パターンの検証に。",
     introduction:

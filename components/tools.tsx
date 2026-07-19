@@ -1246,7 +1246,7 @@ export const RegexTesterTool: FC = () => {
   const result = testRegex(pattern, flags, input, replacement)
 
   return (
-    <Panel title="正規表現確認">
+    <Panel title="正規表現チェック">
       <Textarea label="パターン" onChange={setPattern} rows={1} value={pattern} />
       <Textarea label="フラグ（例: gi, m, s）" onChange={setFlags} rows={1} value={flags} />
       <Textarea label="テスト文字列" onChange={setInput} rows={5} value={input} />

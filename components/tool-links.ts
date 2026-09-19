@@ -449,6 +449,24 @@ export const toolLinks = [
     ],
   },
   {
+    href: "/markdown-editor/",
+    title: "Markdownエディタ",
+    description:
+      "Markdown文書をオンラインで見たまま編集。見出し・リスト・表・コードブロックに加え、KaTeXによるインライン数式・ブロック数式に対応。",
+    introduction:
+      "Markdown記法を意識せず見たまま編集できるWYSIWYGエディタ。見出し、リスト、表、コードブロックのほか、KaTeXによる数式表示に対応し、編集結果は常にMarkdownとして取得できる。",
+    usage: [
+      "編集エリアへ直接入力するか、「/」でブロックメニューを開いて要素を挿入する。",
+      "数式はインラインなら$で、ブロックなら$$で囲んで入力する。",
+      "編集結果はMarkdownソースとして表示され、コピーまたは保存で再利用できる。",
+    ],
+    mechanism: [
+      "ProseMirrorベースのMilkdownエディタで、見たまま編集とMarkdown構文を相互変換。",
+      "数式部分はKaTeXでレンダリングし、TeX記法をそのままMarkdown内に保持。",
+    ],
+    shell: [],
+  },
+  {
     href: "/regex-tester/",
     title: "正規表現チェック",
     description:

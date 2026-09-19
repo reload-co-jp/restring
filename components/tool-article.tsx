@@ -75,6 +75,11 @@ const relatedToolHrefs: Record<string, string[]> = {
   "/sql-builder/": ["/json-validator/", "/regex-tester/", "/text-normalize/"],
   "/json-validator/": ["/json-compare/", "/jwt-decoder/", "/sql-builder/"],
   "/regex-tester/": ["/text-compare/", "/case-converter/", "/text-normalize/"],
+  "/markdown-editor/": [
+    "/html-escape/",
+    "/text-compare/",
+    "/case-converter/",
+  ],
 }
 
 const seoTextByHref: Record<string, SeoText> = {
@@ -486,6 +491,29 @@ const seoTextByHref: Record<string, SeoText> = {
         question: "置換結果も見られる？",
         answer:
           "同じ正規表現パターンでreplaceを実行し、置換後の文字列を確認できる。",
+      },
+    ],
+  },
+  "/markdown-editor/": {
+    useCases: [
+      "README、仕様書、ブログ記事をMarkdown記法を覚えずに書きたいとき。",
+      "数式を含むノートやレポートをMarkdownで残したいとき。",
+      "表やコードブロックを含む文書を素早く組み立てたいとき。",
+    ],
+    tips: [
+      "Markdown記法（#、-、```など）をそのまま入力しても自動的に対応する要素へ変換される。",
+      "数式はインライン$…$とブロック$$…$$の2種類があり、複雑な数式はブロックで書くと見やすい。",
+    ],
+    questions: [
+      {
+        question: "書いた内容をMarkdownファイルとして保存できる？",
+        answer:
+          "編集結果は常にMarkdownソースへ変換され、コピーまたは.mdファイルとして保存できる。",
+      },
+      {
+        question: "数式はどう書けば表示される？",
+        answer:
+          "TeX記法をインラインなら$で、ブロックなら$$で囲むとKaTeXによって数式として表示される。",
       },
     ],
   },

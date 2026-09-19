@@ -17,6 +17,8 @@
   "license": "ISC",
   "packageManager": "pnpm@11.5.3",
   "dependencies": {
+    "@milkdown/crepe": "^7.22.1",
+    "katex": "^0.18.7",
     "next": "^16.2.9",
     "react": "^19.2.7",
     "react-dom": "^19.2.7"

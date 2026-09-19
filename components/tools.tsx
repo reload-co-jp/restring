@@ -215,11 +215,11 @@ const unicodeName = (char: string, codePoint: number) => {
   return names[char] ?? `U+${codePoint.toString(16).toUpperCase().padStart(4, "0")}`
 }
 
-const copyText = async (value: string) => {
+export const copyText = async (value: string) => {
   await navigator.clipboard.writeText(value)
 }
 
-const downloadText = (name: string, value: string) => {
+export const downloadText = (name: string, value: string) => {
   const blob = new Blob([value], { type: "text/plain;charset=utf-8" })
   const url = URL.createObjectURL(blob)
   const link = document.createElement("a")
@@ -591,7 +591,7 @@ export const Panel: FC<{ title: string; children: ReactNode }> = ({
   </section>
 )
 
-const ActionButton: FC<{
+export const ActionButton: FC<{
   children: ReactNode
   onClick: () => void
   title?: string
@@ -620,7 +620,10 @@ const Textarea: FC<{
   </label>
 )
 
-const Result: FC<{ name: string; value: string }> = ({ name, value }) => (
+export const Result: FC<{ name: string; value: string }> = ({
+  name,
+  value,
+}) => (
   <div className="result">
     <div className="resultActions">
       <ActionButton onClick={() => copyText(value)} title="コピー">

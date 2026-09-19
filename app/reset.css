@@ -521,3 +521,33 @@ select {
     grid-template-columns: 1fr;
   }
 }
+
+.markdownEditorRoot {
+  border: 1px solid #9a9a90;
+  max-height: 32rem;
+  overflow: auto;
+}
+
+.markdownEditorRoot .milkdown {
+  --crepe-color-background: #fffdfa;
+  --crepe-color-on-background: #202124;
+  --crepe-color-surface: #f6f5f0;
+  --crepe-color-surface-low: #ececdf;
+  --crepe-color-on-surface: #202124;
+  --crepe-color-on-surface-variant: #4b4b46;
+  --crepe-color-outline: #9a9a90;
+  --crepe-color-primary: #202124;
+  --crepe-color-secondary: #cfcfc5;
+  --crepe-color-on-secondary: #202124;
+  --crepe-color-inverse: #202124;
+  --crepe-color-on-inverse: #fffdfa;
+  --crepe-color-inline-code: #9d2f22;
+  --crepe-color-error: #9d2f22;
+  --crepe-color-hover: #ececdf;
+  --crepe-color-selected: #e0e0d0;
+  --crepe-color-inline-area: #ececdf;
+  --crepe-font-title: inherit;
+  --crepe-font-default: inherit;
+  --crepe-font-code: var(--code-font);
+  padding: 0.75rem;
+}

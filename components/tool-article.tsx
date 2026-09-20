@@ -76,9 +76,14 @@ const relatedToolHrefs: Record<string, string[]> = {
   "/json-validator/": ["/json-compare/", "/jwt-decoder/", "/sql-builder/"],
   "/regex-tester/": ["/text-compare/", "/case-converter/", "/text-normalize/"],
   "/markdown-editor/": [
+    "/tex-helper/",
     "/html-escape/",
     "/text-compare/",
-    "/case-converter/",
+  ],
+  "/tex-helper/": [
+    "/markdown-editor/",
+    "/html-escape/",
+    "/text-compare/",
   ],
 }
 
@@ -514,6 +519,29 @@ const seoTextByHref: Record<string, SeoText> = {
         question: "数式はどう書けば表示される？",
         answer:
           "TeX記法をインラインなら$で、ブロックなら$$で囲むとKaTeXによって数式として表示される。",
+      },
+    ],
+  },
+  "/tex-helper/": {
+    useCases: [
+      "TeXコマンドを覚えていない数式をMarkdown記事やノートへ入れたいとき。",
+      "分数、累乗、総和、積分などの構文をすぐ組み立てたいとき。",
+      "数式が正しく表示されるか、書く前にプレビューで確認したいとき。",
+    ],
+    tips: [
+      "分数や括弧のボタンは、テキストを選択してから押すと選択範囲を囲める。",
+      "複雑な数式は改行しやすいブロック数式（$$…$$）、文中の短い数式はインライン（$…$）が向く。",
+    ],
+    questions: [
+      {
+        question: "TeXコマンドを覚えていなくても使える？",
+        answer:
+          "ギリシャ文字、演算子、分数、総和、積分などのボタンから挿入できるため、コマンドを覚えていなくても数式を組み立てられる。",
+      },
+      {
+        question: "出力先はMarkdownエディタにそのまま貼れる？",
+        answer:
+          "出力はインライン$…$またはブロック$$…$$のMarkdown形式のため、Markdownエディタなど数式対応のMarkdown文書へそのまま貼り付けられる。",
       },
     ],
   },

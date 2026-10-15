@@ -9,6 +9,7 @@ import {
   popularToolHrefs,
   searchTools,
   toolCategories,
+  toolLinks,
 } from "components/tool-links"
 
 export const ToolDirectory: FC = () => {
@@ -22,8 +23,16 @@ export const ToolDirectory: FC = () => {
   return (
     <>
       <section className="hero">
-        <h1>開発のための、小さなツールボックス</h1>
-        <p>
+        <p className="heroEyebrow">
+          <span aria-hidden="true" className="heroDot" />
+          {toolLinks.length} tools · ブラウザ内で完結
+        </p>
+        <h1>
+          開発のための、
+          <br />
+          <span className="heroAccent">小さなツールボックス</span>
+        </h1>
+        <p className="heroLead">
           文字列比較、JSON検証、エンコード、日時変換などをブラウザですばやく処理。入力データは外部へ送信しない。
         </p>
         <div className="heroSearch">
@@ -68,7 +77,9 @@ export const ToolDirectory: FC = () => {
               aria-pressed={category === item.id}
               className="chip"
               key={item.id}
-              onClick={() => setCategory(category === item.id ? undefined : item.id)}
+              onClick={() =>
+                setCategory(category === item.id ? undefined : item.id)
+              }
               type="button"
             >
               <Icon name={item.id} size={14} />
@@ -106,6 +117,7 @@ export const ToolDirectory: FC = () => {
               <h3 id={`category-${item.id}`}>
                 <Icon name={item.id} size={16} />
                 {item.label}
+                <span className="toolGroupCount">{tools.length}</span>
               </h3>
               <ul className="toolGrid">
                 {tools.map((tool) => (

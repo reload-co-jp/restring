@@ -540,20 +540,89 @@ ol {
 /* ---------- Home ---------- */
 
 .hero {
+  background:
+    radial-gradient(
+      60% 80% at 100% 0%,
+      color-mix(in srgb, var(--accent) 14%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 70% at 0% 100%,
+      color-mix(in srgb, var(--accent) 8%, transparent),
+      transparent 70%
+    ),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
   display: grid;
-  gap: 1rem;
-  padding: 1.5rem 0 0.5rem;
+  gap: 1.25rem;
+  isolation: isolate;
+  overflow: hidden;
+  padding: clamp(1.75rem, 5vw, 3.5rem);
+  position: relative;
+}
+
+/* 方眼の地模様。右上から薄く消える */
+.hero::before {
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 28px 28px;
+  content: "";
+  inset: 0;
+  mask-image: radial-gradient(70% 90% at 100% 0%, #000, transparent 75%);
+  opacity: 0.7;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+}
+
+.heroEyebrow {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-2);
+  display: inline-flex;
+  font-family: var(--code-font);
+  font-size: 0.75rem;
+  gap: 0.5rem;
+  justify-self: start;
+  letter-spacing: 0.02em;
+  padding: 0.25rem 0.75rem;
+}
+
+.heroDot {
+  background: var(--added-fg);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--added-fg) 20%, transparent);
+  height: 6px;
+  width: 6px;
 }
 
 .hero h1 {
-  font-size: clamp(1.625rem, 3.5vw, 2.25rem);
-  letter-spacing: -0.01em;
-  line-height: 1.35;
+  font-size: clamp(1.875rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
 }
 
-.hero > p {
+.heroAccent {
+  background: linear-gradient(
+    100deg,
+    var(--accent),
+    color-mix(in srgb, var(--accent) 55%, #9b5de5)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.heroLead {
   color: var(--text-2);
-  max-width: 40rem;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  max-width: 38rem;
 }
 
 .heroSearch {
@@ -573,11 +642,11 @@ ol {
 .heroSearch input {
   background: var(--surface);
   border: 1px solid var(--border-strong);
-  border-radius: 10px;
-  box-shadow: var(--shadow);
+  border-radius: 12px;
+  box-shadow: var(--shadow-hover);
   color: var(--text);
   font-size: 1rem;
-  height: 52px;
+  height: 56px;
   padding: 0 1rem 0 3rem;
   width: 100%;
 }
@@ -690,8 +759,24 @@ ol {
   align-items: center;
   color: var(--text-2);
   display: flex;
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   gap: 0.5rem;
+  letter-spacing: 0.02em;
+}
+
+/* 見出し右へ伸びる罫線 */
+.toolGroup h3::after {
+  background: var(--border);
+  content: "";
+  flex: 1;
+  height: 1px;
+}
+
+.toolGroupCount {
+  color: var(--muted);
+  font-family: var(--code-font);
+  font-size: 0.75rem;
+  font-weight: 400;
 }
 
 .toolGrid {
@@ -706,13 +791,13 @@ ol {
   align-items: flex-start;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 12px;
   box-shadow: var(--shadow);
   color: var(--text-2);
   display: flex;
-  gap: 0.75rem;
+  gap: 0.875rem;
   height: 100%;
-  padding: 1rem;
+  padding: 1.125rem;
   text-decoration: none;
   transition:
     border-color var(--transition),
@@ -721,8 +806,14 @@ ol {
 }
 
 .toolCard:hover {
-  border-color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
   box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+.toolCard:focus-visible {
+  box-shadow: 0 0 0 3px var(--ring);
+  outline: none;
 }
 
 .toolCard > .icon {
@@ -741,13 +832,22 @@ ol {
 .toolCardIcon {
   align-items: center;
   background: var(--accent-soft);
-  border-radius: var(--radius-sm);
+  border: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
+  border-radius: 10px;
   color: var(--accent);
   display: inline-flex;
   flex-shrink: 0;
-  height: 36px;
+  height: 40px;
   justify-content: center;
-  width: 36px;
+  transition:
+    background var(--transition),
+    color var(--transition);
+  width: 40px;
+}
+
+.toolCard:hover .toolCardIcon {
+  background: var(--accent);
+  color: var(--on-accent);
 }
 
 .toolCardBody {

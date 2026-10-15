@@ -1799,3 +1799,37 @@ input::placeholder {
     transition: none !important;
   }
 }
+
+/* QRコード */
+.qrPreview {
+  align-items: start;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
+}
+
+.qrPreview img {
+  aspect-ratio: 1;
+  background: repeating-conic-gradient(var(--border) 0 25%, transparent 0 50%) 0
+    0 / 16px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  width: 100%;
+}
+
+.colorField {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.colorField input {
+  block-size: 2rem;
+  inline-size: 3rem;
+}
+
+@media (max-width: 640px) {
+  .qrPreview {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -287,6 +287,36 @@ export const toolLinks = [
     ],
   },
   {
+    href: "/qr-code-generator/",
+    category: "web" as ToolCategoryId,
+    title: "QRコード生成",
+    description:
+      "URLやテキストからQRコードを作成。誤り訂正レベル・余白・色を指定し、PNGまたはSVGで保存。",
+    introduction:
+      "URLやテキストをQRコードに変換するツール。印刷物やスライドへのURL掲載、イベントの受付、Wi-Fi接続情報の共有などに使える。",
+    usage: [
+      "QRコードにしたいURLやテキストを入力する。",
+      "誤り訂正レベル、余白、色を選ぶ。",
+      "プレビューを確認し、PNGまたはSVGで保存する。",
+    ],
+    mechanism: [
+      "入力をUTF-8のバイト列にし、誤り訂正レベルに応じて最小のバージョン（サイズ）を自動で選んで符号化。",
+      "セルをSVGのパスとして描画し、PNGはSVGをcanvasに描いて書き出す。",
+    ],
+    shell: [
+      {
+        label: "PNGで生成",
+        environment: "qrencode（要インストール）",
+        command: "qrencode -o qrcode.png -s 10 'https://example.com/'",
+      },
+      {
+        label: "ターミナルに表示",
+        environment: "qrencode",
+        command: "qrencode -t ansiutf8 'https://example.com/'",
+      },
+    ],
+  },
+  {
     href: "/html-escape/",
     category: "web" as ToolCategoryId,
     title: "HTMLエスケープ",

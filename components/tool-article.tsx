@@ -76,6 +76,11 @@ const relatedToolHrefs: Record<string, string[]> = {
     "/regex-tester/",
   ],
   "/url-encode-decode/": ["/base64/", "/html-escape/", "/jwt-decoder/"],
+  "/qr-code-generator/": [
+    "/url-encode-decode/",
+    "/character-count/",
+    "/uuid-generator/",
+  ],
   "/base64/": ["/jwt-decoder/", "/url-encode-decode/", "/json-validator/"],
   "/html-escape/": [
     "/html-special-characters/",
@@ -613,6 +618,36 @@ const seoTextByHref: Record<string, SeoText> = {
         question: "Shift_JISとCP932（Windows-31J）の違いは？",
         answer:
           "ブラウザのShift_JISはWHATWG Encoding Standardに従い、①や髙などのNEC・IBM拡張文字を含むCP932相当で扱う。",
+      },
+    ],
+  },
+  "/qr-code-generator/": {
+    useCases: [
+      "チラシやポスター、名刺、スライドにURLを載せたいとき。",
+      "イベントの受付や資料のダウンロード先をスマートフォンで開いてもらいたいとき。",
+      "Wi-Fiの接続情報やメールアドレスをQRコードで共有したいとき。",
+    ],
+    tips: [
+      "内容が短いほどセルが大きくなり、読み取りやすい。長いURLは短縮してから生成する。",
+      "ロゴを重ねたり汚れやすい場所に貼ったりする場合は、誤り訂正レベルをQかHにする。",
+      "周囲の余白（クワイエットゾーン）は4セルが標準。削ると読み取れない端末がある。",
+      "前景を背景より濃い色にする。色を反転させると読み取れないリーダーが多い。",
+    ],
+    questions: [
+      {
+        question: "Wi-FiのQRコードは作れる？",
+        answer:
+          "「WIFI:T:WPA;S:ネットワーク名;P:パスワード;;」の形式で入力すると、iPhoneやAndroidのカメラで読み取って接続できる。",
+      },
+      {
+        question: "印刷にはPNGとSVGのどちらが向いている？",
+        answer:
+          "SVGは拡大しても劣化しないため、印刷物やデザインツールでの編集に向く。Webページや文書への貼り付けにはPNGが手軽。",
+      },
+      {
+        question: "作成したQRコードに有効期限はある？",
+        answer:
+          "ない。QRコードには入力した内容そのものが記録され、外部サービスを経由しないため、ずっと使える。",
       },
     ],
   },

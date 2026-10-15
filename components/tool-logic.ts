@@ -223,8 +223,10 @@ export const copyText = async (value: string) => {
   await navigator.clipboard.writeText(value)
 }
 
-export const downloadText = (name: string, value: string) => {
-  const blob = new Blob([value], { type: "text/plain;charset=utf-8" })
+export const downloadText = (name: string, value: string) =>
+  downloadBlob(name, new Blob([value], { type: "text/plain;charset=utf-8" }))
+
+export const downloadBlob = (name: string, blob: Blob) => {
   const url = URL.createObjectURL(blob)
   const link = document.createElement("a")
   link.href = url
@@ -1355,4 +1357,33 @@ export const stringifyDelimited = (value: unknown, delimiter: string) => {
   return [header, ...rows.map((item) => header.map((key) => item[key]))]
     .map((cells) => cells.map(cell).join(delimiter))
     .join("\n")
+}
+
+/* ---------- QRコード ---------- */
+
+// 暗いモジュールを行ごとに連続した横長の矩形へまとめ、パスを短くする
+// background が空なら背景は透明
+export const qrToSvg = (
+  modules: boolean[][],
+  foreground: string,
+  background: string
+) => {
+  const size = modules.length
+  const path = modules
+    .flatMap((row, y) => {
+      const runs: string[] = []
+      for (let x = 0; x < row.length; x++) {
+        if (!row[x]) continue
+        const start = x
+        while (row[x + 1]) x++
+        const width = x - start + 1
+        runs.push(`M${start} ${y}h${width}v1h-${width}z`)
+      }
+      return runs
+    })
+    .join("")
+  const rect = background
+    ? `<rect width="${size}" height="${size}" fill="${background}"/>`
+    : ""
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges">${rect}<path d="${path}" fill="${foreground}"/></svg>`
 }

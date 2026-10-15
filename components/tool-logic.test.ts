@@ -27,6 +27,7 @@ import {
   hashText,
   type XmlNodeLike,
   parseDelimited,
+  qrToSvg,
   stringifyDelimited,
   valueToXml,
   xmlToValue,
@@ -443,4 +444,17 @@ test("csv and tsv", () => {
   assert.equal(stringifyDelimited({ root: { item: { a: "1" } } }, ","), "a\n1")
   assert.equal(stringifyDelimited({ a: "1" }, ","), "a\n1")
   assert.throws(() => parseDelimited('a\n"b', ","))
+})
+
+test("qr svg", () => {
+  const modules = [
+    [true, true, false],
+    [false, true, true],
+    [true, false, true],
+  ]
+  assert.equal(
+    qrToSvg(modules, "#000000", "#ffffff"),
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 3" shape-rendering="crispEdges"><rect width="3" height="3" fill="#ffffff"/><path d="M0 0h2v1h-2zM1 1h2v1h-2zM0 2h1v1h-1zM2 2h1v1h-1z" fill="#000000"/></svg>'
+  )
+  assert.ok(!qrToSvg(modules, "#000000", "").includes("<rect"))
 })

@@ -202,6 +202,22 @@ export const terms: Term[] = [
     tool: "/jwt-decoder/",
   },
   {
+    id: "qr-code",
+    term: "QRコード",
+    category: "web",
+    description:
+      "白黒のセルを格子状に並べてデータを表す2次元コード。最大で数字7,089文字、バイナリ2,953バイトを記録でき、汚れや欠けがあっても誤り訂正で読み取れる。",
+    tool: "/qr-code-generator/",
+  },
+  {
+    id: "error-correction",
+    term: "誤り訂正レベル（L / M / Q / H）",
+    category: "web",
+    description:
+      "QRコードが欠けても復元できる割合。Lは約7%、Mは約15%、Qは約25%、Hは約30%。レベルを上げるほど読み取りに強くなるが、同じ内容でもセル数が増える。",
+    tool: "/qr-code-generator/",
+  },
+  {
     id: "hash",
     term: "ハッシュ関数",
     category: "web",

@@ -72,6 +72,16 @@ import {
   verifyJwtSignature,
   visibleText,
   xmlDeclaration,
+  PasswordCharset,
+  Radix,
+  WidthMode,
+  convertWidth,
+  generatePassword,
+  parseRadix,
+  parseUrl,
+  parseWareki,
+  radixes,
+  toWareki,
 } from "components/tool-logic"
 
 export { copyText, downloadText } from "components/tool-logic"
@@ -2321,3 +2331,331 @@ export const XmlParserTool: FC = () => (
     <XmlParser />
   </ClientOnly>
 )
+
+/* ---------- 全角・半角・かな変換 ---------- */
+
+const sampleWidth = "Ｒｅｓｔｒｉｎｇ　２０２６！ ﾃｷｽﾄ へんかん"
+
+export const WidthConverterTool: FC = () => {
+  const [value, setValue] = useState(sampleWidth)
+  const [mode, setMode] = useState<WidthMode>("half")
+
+  return (
+    <Panel title="全角・半角・かな変換">
+      <TextArea
+        label="入力"
+        onChange={setValue}
+        rows={4}
+        sample={sampleWidth}
+        value={value}
+      />
+      <Segmented
+        label="変換形式"
+        onChange={setMode}
+        options={[
+          { value: "half", label: "英数記号を半角" },
+          { value: "full", label: "全角（半角カナ含む）" },
+          { value: "katakana", label: "ひらがな→カタカナ" },
+          { value: "hiragana", label: "カタカナ→ひらがな" },
+        ]}
+        value={mode}
+      />
+      <Result name="converted.txt" value={convertWidth(value, mode)} />
+    </Panel>
+  )
+}
+
+/* ---------- 和暦・西暦変換 ---------- */
+
+const KvRows: FC<{ rows: string[][] }> = ({ rows }) => (
+  <dl className="kvList">
+    {rows.map(([label, text]) => (
+      <div key={label}>
+        <dt>{label}</dt>
+        <dd>
+          <code>{text}</code>
+          <CopyButton label="コピー" value={text} variant="ghost" />
+        </dd>
+      </div>
+    ))}
+  </dl>
+)
+
+const todayIso = () => {
+  const now = new Date()
+  return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+    .toISOString()
+    .slice(0, 10)
+}
+
+const WarekiConverter: FC = () => {
+  const [western, setWestern] = useState(todayIso)
+  const [wareki, setWareki] = useState(() => toWareki(todayIso())?.text ?? "")
+  const westernId = useId()
+  const toResult = /^\d{4}-\d{2}-\d{2}$/.test(western)
+    ? toWareki(western)
+    : null
+  const fromResult = parseWareki(wareki)
+
+  return (
+    <>
+      <div className="field">
+        <FieldHead id={westernId} label="西暦 → 和暦" />
+        <input
+          className="textInput mono"
+          id={westernId}
+          max="9999-12-31"
+          min="1868-01-25"
+          onChange={(event) => setWestern(event.target.value)}
+          type="date"
+          value={western}
+        />
+      </div>
+      {toResult ? (
+        <KvRows
+          rows={[
+            ["和暦", toResult.text],
+            ["元号・年", `${toResult.era}${toResult.year}年`],
+          ]}
+        />
+      ) : (
+        <Status tone="warn">明治（1868年1月25日）以降の日付を入力</Status>
+      )}
+      <TextInput
+        error={
+          wareki.trim() !== "" && !fromResult
+            ? "元号の範囲外、または形式が不正"
+            : undefined
+        }
+        hint="例: 令和8年10月15日、平成元年1月8日、R8.10.15、H31/4/30"
+        label="和暦 → 西暦"
+        mono={false}
+        onChange={setWareki}
+        value={wareki}
+      />
+      {fromResult && (
+        <KvRows
+          rows={[
+            ["西暦", fromResult],
+            [
+              "日本語表記",
+              fromResult.replace(/^(\d+)-0?(\d+)-0?(\d+)$/, "$1年$2月$3日"),
+            ],
+          ]}
+        />
+      )}
+    </>
+  )
+}
+
+export const WarekiConverterTool: FC = () => (
+  <Panel title="和暦・西暦変換">
+    <ClientOnly>
+      <WarekiConverter />
+    </ClientOnly>
+  </Panel>
+)
+
+/* ---------- 進数変換 ---------- */
+
+const radixLabels: Record<Radix, string> = {
+  2: "2進数",
+  8: "8進数",
+  10: "10進数",
+  16: "16進数",
+}
+
+export const RadixConverterTool: FC = () => {
+  const [value, setValue] = useState("255")
+  const [radix, setRadix] = useState<`${Radix}`>("10")
+  const parsed = parseRadix(value, Number(radix) as Radix)
+
+  return (
+    <Panel title="進数変換">
+      <Segmented
+        label="入力の進数"
+        onChange={setRadix}
+        options={radixes.map((item) => ({
+          value: `${item}` as const,
+          label: radixLabels[item],
+        }))}
+        value={radix}
+      />
+      <TextInput
+        error={
+          value.trim() !== "" && parsed === null
+            ? `${radixLabels[Number(radix) as Radix]}として解釈できない文字を含む`
+            : undefined
+        }
+        hint="桁数の上限なし。空白・アンダースコア区切り、0x・0b・0o接頭辞、負数に対応。"
+        label="値"
+        onChange={setValue}
+        value={value}
+      />
+      {parsed !== null && (
+        <KvRows
+          rows={radixes.map((item) => [
+            radixLabels[item],
+            parsed.toString(item).toUpperCase(),
+          ])}
+        />
+      )}
+    </Panel>
+  )
+}
+
+/* ---------- パスワード生成 ---------- */
+
+const charsetLabels: Record<PasswordCharset, string> = {
+  upper: "大文字",
+  lower: "小文字",
+  digit: "数字",
+  symbol: "記号",
+}
+
+const PasswordGenerator: FC = () => {
+  const [length, setLength] = useState<"8" | "12" | "16" | "24" | "32" | "64">(
+    "16"
+  )
+  const [sets, setSets] = useState<PasswordCharset[]>([
+    "upper",
+    "lower",
+    "digit",
+  ])
+  const [excludeAmbiguous, setExcludeAmbiguous] = useState(false)
+  const [seed, setSeed] = useState(0)
+  // seedを変えると再生成
+  const passwords = useMemo(
+    () =>
+      Array.from({ length: 5 }, () =>
+        generatePassword(Number(length), sets, excludeAmbiguous)
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [length, sets, excludeAmbiguous, seed]
+  )
+  const toggle = (set: PasswordCharset, checked: boolean) =>
+    setSets(
+      (Object.keys(charsetLabels) as PasswordCharset[]).filter((item) =>
+        item === set ? checked : sets.includes(item)
+      )
+    )
+
+  return (
+    <>
+      <div className="toolbar">
+        <Segmented
+          label="文字数"
+          onChange={setLength}
+          options={(["8", "12", "16", "24", "32", "64"] as const).map(
+            (item) => ({ value: item, label: item })
+          )}
+          value={length}
+        />
+        <fieldset className="checkGroup">
+          <legend>文字種</legend>
+          {(Object.keys(charsetLabels) as PasswordCharset[]).map((set) => (
+            <Checkbox
+              checked={sets.includes(set)}
+              key={set}
+              label={charsetLabels[set]}
+              onChange={(checked) => toggle(set, checked)}
+            />
+          ))}
+          <Checkbox
+            checked={excludeAmbiguous}
+            label="紛らわしい文字（Il1O0o）を除外"
+            onChange={setExcludeAmbiguous}
+          />
+        </fieldset>
+        <ActionButton onClick={() => setSeed(seed + 1)} variant="primary">
+          再生成
+        </ActionButton>
+      </div>
+      {sets.length === 0 ? (
+        <Status tone="warn">文字種を1つ以上選択</Status>
+      ) : (
+        <Result
+          label="パスワード"
+          name="passwords.txt"
+          value={passwords.join("\n")}
+        />
+      )}
+    </>
+  )
+}
+
+export const PasswordGeneratorTool: FC = () => (
+  <Panel
+    description="crypto.getRandomValues()で暗号論的に安全な乱数から生成。"
+    title="パスワード生成"
+  >
+    <ClientOnly>
+      <PasswordGenerator />
+    </ClientOnly>
+  </Panel>
+)
+
+/* ---------- URL解析 ---------- */
+
+const sampleUrl =
+  "https://user@example.com:8080/search/result?q=%E6%97%A5%E6%9C%AC&page=2&tag=a&tag=b#top"
+
+export const UrlParserTool: FC = () => {
+  const [value, setValue] = useState(sampleUrl)
+  const parsed = parseUrl(value)
+  const url = parsed?.url
+
+  return (
+    <Panel title="URL解析">
+      <TextInput
+        error={
+          value.trim() !== "" && !parsed
+            ? "URLとして解釈できない（https://などのスキームから入力）"
+            : undefined
+        }
+        label="URL"
+        onChange={setValue}
+        value={value}
+      />
+      {url && (
+        <KvRows
+          rows={[
+            ["プロトコル", url.protocol],
+            ["ユーザー名", url.username],
+            ["ホスト名", url.hostname],
+            ["ポート", url.port],
+            ["オリジン", url.origin],
+            ["パス", url.pathname],
+            ["パス（デコード）", safeDecodeURIComponent(url.pathname).value],
+            ["クエリ", url.search],
+            ["フラグメント", url.hash],
+          ].filter(([, text]) => text && text !== "null")}
+        />
+      )}
+      {parsed && parsed.params.length > 0 && (
+        <div className="tableWrap">
+          <table className="dataTable">
+            <thead>
+              <tr>
+                <th scope="col">キー</th>
+                <th scope="col">値（デコード済み）</th>
+              </tr>
+            </thead>
+            <tbody>
+              {parsed.params.map(([key, param], index) => (
+                <tr key={index}>
+                  <td>
+                    <code>{key}</code>
+                  </td>
+                  <td>
+                    <code>{param}</code>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </Panel>
+  )
+}

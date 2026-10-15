@@ -36,6 +36,13 @@ import {
   parseHexBytes,
   processLines,
   repairMojibake,
+  convertWidth,
+  toWareki,
+  fromWareki,
+  parseWareki,
+  parseRadix,
+  generatePassword,
+  parseUrl,
 } from "./tool-logic.ts"
 import { searchTools } from "./tool-links.ts"
 
@@ -457,4 +464,55 @@ test("qr svg", () => {
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 3" shape-rendering="crispEdges"><rect width="3" height="3" fill="#ffffff"/><path d="M0 0h2v1h-2zM1 1h2v1h-2zM0 2h1v1h-1zM2 2h1v1h-1z" fill="#000000"/></svg>'
   )
   assert.ok(!qrToSvg(modules, "#000000", "").includes("<rect"))
+})
+
+test("width conversion", () => {
+  assert.equal(convertWidth("ＡＢＣ１２３！　", "half"), "ABC123! ")
+  assert.equal(convertWidth("AB1! ｶﾞｷﾞｸﾞ", "full"), "ＡＢ１！　ガギグ")
+  assert.equal(convertWidth("ひらがなゔ", "katakana"), "ヒラガナヴ")
+  assert.equal(convertWidth("カタカナー", "hiragana"), "かたかなー")
+})
+
+test("wareki", () => {
+  assert.equal(toWareki("2019-05-01")?.text, "令和元年5月1日")
+  assert.equal(toWareki("2019-04-30")?.text, "平成31年4月30日")
+  assert.equal(toWareki("1989-01-07")?.text, "昭和64年1月7日")
+  assert.equal(toWareki("1800-01-01"), null)
+  assert.equal(fromWareki("平成", 31, 4, 30), "2019-04-30")
+  assert.equal(fromWareki("平成", 31, 5, 1), null)
+  assert.equal(fromWareki("令和", 1, 2, 30), null)
+  assert.equal(parseWareki("令和元年5月1日"), "2019-05-01")
+  assert.equal(parseWareki("H31.4.30"), "2019-04-30")
+  assert.equal(parseWareki("ｓ６４／１／７"), "1989-01-07")
+  assert.equal(parseWareki("令和8年"), null)
+})
+
+test("radix parsing", () => {
+  assert.equal(parseRadix("0xFF", 16), BigInt(255))
+  assert.equal(parseRadix("1111_0000", 2), BigInt(240))
+  assert.equal(parseRadix("-17", 8), -BigInt(15))
+  assert.equal(parseRadix("12a", 10), null)
+  assert.equal(
+    parseRadix("ffffffffffffffffffff", 16)?.toString(10),
+    "1208925819614629174706175"
+  )
+})
+
+test("password generation", () => {
+  const password = generatePassword(16, ["upper", "digit"], true)
+  assert.equal(password.length, 16)
+  assert.match(password, /^[A-HJ-NP-Z2-9]+$/)
+  assert.match(password, /[A-Z]/)
+  assert.match(password, /\d/)
+  assert.equal(generatePassword(16, [], false), "")
+})
+
+test("url parsing", () => {
+  const parsed = parseUrl("https://example.com:8080/a?q=%E6%97%A5&q=2#top")
+  assert.equal(parsed?.url.port, "8080")
+  assert.deepEqual(parsed?.params, [
+    ["q", "日"],
+    ["q", "2"],
+  ])
+  assert.equal(parseUrl("not a url"), null)
 })

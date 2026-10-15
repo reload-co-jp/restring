@@ -112,6 +112,23 @@ const relatedToolHrefs: Record<string, string[]> = {
   "/regex-tester/": ["/text-compare/", "/case-converter/", "/text-normalize/"],
   "/markdown-editor/": ["/tex-helper/", "/html-escape/", "/text-compare/"],
   "/tex-helper/": ["/markdown-editor/", "/html-escape/", "/text-compare/"],
+  "/width-converter/": [
+    "/text-normalize/",
+    "/case-converter/",
+    "/character-count/",
+  ],
+  "/wareki-converter/": [
+    "/epoch-converter/",
+    "/timezone-converter/",
+    "/cron-parser/",
+  ],
+  "/radix-converter/": [
+    "/unicode-inspector/",
+    "/character-encoding/",
+    "/hash-generator/",
+  ],
+  "/password-generator/": ["/uuid-generator/", "/hash-generator/", "/base64/"],
+  "/url-parser/": ["/url-encode-decode/", "/qr-code-generator/", "/base64/"],
 }
 
 const seoTextByHref: Record<string, SeoText> = {
@@ -719,6 +736,117 @@ const seoTextByHref: Record<string, SeoText> = {
         question: "実行日時はどのタイムゾーン？",
         answer:
           "ブラウザのタイムゾーンで計算する。サーバーがUTCで動く場合はタイムゾーン変換ツールで時差を確認する。",
+      },
+    ],
+  },
+  "/width-converter/": {
+    useCases: [
+      "フォームに入力された全角英数字を半角へそろえたいとき。",
+      "住所や氏名の半角カナを全角カナへ直したいとき。",
+      "ふりがなをひらがな・カタカナのどちらかに統一したいとき。",
+    ],
+    tips: [
+      "全角変換では半角スペースも全角スペースになる。スペースを残したい場合は変換後に置換する。",
+      "長音符「ー」はひらがな・カタカナ共通のため変換しない。",
+    ],
+    questions: [
+      {
+        question: "全角カナを半角カナにできる？",
+        answer:
+          "未対応。半角カナは機種依存や文字化けの原因になりやすいため、全角への統一を推奨する。",
+      },
+      {
+        question: "テキスト正規化ツールとの違いは？",
+        answer:
+          "テキスト正規化はUnicode正規化や空白の整理を行う。このツールは全角・半角・かなの向きを指定して変換する。",
+      },
+    ],
+  },
+  "/wareki-converter/": {
+    useCases: [
+      "役所や銀行の書類に和暦で日付を書きたいとき。",
+      "生年月日を和暦と西暦で確認したいとき。",
+      "改元前後の日付がどの元号になるか調べたいとき。",
+    ],
+    tips: [
+      "元号の1年目は「元年」と表記する。入力でも「元年」と数字の「1年」の両方を受け付ける。",
+      "昭和64年は1月7日まで、平成31年は4月30日までと短い。",
+    ],
+    questions: [
+      {
+        question: "令和の年を簡単に計算する方法は？",
+        answer: "西暦から2018を引く。平成は1988、昭和は1925を引く。",
+      },
+      {
+        question: "明治5年以前の日付は正しい？",
+        answer:
+          "明治5年までは旧暦（太陰太陽暦）のため、このツールのグレゴリオ暦の日付とは一致しない。",
+      },
+    ],
+  },
+  "/radix-converter/": {
+    useCases: [
+      "ビットフラグやビットマスクを2進数で確認したいとき。",
+      "16進数のカラーコードやメモリアドレスを10進数で見たいとき。",
+      "chmodの8進数パーミッションをビットで確認したいとき。",
+    ],
+    tips: [
+      "2進数は4桁ごとに16進数の1桁に対応する。",
+      "負数は2の補数ではなく、先頭に「-」を付けた絶対値で表示する。",
+    ],
+    questions: [
+      {
+        question: "大きな数値でも誤差は出ない？",
+        answer: "BigIntで計算するため、桁数に関係なく誤差なく変換できる。",
+      },
+      {
+        question: "小数は変換できる？",
+        answer: "整数のみ対応。",
+      },
+    ],
+  },
+  "/password-generator/": {
+    useCases: [
+      "新しいアカウントの初期パスワードを用意したいとき。",
+      "テスト環境の認証情報やシークレットの仮値を作りたいとき。",
+      "記号を使えないサービス向けに英数字だけのパスワードを作りたいとき。",
+    ],
+    tips: [
+      "長さは文字種の多さより強度に効く。16文字以上を推奨する。",
+      "紙に書き写す場合は紛らわしい文字の除外を有効にする。",
+    ],
+    questions: [
+      {
+        question: "生成したパスワードは送信・保存される？",
+        answer: "生成はブラウザ内で完結し、サーバーへ送信・保存しない。",
+      },
+      {
+        question: "Math.random()と何が違う？",
+        answer:
+          "crypto.getRandomValues()は暗号論的に安全な乱数で、出力から次の値を予測できない。",
+      },
+    ],
+  },
+  "/url-parser/": {
+    useCases: [
+      "長いトラッキングURLのパラメータを確認したいとき。",
+      "APIのリクエストURLのクエリが意図どおりか確かめたいとき。",
+      "パーセントエンコードされた日本語のパスやクエリを読みたいとき。",
+    ],
+    tips: [
+      "クエリの「+」はスペースとしてデコードされる。",
+      "フラグメント（#以降）はサーバーへ送信されない。",
+    ],
+    questions: [
+      {
+        question: "スキームのないURLは解析できる？",
+        answer:
+          "解析できない。example.comのような入力はhttps://を付けて入力する。",
+      },
+      {
+        question: "URLエンコード・デコードツールとの違いは？",
+        answer:
+          "URLエンコードは文字列全体を変換する。このツールはURLを構成要素に分解してから各値をデコードする。",
       },
     ],
   },

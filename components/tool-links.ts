@@ -825,6 +825,147 @@ export const toolLinks = [
       },
     ],
   },
+  {
+    href: "/width-converter/",
+    category: "text" as ToolCategoryId,
+    title: "全角・半角・かな変換",
+    description:
+      "全角英数字・記号と半角を相互変換。半角カナの全角化、ひらがな・カタカナ変換に対応。",
+    introduction:
+      "全角・半角とひらがな・カタカナを変換するツール。フォーム入力値、CSV、住所データの表記揺れの統一に使える。",
+    usage: [
+      "変換したい文字列を入力する。",
+      "変換形式を選ぶ。",
+      "結果をコピーまたは保存する。",
+    ],
+    mechanism: [
+      "全角英数字・記号（U+FF01〜FF5E）と半角（U+0021〜007E）の文字コード差0xFEE0を利用して変換。全角スペースは半角スペースに対応させる。",
+      "半角カナはUnicode NFKC正規化で濁点・半濁点ごと全角カタカナへ変換。",
+      "ひらがなとカタカナは文字コード差0x60を利用して変換。長音符「ー」はそのまま残す。",
+    ],
+    shell: [
+      {
+        label: "全角英数字を半角へ変換",
+        environment: "Python 3",
+        command:
+          "python3 -c 'import sys; print(sys.stdin.read().translate({c: c - 0xFEE0 for c in range(0xFF01, 0xFF5F)}), end=\"\")'",
+      },
+      {
+        label: "半角カナ・全角英数字を正規化",
+        environment: "nkf（要インストール）",
+        command: "nkf -w -Z1 -X input.txt",
+      },
+    ],
+  },
+  {
+    href: "/wareki-converter/",
+    category: "time" as ToolCategoryId,
+    title: "和暦・西暦変換",
+    description:
+      "西暦と和暦（令和・平成・昭和・大正・明治）を相互変換。元年表記やR8.10.15形式に対応。",
+    introduction:
+      "西暦と和暦を相互に変換するツール。改元をまたぐ日付も日単位で判定するため、書類作成や生年月日の確認に使える。",
+    usage: [
+      "西暦の日付を選ぶと和暦を表示する。",
+      "和暦を入力すると西暦を表示する。",
+      "結果をコピーする。",
+    ],
+    mechanism: [
+      "各元号の開始日（令和2019年5月1日、平成1989年1月8日、昭和1926年12月25日、大正1912年7月30日、明治1868年1月25日）と比較して元号を判定。",
+      "和暦の入力は全角数字や「R」「H」などの略記をNFKC正規化してから解析し、元号の範囲外の日付はエラーにする。",
+      "明治5年以前の旧暦期間もグレゴリオ暦の日付として扱う。",
+    ],
+    shell: [
+      {
+        label: "今日の日付を令和で表示",
+        environment: "Python 3",
+        command:
+          "python3 -c 'import datetime as d; t=d.date.today(); print(f\"令和{t.year-2018}年{t.month}月{t.day}日\")'",
+      },
+    ],
+  },
+  {
+    href: "/radix-converter/",
+    category: "dev" as ToolCategoryId,
+    title: "進数変換",
+    description:
+      "2進数・8進数・10進数・16進数を相互変換。桁数の上限なし、負数と0x・0b接頭辞に対応。",
+    introduction:
+      "数値を2進数・8進数・10進数・16進数で同時に表示するツール。ビットフラグ、パーミッション、カラーコード、メモリアドレスの確認に使える。",
+    usage: [
+      "入力の進数を選ぶ。",
+      "値を入力する。",
+      "各進数の結果をコピーする。",
+    ],
+    mechanism: [
+      "BigIntで解析するため、Number.MAX_SAFE_INTEGERを超える桁数でも誤差なく変換。",
+      "空白・アンダースコアの区切り、0x・0b・0oの接頭辞、先頭の「-」を解釈。",
+    ],
+    shell: [
+      {
+        label: "16進数を10進数へ変換",
+        environment: "bash / zsh",
+        command: "echo $((16#ff))",
+      },
+      {
+        label: "10進数を2進数へ変換",
+        environment: "bc",
+        command: "echo 'obase=2; 255' | bc",
+      },
+    ],
+  },
+  {
+    href: "/password-generator/",
+    category: "dev" as ToolCategoryId,
+    title: "パスワード生成",
+    description:
+      "安全なランダムパスワードを生成。文字数、文字種、紛らわしい文字の除外を指定可能。",
+    introduction:
+      "ランダムなパスワードを生成するツール。アカウント作成、APIキーの仮値、テスト用の認証情報の作成に使える。",
+    usage: [
+      "文字数と文字種を選ぶ。",
+      "必要に応じて紛らわしい文字を除外する。",
+      "結果をコピーまたは保存する。",
+    ],
+    mechanism: [
+      "crypto.getRandomValues()で暗号論的に安全な乱数を取得。剰余による偏りを避けるため、範囲外の乱数は引き直す。",
+      "選択した文字種を最低1文字ずつ含むまで生成し直す。",
+      "生成はブラウザ内で完結し、サーバーへ送信しない。",
+    ],
+    shell: [
+      {
+        label: "ランダムなパスワードを生成",
+        environment: "OpenSSL",
+        command: "openssl rand -base64 24",
+      },
+    ],
+  },
+  {
+    href: "/url-parser/",
+    category: "web" as ToolCategoryId,
+    title: "URL解析",
+    description:
+      "URLをプロトコル、ホスト、パス、クエリ、フラグメントに分解。クエリパラメータをデコードして一覧表示。",
+    introduction:
+      "URLを構成要素に分解するツール。長いトラッキングURL、APIのリクエストURL、リダイレクト先の確認に使える。",
+    usage: [
+      "解析したいURLを入力する。",
+      "各構成要素とクエリパラメータを確認する。",
+      "必要な値をコピーする。",
+    ],
+    mechanism: [
+      "ブラウザ標準のURL APIで解析。ホスト名の国際化ドメインはPunycodeで表示される。",
+      "クエリはURLSearchParamsでデコードし、同じキーが複数あればすべて表示。",
+    ],
+    shell: [
+      {
+        label: "URLを分解",
+        environment: "Python 3",
+        command:
+          "python3 -c 'import sys,urllib.parse as u; p=u.urlsplit(sys.argv[1]); print(p); print(u.parse_qsl(p.query))' 'https://example.com/?q=1'",
+      },
+    ],
+  },
 ]
 
 export type ToolLink = (typeof toolLinks)[number]

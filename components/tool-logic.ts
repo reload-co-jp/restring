@@ -1387,3 +1387,184 @@ export const qrToSvg = (
     : ""
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges">${rect}<path d="${path}" fill="${foreground}"/></svg>`
 }
+
+/* ---------- 全角・半角・かな変換 ---------- */
+
+export type WidthMode = "half" | "full" | "katakana" | "hiragana"
+
+// 英数記号（U+FF01〜FF5E）と全角スペースは半角と0xFEE0差。半角カナはNFKCで濁点ごと全角へ
+export const convertWidth = (value: string, mode: WidthMode) => {
+  if (mode === "half")
+    return value
+      .replace(/[！-～]/g, (char) =>
+        String.fromCharCode(char.charCodeAt(0) - 0xfee0)
+      )
+      .replace(/\u3000/g, " ")
+  if (mode === "full")
+    return value
+      .replace(/[!-~]/g, (char) =>
+        String.fromCharCode(char.charCodeAt(0) + 0xfee0)
+      )
+      .replace(/ /g, "　")
+      .replace(/[｡-ﾟ]+/g, (kana) => kana.normalize("NFKC"))
+  // ひらがな（U+3041〜3096）とカタカナは0x60差
+  if (mode === "katakana")
+    return value.replace(/[ぁ-ゖ]/g, (char) =>
+      String.fromCharCode(char.charCodeAt(0) + 0x60)
+    )
+  return value.replace(/[ァ-ヶ]/g, (char) =>
+    String.fromCharCode(char.charCodeAt(0) - 0x60)
+  )
+}
+
+/* ---------- 和暦 ---------- */
+
+// 明治は改暦前（1872年以前）も便宜上グレゴリオ暦で扱う
+export const eras = [
+  { name: "令和", start: "2019-05-01" },
+  { name: "平成", start: "1989-01-08" },
+  { name: "昭和", start: "1926-12-25" },
+  { name: "大正", start: "1912-07-30" },
+  { name: "明治", start: "1868-01-25" },
+] as const
+
+export type EraName = (typeof eras)[number]["name"]
+
+// date: YYYY-MM-DD
+export const toWareki = (date: string) => {
+  const era = eras.find((item) => date >= item.start)
+  if (!era) return null
+  const [year, month, day] = date.split("-").map(Number)
+  const eraYear = year - Number(era.start.slice(0, 4)) + 1
+  return {
+    era: era.name,
+    year: eraYear,
+    text: `${era.name}${eraYear === 1 ? "元" : eraYear}年${month}月${day}日`,
+  }
+}
+
+// 元号の範囲外ならnull
+export const fromWareki = (
+  era: EraName,
+  eraYear: number,
+  month: number,
+  day: number
+) => {
+  const start = eras.find((item) => item.name === era)!.start
+  const year = Number(start.slice(0, 4)) + eraYear - 1
+  const date = new Date(Date.UTC(year, month - 1, day))
+  if (date.getUTCMonth() !== month - 1 || eraYear < 1) return null
+  const iso = date.toISOString().slice(0, 10)
+  return toWareki(iso)?.era === era ? iso : null
+}
+
+const eraInitials: Record<string, EraName> = {
+  M: "明治",
+  T: "大正",
+  S: "昭和",
+  H: "平成",
+  R: "令和",
+}
+
+// 「令和8年10月15日」「R8.10.15」「H31/4/30」形式
+export const parseWareki = (value: string) => {
+  const match = value
+    .normalize("NFKC")
+    .trim()
+    .match(
+      /^(明治|大正|昭和|平成|令和|[MTSHR])\s*(元|\d+)\s*[年./-]\s*(\d+)\s*[月./-]\s*(\d+)\s*日?$/i
+    )
+  if (!match) return null
+  const era = eraInitials[match[1].toUpperCase()] ?? (match[1] as EraName)
+  const eraYear = match[2] === "元" ? 1 : Number(match[2])
+  return fromWareki(era, eraYear, Number(match[3]), Number(match[4]))
+}
+
+/* ---------- 進数変換 ---------- */
+
+export const radixes = [2, 8, 10, 16] as const
+export type Radix = (typeof radixes)[number]
+
+const radixPrefix: Record<Radix, string> = {
+  2: "0b",
+  8: "0o",
+  10: "",
+  16: "0x",
+}
+const radixDigits: Record<Radix, RegExp> = {
+  2: /^[01]+$/,
+  8: /^[0-7]+$/,
+  10: /^\d+$/,
+  16: /^[\da-f]+$/i,
+}
+
+// 任意桁数に対応するためBigIntで解析。区切りの空白・アンダースコアと0x等の接頭辞は無視
+export const parseRadix = (value: string, radix: Radix) => {
+  const trimmed = value.replace(/[\s_]/g, "")
+  const negative = trimmed.startsWith("-")
+  const digits = trimmed
+    .replace(/^-/, "")
+    .replace(new RegExp(`^${radixPrefix[radix]}`, "i"), "")
+  if (!radixDigits[radix].test(digits)) return null
+  const parsed = BigInt(`${radixPrefix[radix]}${digits}`)
+  return negative ? -parsed : parsed
+}
+
+/* ---------- パスワード生成 ---------- */
+
+export const passwordCharsets = {
+  upper: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  lower: "abcdefghijklmnopqrstuvwxyz",
+  digit: "0123456789",
+  symbol: "!#$%&()*+,-./:;<=>?@[]^_{|}~",
+} as const
+
+export type PasswordCharset = keyof typeof passwordCharsets
+
+const ambiguousChars = /[Il1O0o]/g
+
+// 剰余の偏りを避けるため、範囲外の乱数は捨てて引き直す
+const randomIndex = (size: number) => {
+  const limit = Math.floor(0x100000000 / size) * size
+  const buffer = new Uint32Array(1)
+  do crypto.getRandomValues(buffer)
+  while (buffer[0] >= limit)
+  return buffer[0] % size
+}
+
+// 選んだ文字種を最低1文字ずつ含める
+export const generatePassword = (
+  length: number,
+  sets: PasswordCharset[],
+  excludeAmbiguous: boolean
+) => {
+  const groups = sets.map((set) =>
+    excludeAmbiguous
+      ? passwordCharsets[set].replace(ambiguousChars, "")
+      : passwordCharsets[set]
+  )
+  const all = groups.join("")
+  if (!all || length < groups.length) return ""
+  for (;;) {
+    const password = Array.from(
+      { length },
+      () => all[randomIndex(all.length)]
+    ).join("")
+    if (groups.every((group) => [...password].some((c) => group.includes(c))))
+      return password
+  }
+}
+
+/* ---------- URL解析 ---------- */
+
+export const parseUrl = (value: string) => {
+  try {
+    const url = new URL(value.trim())
+    return {
+      url,
+      params: [...url.searchParams.entries()],
+    }
+  } catch {
+    return null
+  }
+}

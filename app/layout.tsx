@@ -143,6 +143,9 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
                 入力した文字列はブラウザ内で処理し、サーバーへ送信・保存しない。テーマ設定のみブラウザに保存する。アクセス解析にGoogle
                 Analyticsを利用。
               </p>
+              <p>
+                <Link href="/glossary/">用語集</Link>
+              </p>
             </section>
             <nav aria-label="全ツール" className="footerTools">
               {toolCategories.map((category) => (

@@ -5,7 +5,7 @@ import { absoluteUrl } from "components/seo"
 export const dynamic = "force-static"
 
 const lastModified = new Date(
-  process.env.NEXT_PUBLIC_SITE_UPDATED_AT ?? "2026-07-07"
+  process.env.NEXT_PUBLIC_SITE_UPDATED_AT ?? "2026-10-15"
 )
 
 const sitemap = (): MetadataRoute.Sitemap => [

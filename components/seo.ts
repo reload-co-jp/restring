@@ -6,7 +6,7 @@ export const siteUrl =
 export const siteName = "Restring"
 
 export const siteDescription =
-  "開発者向け文字列処理・比較ツール集。テキスト比較、JSON比較、JWT解析、Base64、URLエンコード、HTMLエスケープ、Unicode確認をブラウザで実行。"
+  "開発者向け文字列処理・比較ツール集。テキスト比較、JSON比較・検証、JWT解析、Base64、URLエンコード、正規表現テスト、SQL生成、Markdownエディタ、TeX数式入力などをブラウザで実行。"
 
 export const siteKeywords = [
   "文字列処理",
@@ -17,6 +17,11 @@ export const siteKeywords = [
   "URLエンコード",
   "HTMLエスケープ",
   "Unicode",
+  "正規表現",
+  "JSON検証",
+  "UNIX時間変換",
+  "Markdownエディタ",
+  "TeX数式",
   "開発者ツール",
 ]
 

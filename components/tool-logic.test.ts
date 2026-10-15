@@ -23,7 +23,14 @@ import {
   decodeBytes,
   describeCron,
   encodeText,
+  formatXml,
   hashText,
+  type XmlNodeLike,
+  parseDelimited,
+  stringifyDelimited,
+  valueToXml,
+  xmlToValue,
+  locateXmlError,
   nextCronRuns,
   parseHexBytes,
   processLines,
@@ -241,4 +248,199 @@ test("cron", () => {
   assert.equal(describeCron("0 9 * * 1-5")[4].value, "月, 火, 水, 木, 金")
   assert.throws(() => describeCron("60 * * * *"))
   assert.throws(() => describeCron("* * *"))
+})
+
+test("xml format and error location", () => {
+  const text = (value: string): XmlNodeLike => ({
+    nodeType: 3,
+    nodeName: "#text",
+    nodeValue: value,
+    childNodes: [],
+  })
+  const element = (
+    name: string,
+    childNodes: XmlNodeLike[],
+    attributes: XmlNodeLike["attributes"] = []
+  ): XmlNodeLike => ({
+    nodeType: 1,
+    nodeName: name,
+    nodeValue: null,
+    childNodes,
+    attributes,
+  })
+  const doc: XmlNodeLike = {
+    nodeType: 9,
+    nodeName: "#document",
+    nodeValue: null,
+    childNodes: [
+      element("root", [
+        text("\n  "),
+        element("item", [text(" a & b ")], [{ name: "id", value: '1"' }]),
+        {
+          nodeType: 8,
+          nodeName: "#comment",
+          nodeValue: " note ",
+          childNodes: [],
+        },
+        {
+          nodeType: 4,
+          nodeName: "#cdata-section",
+          nodeValue: "<raw>",
+          childNodes: [],
+        },
+        element("empty", []),
+      ]),
+    ],
+  }
+  const declaration = '<?xml version="1.0"?>'
+  assert.equal(
+    formatXml(doc, "  ", declaration),
+    [
+      declaration,
+      "<root>",
+      '  <item id="1&quot;">a &amp; b</item>',
+      "  <!-- note -->",
+      "  <![CDATA[<raw>]]>",
+      "  <empty/>",
+      "</root>",
+    ].join("\n")
+  )
+  assert.equal(
+    formatXml(doc, ""),
+    '<root><item id="1&quot;">a &amp; b</item><!-- note --><![CDATA[<raw>]]><empty/></root>'
+  )
+  assert.deepEqual(
+    locateXmlError(
+      "error on line 3 at column 5: Opening and ending tag mismatch"
+    ),
+    {
+      line: 3,
+      column: 5,
+    }
+  )
+  assert.deepEqual(
+    locateXmlError(
+      "XML Parsing Error: mismatched tag\nLine Number 2, Column 7:"
+    ),
+    {
+      line: 2,
+      column: 7,
+    }
+  )
+  assert.deepEqual(
+    locateXmlError("XML 解析エラー: タグの不一致\n行番号: 4, 列: 1:"),
+    { line: 4, column: 1 }
+  )
+  assert.equal(locateXmlError("unknown"), null)
+})
+
+test("xml value conversion", () => {
+  const node = (
+    nodeType: number,
+    nodeName: string,
+    nodeValue: string | null,
+    childNodes: XmlNodeLike[] = [],
+    attributes: XmlNodeLike["attributes"] = []
+  ): XmlNodeLike => ({ nodeType, nodeName, nodeValue, childNodes, attributes })
+  const doc = node(9, "#document", null, [
+    node(1, "catalog", null, [
+      node(3, "#text", "\n  "),
+      node(
+        1,
+        "book",
+        null,
+        [node(1, "title", null, [node(3, "#text", "A & B")])],
+        [{ name: "id", value: "1" }]
+      ),
+      node(
+        1,
+        "book",
+        null,
+        [node(1, "title", null, [node(4, "#cdata-section", "C")])],
+        [{ name: "id", value: "2" }]
+      ),
+      node(
+        1,
+        "note",
+        null,
+        [node(3, "#text", "memo")],
+        [{ name: "lang", value: "ja" }]
+      ),
+      node(1, "empty", null),
+    ]),
+  ])
+  const value = {
+    catalog: {
+      book: [
+        { "@id": "1", title: "A & B" },
+        { "@id": "2", title: "C" },
+      ],
+      note: { "@lang": "ja", "#text": "memo" },
+      empty: "",
+    },
+  }
+  assert.deepEqual(xmlToValue(doc), value)
+  assert.equal(
+    valueToXml(value),
+    [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      "<catalog>",
+      '  <book id="1">',
+      "    <title>A &amp; B</title>",
+      "  </book>",
+      '  <book id="2">',
+      "    <title>C</title>",
+      "  </book>",
+      '  <note lang="ja">memo</note>',
+      "  <empty/>",
+      "</catalog>",
+    ].join("\n")
+  )
+  assert.equal(
+    valueToXml([1, null]),
+    '<?xml version="1.0" encoding="UTF-8"?>\n<root>\n  <item>1</item>\n  <item/>\n</root>'
+  )
+  assert.equal(
+    valueToXml({ a: 1, b: 2 }),
+    '<?xml version="1.0" encoding="UTF-8"?>\n<root>\n  <a>1</a>\n  <b>2</b>\n</root>'
+  )
+  assert.throws(() => valueToXml({ "1st": 1 }))
+})
+
+test("csv and tsv", () => {
+  const rows = parseDelimited(
+    '\ufeffname,note\r\n"Doe, J","say ""hi""\nbye"\nA,\n',
+    ","
+  )
+  assert.deepEqual(rows, [
+    { name: "Doe, J", note: 'say "hi"\nbye' },
+    { name: "A", note: "" },
+  ])
+  assert.equal(
+    stringifyDelimited(rows, ","),
+    'name,note\n"Doe, J","say ""hi""\nbye"\nA,'
+  )
+  assert.deepEqual(parseDelimited(stringifyDelimited(rows, ","), ","), rows)
+  assert.equal(
+    stringifyDelimited([{ a: 1 }, { b: { c: true } }], "\t"),
+    'a\tb\n1\t\n\t{"c":true}'
+  )
+  assert.throws(() => stringifyDelimited([1, 2], ","))
+  assert.equal(
+    stringifyDelimited(
+      {
+        catalog: {
+          book: [
+            { "@id": "1", title: "A" },
+            { "@id": "2", title: "B" },
+          ],
+        },
+      },
+      ","
+    ),
+    "@id,title\n1,A\n2,B"
+  )
+  assert.equal(stringifyDelimited({ root: { item: { a: "1" } } }, ","), "a\n1")
+  assert.equal(stringifyDelimited({ a: "1" }, ","), "a\n1")
+  assert.throws(() => parseDelimited('a\n"b', ","))
 })

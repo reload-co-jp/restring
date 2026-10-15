@@ -271,7 +271,23 @@ export const terms: Term[] = [
     category: "dev",
     description:
       "インデントで構造を表すデータ形式。JSONの上位互換で、コメントやアンカーを書ける。Kubernetes、GitHub Actions、docker-composeなどの設定ファイルで使われる。インデントにタブは使えない。",
-    tool: "/yaml-json-converter/",
+    tool: "/data-converter/",
+  },
+  {
+    id: "xml",
+    term: "XML",
+    category: "dev",
+    description:
+      "タグで階層構造を表すマークアップ言語。すべての要素を閉じる、属性値を引用符で囲むなどの規則を満たすものを整形式（well-formed）と呼ぶ。RSS、SOAP、sitemap、Officeファイルの内部形式などで使われる。",
+    tool: "/xml-parser/",
+  },
+  {
+    id: "xpath",
+    term: "XPath",
+    category: "dev",
+    description:
+      "XML文書内の要素や属性を指定する言語。//bookは全階層のbook要素、/catalog/book[1]は最初のbook要素、@idは属性、[price > 3000]は条件を表す。",
+    tool: "/xml-parser/",
   },
   {
     id: "minify",
@@ -280,6 +296,14 @@ export const terms: Term[] = [
     description:
       "動作を変えずに空白・改行などを取り除き、データを短くする処理。JSONの圧縮は1行になるため、ログや環境変数への埋め込みに使う。",
     tool: "/json-validator/",
+  },
+  {
+    id: "csv",
+    term: "CSV / TSV",
+    category: "dev",
+    description:
+      '表データを1行1レコード、値をカンマ（CSV）またはタブ（TSV）で区切って表すテキスト形式。値にカンマや改行、引用符を含む場合はダブルクォートで囲み、引用符自体は「""」と重ねる（RFC 4180）。',
+    tool: "/data-converter/",
   },
   {
     id: "regex",

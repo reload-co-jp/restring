@@ -39,11 +39,13 @@ import {
   encodeUtf16,
   encodeUtf8,
   escapeHtml,
+  formatXml,
   formatEpochResult,
   formatInTimeZone,
   getAllTimeZones,
   hashAlgorithms,
   hashText,
+  locateXmlError,
   nextCronRuns,
   normalizeForCompare,
   normalizeText,
@@ -69,6 +71,7 @@ import {
   validateJson,
   verifyJwtSignature,
   visibleText,
+  xmlDeclaration,
 } from "components/tool-logic"
 
 export { copyText, downloadText } from "components/tool-logic"
@@ -2175,3 +2178,146 @@ export const CronParserTool: FC = () => {
     </Panel>
   )
 }
+
+const sampleXml = `<?xml version="1.0" encoding="UTF-8"?>
+<catalog><book id="1"><title>XML入門</title><price>2800</price></book><book id="2"><title>XPath実践</title><price>3200</price></book></catalog>`
+
+const xmlIndents = { "2": "  ", "4": "    ", tab: "\t", minify: "" } as const
+
+export const parseXml = (value: string) => {
+  const doc = new DOMParser().parseFromString(value, "application/xml")
+  const errorNode = doc.querySelector("parsererror")
+  if (!errorNode) return { doc, error: "", location: null }
+  // Chrome・Safariはdiv内、Firefoxは先頭のテキストノードにメッセージがある
+  const message = (
+    errorNode.querySelector("div")?.textContent ??
+    errorNode.firstChild?.textContent ??
+    "XMLが不正"
+  ).trim()
+  return { doc: null, error: message, location: locateXmlError(message) }
+}
+
+const evaluateXPath = (doc: Document, expression: string) => {
+  const result = doc.evaluate(
+    expression,
+    doc,
+    (prefix) => doc.documentElement.lookupNamespaceURI(prefix),
+    XPathResult.ANY_TYPE,
+    null
+  )
+  if (result.resultType === XPathResult.NUMBER_TYPE)
+    return [String(result.numberValue)]
+  if (result.resultType === XPathResult.STRING_TYPE) return [result.stringValue]
+  if (result.resultType === XPathResult.BOOLEAN_TYPE)
+    return [String(result.booleanValue)]
+  const nodes: string[] = []
+  for (let node = result.iterateNext(); node; node = result.iterateNext()) {
+    nodes.push(formatXml(node, "  "))
+  }
+  return nodes
+}
+
+const XmlParser: FC = () => {
+  const [value, setValue] = useState(sampleXml)
+  const [indent, setIndent] = useState<keyof typeof xmlIndents>("2")
+  const [xpath, setXpath] = useState("//book[price > 3000]/title")
+  const parsed = useMemo(() => parseXml(value), [value])
+  const location = parsed.location
+  const errorLine = location ? value.split("\n")[location.line - 1] : undefined
+  const gutter = location ? `${location.line} | ` : ""
+
+  let matches: string[] = []
+  let xpathError = ""
+  if (parsed.doc && xpath.trim() !== "") {
+    try {
+      matches = evaluateXPath(parsed.doc, xpath)
+    } catch (error) {
+      xpathError = error instanceof Error ? error.message : "XPathが不正"
+    }
+  }
+
+  return (
+    <>
+      <Panel title="XML">
+        <TextArea
+          label="解析するXML"
+          onChange={setValue}
+          rows={12}
+          sample={sampleXml}
+          value={value}
+        />
+        <Status tone={parsed.doc ? "ok" : "error"}>
+          {parsed.doc
+            ? `整形式のXML（要素数 ${parsed.doc.getElementsByTagName("*").length}）`
+            : `構文エラー: ${parsed.error}`}
+        </Status>
+        {location && (
+          <div className="errorLocation">
+            <p>
+              <strong>
+                {location.line}行目 {location.column}列目
+              </strong>
+              付近を確認
+            </p>
+            {errorLine !== undefined && (
+              <pre className="output">
+                {`${gutter}${errorLine}\n${" ".repeat(gutter.length + Math.max(location.column - 1, 0))}^`}
+              </pre>
+            )}
+          </div>
+        )}
+      </Panel>
+      {parsed.doc && (
+        <>
+          <Panel title="整形結果">
+            <Segmented
+              label="インデント"
+              onChange={setIndent}
+              options={[
+                { value: "2", label: "スペース2" },
+                { value: "4", label: "スペース4" },
+                { value: "tab", label: "タブ" },
+                { value: "minify", label: "圧縮（1行）" },
+              ]}
+              value={indent}
+            />
+            <Result
+              label={indent === "minify" ? "圧縮XML" : "整形済みXML"}
+              name="formatted.xml"
+              value={formatXml(
+                parsed.doc,
+                xmlIndents[indent],
+                xmlDeclaration(value)
+              )}
+            />
+          </Panel>
+          <Panel
+            description="名前空間の接頭辞はルート要素の宣言から解決。デフォルト名前空間の要素は *[local-name()='name'] で指定。"
+            title="XPath検索"
+          >
+            <TextInput
+              error={xpathError}
+              label="XPath"
+              onChange={setXpath}
+              value={xpath}
+            />
+            {!xpathError && xpath.trim() !== "" && (
+              <Result
+                label={`結果（${matches.length}件）`}
+                name="xpath-result.txt"
+                value={matches.join("\n")}
+              />
+            )}
+          </Panel>
+        </>
+      )}
+    </>
+  )
+}
+
+// DOMParserはブラウザ専用のため、静的書き出し時は描画しない
+export const XmlParserTool: FC = () => (
+  <ClientOnly>
+    <XmlParser />
+  </ClientOnly>
+)

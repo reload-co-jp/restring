@@ -708,6 +708,38 @@ export const toolLinks = [
     ],
   },
   {
+    href: "/data-converter/",
+    category: "dev" as ToolCategoryId,
+    title: "データ形式変換",
+    description:
+      "JSON・YAML・XML・CSV・TSVを相互変換。XMLの属性、CSVの見出し行と引用符に対応。",
+    introduction:
+      "構造化データの形式を相互に変換するツール。APIレスポンスのJSONをCSVにして表計算ソフトで開いたり、XMLをJSONやYAMLで確認したりできる。",
+    usage: [
+      "入力形式と出力形式を選び、データを入力する。",
+      "変換結果をコピーまたは保存する。",
+      "「入れ替え」で入力形式と出力形式を入れ替え、変換結果を次の入力にする。",
+    ],
+    mechanism: [
+      "入力をいったんJavaScriptの値に変換し、出力形式で書き出す。",
+      "XMLは属性を「@名前」、テキストを「#text」のキーに対応させ、同名の子要素は配列にする。",
+      "CSV・TSVはRFC 4180に沿って引用符と改行を扱い、1行目を見出しとしてオブジェクトの配列にする。",
+    ],
+    shell: [
+      {
+        label: "JSONをCSVへ変換",
+        environment: "jq",
+        command:
+          "jq -r '(.[0] | keys_unsorted) as $k | $k, (.[] | [.[$k[]]]) | @csv' input.json",
+      },
+      {
+        label: "XMLをJSONへ変換",
+        environment: "yq（要インストール）",
+        command: "yq -p=xml -o=json input.xml",
+      },
+    ],
+  },
+  {
     href: "/yaml-json-converter/",
     category: "dev" as ToolCategoryId,
     title: "YAML・JSON変換",
@@ -728,6 +760,38 @@ export const toolLinks = [
         label: "YAMLをJSONへ変換",
         environment: "yq（要インストール）",
         command: "yq -o=json input.yaml",
+      },
+    ],
+  },
+  {
+    href: "/xml-parser/",
+    category: "dev" as ToolCategoryId,
+    title: "XML解析",
+    description:
+      "XMLの構文チェックと整形・圧縮。エラー位置の行番号・列番号を表示し、XPathで要素や属性を抽出。",
+    introduction:
+      "XMLの構文を検証し、読みやすく整形するツール。XPathで必要な要素だけを取り出せるため、RSSフィード、SOAPレスポンス、Androidやsitemapの設定ファイルの確認に使える。",
+    usage: [
+      "解析したいXMLを入力する。",
+      "構文エラーがある場合はエラーメッセージと該当行・列を確認する。",
+      "整形結果のインデントを選び、コピーまたは保存する。",
+      "XPathを入力し、該当する要素・属性・テキストを確認する。",
+    ],
+    mechanism: [
+      "ブラウザ標準のDOMParserでXMLを解析し、parsererror要素からエラー位置を取得。",
+      "解析結果のDOMを再帰的にたどり、指定したインデントで出力。空白のみのテキストは除去。",
+      "XPathはブラウザ標準のdocument.evaluateで評価。",
+    ],
+    shell: [
+      {
+        label: "XMLを検証して整形",
+        environment: "xmllint（macOS標準搭載、Linuxはlibxml2-utils）",
+        command: "xmllint --format input.xml",
+      },
+      {
+        label: "XPathで抽出",
+        environment: "xmllint",
+        command: "xmllint --xpath '//book/title/text()' input.xml",
       },
     ],
   },

@@ -32,6 +32,12 @@ const relatedToolHrefs: Record<string, string[]> = {
     "/regex-tester/",
   ],
   "/uuid-generator/": ["/hash-generator/", "/sql-builder/", "/json-validator/"],
+  "/xml-parser/": [
+    "/json-validator/",
+    "/yaml-json-converter/",
+    "/html-escape/",
+  ],
+  "/data-converter/": ["/json-validator/", "/xml-parser/", "/line-sort/"],
   "/yaml-json-converter/": [
     "/json-validator/",
     "/json-compare/",
@@ -701,6 +707,54 @@ const seoTextByHref: Record<string, SeoText> = {
         question: "UUIDとGUIDの違いは？",
         answer:
           "GUIDはMicrosoftでの呼び名で、形式は同じ。GUIDは大文字や波括弧付きで表記されることが多い。",
+      },
+    ],
+  },
+  "/xml-parser/": {
+    useCases: [
+      "RSSフィード、SOAPレスポンス、sitemap.xmlの構文を確認したいとき。",
+      "1行に詰まったXMLを読みやすく整形したいとき。",
+      "大きなXMLから特定の要素や属性の値だけを取り出したいとき。",
+    ],
+    tips: [
+      "XMLは大文字小文字を区別し、すべての要素を閉じる必要がある。HTMLの<br>はXMLでは<br/>と書く。",
+      "本文に「&」「<」を書く場合は&amp;・&lt;にエスケープするか、CDATAセクションで囲む。",
+      "XPathの//titleは全階層のtitle要素、@idは属性、text()はテキストを表す。",
+    ],
+    questions: [
+      {
+        question: "整形すると空白が変わる？",
+        answer:
+          "空白のみのテキストを除去し、テキストの前後の空白を削る。<p>a <b>b</b></p>のようにテキストと要素が混在する文書では、単語間の空白が変わる場合がある。",
+      },
+      {
+        question: "名前空間付きのXMLをXPathで検索するには？",
+        answer:
+          "ルート要素で宣言された接頭辞（soap:Bodyなど）はそのまま使える。接頭辞のないデフォルト名前空間の要素は *[local-name()='item'] のように指定する。",
+      },
+    ],
+  },
+  "/data-converter/": {
+    useCases: [
+      "APIレスポンスのJSONをCSVにして、表計算ソフトで開きたいとき。",
+      "XMLのレスポンスや設定ファイルを、読みやすいJSONやYAMLで確認したいとき。",
+      "CSVの表データを、テストデータや設定用のJSON・YAMLに書き換えたいとき。",
+    ],
+    tips: [
+      "XMLから変換した値はすべて文字列になる。数値として扱う場合は変換後に型を確認する。",
+      "CSVへ変換できるのはオブジェクトの配列。XMLのようにキー1つで包まれたデータは中の配列を表にし、入れ子の値はJSON文字列としてセルに入る。",
+      "XMLのルート要素は1つのため、キーが1つのオブジェクト以外は<root>で包んで出力する。",
+    ],
+    questions: [
+      {
+        question: "XMLの属性はどう変換される？",
+        answer:
+          "属性は「@id」のように@付きのキー、要素のテキストは「#text」のキーになる。xml2jsやyqと同じ慣習で、逆方向の変換でも属性として復元される。",
+      },
+      {
+        question: "Excelで作ったCSVは読み込める？",
+        answer:
+          "UTF-8のCSVに対応し、先頭のBOMは自動で除去する。Shift_JISで保存したCSVは、文字コード変換ツールでUTF-8にしてから入力する。",
       },
     ],
   },

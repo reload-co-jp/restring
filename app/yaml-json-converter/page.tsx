@@ -1,4 +1,4 @@
-import { YamlJsonConverterTool } from "components/yaml-json-converter"
+import { DataConverterTool } from "components/data-converter"
 import { createPageMetadata } from "components/seo"
 import { ToolArticle } from "components/tool-article"
 
@@ -11,7 +11,7 @@ export const metadata = createPageMetadata({
 
 const Page = () => (
   <ToolArticle href="/yaml-json-converter/">
-    <YamlJsonConverterTool />
+    <DataConverterTool from="yaml" to="json" />
   </ToolArticle>
 )
 

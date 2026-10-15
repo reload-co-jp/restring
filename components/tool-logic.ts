@@ -1077,3 +1077,282 @@ export const nextCronRuns = (expression: string, from: Date, count: number) => {
   }
   return runs
 }
+
+/* ---------- XML ---------- */
+
+// DOMのNodeと互換。テストではプレーンなオブジェクトを渡す
+export type XmlNodeLike = {
+  nodeType: number
+  nodeName: string
+  nodeValue: string | null
+  childNodes: ArrayLike<XmlNodeLike>
+  attributes?: ArrayLike<{ name: string; value: string }> | null
+  publicId?: string
+  systemId?: string
+}
+
+const escapeXmlText = (value: string) =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+
+const escapeXmlAttribute = (value: string) =>
+  escapeXmlText(value).replace(/"/g, "&quot;")
+
+// ponytail: 空白のみのテキストを捨て、テキストの前後空白を削るため、混在内容（<p>a <b>b</b></p>）の空白は保持しない
+export const formatXml = (
+  node: XmlNodeLike,
+  indent: string,
+  declaration = ""
+) => {
+  const lines: string[] = []
+  const walk = (current: XmlNodeLike, depth: number) => {
+    const pad = indent.repeat(depth)
+    const children = Array.from(current.childNodes).filter(
+      (child) =>
+        !(child.nodeType === 3 && (child.nodeValue ?? "").trim() === "")
+    )
+    switch (current.nodeType) {
+      case 2:
+        lines.push(
+          `${pad}${current.nodeName}="${escapeXmlAttribute(current.nodeValue ?? "")}"`
+        )
+        return
+      case 3:
+        lines.push(pad + escapeXmlText((current.nodeValue ?? "").trim()))
+        return
+      case 4:
+        lines.push(`${pad}<![CDATA[${current.nodeValue}]]>`)
+        return
+      case 7:
+        lines.push(`${pad}<?${current.nodeName} ${current.nodeValue}?>`)
+        return
+      case 8:
+        lines.push(`${pad}<!--${current.nodeValue}-->`)
+        return
+      case 9:
+        children.forEach((child) => walk(child, depth))
+        return
+      case 10: {
+        const external = current.publicId
+          ? ` PUBLIC "${current.publicId}" "${current.systemId}"`
+          : current.systemId
+            ? ` SYSTEM "${current.systemId}"`
+            : ""
+        lines.push(`${pad}<!DOCTYPE ${current.nodeName}${external}>`)
+        return
+      }
+    }
+    const attributes = Array.from(
+      current.attributes ?? [],
+      (attribute) =>
+        ` ${attribute.name}="${escapeXmlAttribute(attribute.value)}"`
+    ).join("")
+    const open = `${pad}<${current.nodeName}${attributes}`
+    if (children.length === 0) {
+      lines.push(`${open}/>`)
+    } else if (children.length === 1 && children[0].nodeType === 3) {
+      lines.push(
+        `${open}>${escapeXmlText((children[0].nodeValue ?? "").trim())}</${current.nodeName}>`
+      )
+    } else {
+      lines.push(`${open}>`)
+      children.forEach((child) => walk(child, depth + 1))
+      lines.push(`${pad}</${current.nodeName}>`)
+    }
+  }
+  walk(node, 0)
+  return [declaration, ...lines].filter(Boolean).join(indent === "" ? "" : "\n")
+}
+
+// DOMParserはXML宣言をノードとして残さないため、入力から取り出して整形結果に付け直す
+export const xmlDeclaration = (value: string) =>
+  value.trimStart().match(/^<\?xml\s[^?]*\?>/)?.[0] ?? ""
+
+// エラーメッセージの形式はブラウザごとに異なる
+// Chrome・Safari: "error on line 3 at column 5: ..."
+// Firefox: "Line Number 3, Column 5:" / 日本語版 "行番号: 3, 列: 5:"
+export const locateXmlError = (message: string) => {
+  const match =
+    message.match(/line(?: number)?\s*(\d+)\D+?(\d+)/i) ??
+    message.match(/行番号[:：]?\s*(\d+)\D+?(\d+)/)
+  return match ? { line: Number(match[1]), column: Number(match[2]) } : null
+}
+
+/* ---------- データ形式変換 ---------- */
+
+// XMLとオブジェクトの対応は xml2js などと同じ慣習:
+// 属性は "@名前"、テキストは "#text"、同名の子要素は配列、テキストのみの要素は文字列
+// ponytail: 値はすべて文字列のまま（"1"を数値にしない）。コメント・処理命令は捨てる
+const xmlElementToValue = (element: XmlNodeLike): unknown => {
+  const result: Record<string, unknown> = {}
+  for (const attribute of Array.from(element.attributes ?? [])) {
+    result[`@${attribute.name}`] = attribute.value
+  }
+  let text = ""
+  for (const child of Array.from(element.childNodes)) {
+    if (child.nodeType === 1) {
+      const value = xmlElementToValue(child)
+      const existing = result[child.nodeName]
+      if (existing === undefined) result[child.nodeName] = value
+      else if (Array.isArray(existing)) existing.push(value)
+      else result[child.nodeName] = [existing, value]
+    } else if (child.nodeType === 3 || child.nodeType === 4) {
+      text += child.nodeValue ?? ""
+    }
+  }
+  text = text.trim()
+  if (Object.keys(result).length === 0) return text
+  if (text !== "") result["#text"] = text
+  return result
+}
+
+export const xmlToValue = (doc: XmlNodeLike) => {
+  const root = Array.from(doc.childNodes).find((node) => node.nodeType === 1)
+  if (!root) throw new Error("ルート要素がない")
+  return { [root.nodeName]: xmlElementToValue(root) }
+}
+
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value)
+
+const assertXmlName = (name: string) => {
+  if (!/^[A-Za-z_][\w.-]*(:[A-Za-z_][\w.-]*)?$/.test(name)) {
+    throw new Error(`「${name}」はXMLの名前に使えない`)
+  }
+  return name
+}
+
+export const valueToXml = (value: unknown, indent = "  ") => {
+  const lines = ['<?xml version="1.0" encoding="UTF-8"?>']
+  const write = (name: string, current: unknown, depth: number) => {
+    if (Array.isArray(current)) {
+      current.forEach((item) => write(name, item, depth))
+      return
+    }
+    const pad = indent.repeat(depth)
+    assertXmlName(name)
+    if (current === null || current === undefined || current === "") {
+      lines.push(`${pad}<${name}/>`)
+      return
+    }
+    if (!isPlainObject(current)) {
+      lines.push(`${pad}<${name}>${escapeXmlText(String(current))}</${name}>`)
+      return
+    }
+    const entries = Object.entries(current)
+    const attributes = entries
+      .filter(([key]) => key.startsWith("@"))
+      .map(
+        ([key, item]) =>
+          ` ${assertXmlName(key.slice(1))}="${escapeXmlAttribute(String(item))}"`
+      )
+      .join("")
+    const children = entries.filter(
+      ([key]) => !key.startsWith("@") && key !== "#text"
+    )
+    const text =
+      "#text" in current ? escapeXmlText(String(current["#text"])) : ""
+    if (children.length === 0) {
+      lines.push(
+        text === ""
+          ? `${pad}<${name}${attributes}/>`
+          : `${pad}<${name}${attributes}>${text}</${name}>`
+      )
+      return
+    }
+    lines.push(`${pad}<${name}${attributes}>`)
+    if (text !== "") lines.push(indent.repeat(depth + 1) + text)
+    children.forEach(([key, item]) => write(key, item, depth + 1))
+    lines.push(`${pad}</${name}>`)
+  }
+  // ルート要素は1つに限られるため、キーが1つのオブジェクト以外は<root>で包む
+  const keys = isPlainObject(value) ? Object.keys(value) : []
+  if (
+    isPlainObject(value) &&
+    keys.length === 1 &&
+    !keys[0].startsWith("@") &&
+    keys[0] !== "#text" &&
+    !Array.isArray(value[keys[0]])
+  ) {
+    write(keys[0], value[keys[0]], 0)
+  } else {
+    write("root", Array.isArray(value) ? { item: value } : value, 0)
+  }
+  return lines.join("\n")
+}
+
+// RFC 4180準拠。1行目を見出しとしてオブジェクトの配列にする
+export const parseDelimited = (text: string, delimiter: string) => {
+  const rows: string[][] = []
+  let row: string[] = []
+  let field = ""
+  let quoted = false
+  const source = text.charCodeAt(0) === 0xfeff ? text.slice(1) : text
+  for (let index = 0; index < source.length; index++) {
+    const char = source[index]
+    if (quoted) {
+      if (char !== '"') field += char
+      else if (source[index + 1] === '"') {
+        field += '"'
+        index++
+      } else quoted = false
+    } else if (char === '"' && field === "") {
+      quoted = true
+    } else if (char === delimiter) {
+      row.push(field)
+      field = ""
+    } else if (char === "\n" || char === "\r") {
+      if (char === "\r" && source[index + 1] === "\n") index++
+      row.push(field)
+      rows.push(row)
+      row = []
+      field = ""
+    } else {
+      field += char
+    }
+  }
+  if (quoted) throw new Error('引用符（"）が閉じていない')
+  if (field !== "" || row.length > 0) {
+    row.push(field)
+    rows.push(row)
+  }
+  const [header, ...body] = rows
+  if (!header) return []
+  return body.map((cells) =>
+    Object.fromEntries(header.map((key, index) => [key, cells[index] ?? ""]))
+  )
+}
+
+// 入れ子の値はJSON文字列としてセルに入れる
+// XMLの<catalog><book>…のような包みを外すため、キーが1つのオブジェクトは中身へ降りて表を探す
+export const stringifyDelimited = (value: unknown, delimiter: string) => {
+  let table = value
+  while (isPlainObject(table) && Object.keys(table).length === 1) {
+    const inner = Object.values(table)[0]
+    if (typeof inner !== "object" || inner === null) break
+    table = inner
+  }
+  const rows = Array.isArray(table) ? table : [table]
+  if (!rows.every(isPlainObject)) {
+    throw new Error(
+      "CSV・TSVへ変換できるのはオブジェクト、またはオブジェクトの配列"
+    )
+  }
+  const header = Array.from(new Set(rows.flatMap((item) => Object.keys(item))))
+  const cell = (item: unknown) => {
+    const text =
+      item === null || item === undefined
+        ? ""
+        : typeof item === "object"
+          ? JSON.stringify(item)
+          : String(item)
+    // CSVはRFC 4180どおり「"」を含めば囲む。TSVは慣習に合わせ、解析に必要な場合だけ囲む
+    const quote =
+      text.includes(delimiter) ||
+      /[\r\n]/.test(text) ||
+      (delimiter === "," ? text.includes('"') : text.startsWith('"'))
+    return quote ? `"${text.replace(/"/g, '""')}"` : text
+  }
+  return [header, ...rows.map((item) => header.map((key) => item[key]))]
+    .map((cells) => cells.map(cell).join(delimiter))
+    .join("\n")
+}

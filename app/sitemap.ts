@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next"
 import { toolLinks } from "components/tool-links"
 import { absoluteUrl } from "components/seo"
+import { terms } from "components/glossary"
 
 export const dynamic = "force-static"
 
@@ -27,6 +28,12 @@ const sitemap = (): MetadataRoute.Sitemap => [
     priority: 0.6,
     lastModified,
   },
+  ...terms.map((item) => ({
+    url: absoluteUrl(`/glossary/${item.id}/`),
+    changeFrequency: "monthly" as const,
+    priority: 0.5,
+    lastModified,
+  })),
 ]
 
 export default sitemap

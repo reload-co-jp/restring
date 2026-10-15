@@ -174,7 +174,7 @@ const htmlSpecialCharacters = [
 
 const Page = () => (
   <ToolArticle href="/html-special-characters/">
-    <section className="articleSection">
+    <section className="panel">
       <h2>HTML特殊文字変換 一覧表</h2>
       <div className="entityTableWrap">
         <table className="entityTable">

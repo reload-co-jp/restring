@@ -10,7 +10,8 @@
     "build": "next build",
     "start": "next start",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "node --test \"components/**/*.test.ts\""
   },
   "keywords": [],
   "author": "",

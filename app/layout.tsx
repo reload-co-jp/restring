@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { Metadata } from "next"
 import Script from "next/script"
-import { Title } from "components/elements/layout"
 import {
   defaultOgImage,
   siteDescription,
@@ -9,7 +8,9 @@ import {
   siteName,
   siteUrl,
 } from "components/seo"
-import { ToolTabs } from "components/tool-tabs"
+import { Icon } from "components/icons"
+import { MobileNav, SideNav, ThemeToggle, ToolSearch } from "components/site-nav"
+import { toolCategories, toolLinks } from "components/tool-links"
 import "./reset.css"
 
 const googleAnalyticsId = "G-2M289CH9TQ"
@@ -75,10 +76,14 @@ const structuredData = {
   },
 }
 
+// 描画前に保存済みテーマを反映してちらつきを防ぐ
+const themeScript = `try{var t=localStorage.getItem("theme");if(t==="light"||t==="dark")document.documentElement.dataset.theme=t}catch(e){}`
+
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
       <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <script
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
           type="application/ld+json"
@@ -101,42 +106,65 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             </Script>
           </>
         )}
-        <header
-          style={{
-            backgroundColor: "#fffdfa",
-            borderBottom: "1px solid #9a9a90",
-            padding: ".75rem 1rem",
-            position: "sticky",
-            top: 0,
-            zIndex: 1,
-          }}
-        >
-          <Link className="brandLink" href="/">
-            <Title>Restring</Title>
-          </Link>
-          <ToolTabs />
+        <a className="skipLink" href="#main">
+          本文へスキップ
+        </a>
+        <header className="siteHeader">
+          <div className="siteHeaderInner">
+            <MobileNav />
+            <Link aria-label="Restring トップ" className="brandLink" href="/">
+              <span aria-hidden="true" className="brandMark">
+                R
+              </span>
+              <span className="brandName">Restring</span>
+            </Link>
+            <ToolSearch />
+            <Link className="headerLink" href="/#tools">
+              ツール一覧
+            </Link>
+            <ThemeToggle />
+          </div>
         </header>
-        <main
-          style={{
-            background: "#f6f5f0",
-            margin: "0 auto",
-            maxWidth: "1180px",
-            minHeight: "calc(100dvh - 6.25rem)",
-            padding: "1rem",
-            width: "100%",
-          }}
-        >
-          {children}
-        </main>
-        <footer
-          style={{
-            backgroundColor: "#fffdfa",
-            borderTop: "1px solid #9a9a90",
-            fontSize: ".75rem",
-            padding: "1rem",
-          }}
-        >
-          <p>&copy; Restring</p>
+        <div className="shell">
+          <aside className="sidebar">
+            <SideNav />
+          </aside>
+          <main className="main" id="main">
+            {children}
+          </main>
+        </div>
+        <footer className="siteFooter">
+          <div className="siteFooterInner">
+            <section className="footerAbout">
+              <p className="footerBrand">Restring</p>
+              <p>{siteDescription}</p>
+              <h2>データの取り扱い</h2>
+              <p>
+                入力した文字列はブラウザ内で処理し、サーバーへ送信・保存しない。テーマ設定のみブラウザに保存する。アクセス解析にGoogle
+                Analyticsを利用。
+              </p>
+            </section>
+            <nav aria-label="全ツール" className="footerTools">
+              {toolCategories.map((category) => (
+                <div key={category.id}>
+                  <h2>
+                    <Icon name={category.id} size={14} />
+                    {category.label}
+                  </h2>
+                  <ul>
+                    {toolLinks
+                      .filter((tool) => tool.category === category.id)
+                      .map((tool) => (
+                        <li key={tool.href}>
+                          <Link href={tool.href}>{tool.title}</Link>
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              ))}
+            </nav>
+          </div>
+          <p className="copyright">&copy; Restring</p>
         </footer>
       </body>
     </html>

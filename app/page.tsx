@@ -1,6 +1,6 @@
 import { FC } from "react"
-import Link from "next/link"
 import { toolLinks } from "components/tool-links"
+import { ToolDirectory } from "components/tool-directory"
 import {
   absoluteUrl,
   createPageMetadata,
@@ -15,7 +15,7 @@ export const metadata = createPageMetadata({
 })
 
 const Page: FC = () => (
-  <div className="workspace">
+  <div className="home">
     <script
       dangerouslySetInnerHTML={{
         __html: JSON.stringify({
@@ -61,21 +61,7 @@ const Page: FC = () => (
       }}
       type="application/ld+json"
     />
-    <section className="intro">
-      <h1>Restring</h1>
-      <p>開発者向け文字列処理・比較ツール集。</p>
-    </section>
-    <section className="featureSection" aria-labelledby="features-title">
-      <h2 id="features-title">機能一覧</h2>
-      <div className="featureGrid">
-        {toolLinks.map((tool) => (
-          <Link className="featureLink" href={tool.href} key={tool.href}>
-            <strong>{tool.title}</strong>
-            <span>{tool.description}</span>
-          </Link>
-        ))}
-      </div>
-    </section>
+    <ToolDirectory />
   </div>
 )
 

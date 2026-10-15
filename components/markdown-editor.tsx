@@ -4,7 +4,7 @@ import { FC, useEffect, useRef, useState } from "react"
 import { Crepe } from "@milkdown/crepe"
 import "@milkdown/crepe/theme/common/style.css"
 import "@milkdown/crepe/theme/frame.css"
-import { ActionButton, Panel, copyText, downloadText } from "components/tools"
+import { Panel, Result } from "components/tools"
 
 const defaultMarkdown = `# Markdown WYSIWYGエディタ
 
@@ -56,20 +56,24 @@ export const MarkdownEditorTool: FC = () => {
   }, [])
 
   return (
-    <Panel title="Markdownエディタ">
-      <div className="markdownEditorRoot" ref={rootRef} />
-      <div className="resultActions">
-        <ActionButton onClick={() => copyText(markdown)} title="Markdownをコピー">
-          コピー
-        </ActionButton>
-        <ActionButton
-          onClick={() => downloadText("document.md", markdown)}
-          title="Markdownを保存"
-        >
-          保存
-        </ActionButton>
+    <Panel
+      description="左で見たまま編集すると、右にMarkdownソースが反映される。「/」でブロックメニュー。"
+      title="Markdownエディタ"
+    >
+      <div className="editorLayout">
+        <div className="field">
+          <span className="fieldLabel" id="markdown-editor-label">
+            編集
+          </span>
+          <div
+            aria-labelledby="markdown-editor-label"
+            className="markdownEditorRoot"
+            ref={rootRef}
+            role="group"
+          />
+        </div>
+        <Result label="Markdownソース（出力）" name="document.md" value={markdown} />
       </div>
-      <pre>{markdown}</pre>
     </Panel>
   )
 }

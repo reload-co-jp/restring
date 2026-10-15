@@ -1,6 +1,7 @@
 import { FC, ReactNode } from "react"
 import Link from "next/link"
-import { toolLinks } from "components/tool-links"
+import { categoryLabel, toolLinks } from "components/tool-links"
+import { Icon } from "components/icons"
 import { absoluteUrl, siteName, siteUrl } from "components/seo"
 
 type SeoText = {
@@ -644,50 +645,65 @@ export const ToolArticle: FC<{ children: ReactNode; href: string }> = ({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
         type="application/ld+json"
       />
-      <section className="toolIntro">
+      <header className="toolHeader">
         <nav aria-label="パンくず" className="breadcrumb">
-          <Link href="/">Restring</Link>
-          <span aria-hidden="true">/</span>
-          <span>{tool.title}</span>
+          <ol>
+            <li>
+              <Link href="/">Restring</Link>
+            </li>
+            <li>
+              <Link href={`/#${tool.category}`}>{categoryLabel(tool.category)}</Link>
+            </li>
+            <li aria-current="page">{tool.title}</li>
+          </ol>
         </nav>
-        <h1>{tool.title}</h1>
-        <p className="toolIntroduction">{tool.introduction}</p>
-        <h2>使い方</h2>
-        <ol>
-          {tool.usage.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ol>
-      </section>
-      {children}
-      {seoText && (
+        <h1>
+          <span className="toolHeaderIcon">
+            <Icon name={tool.category} size={22} />
+          </span>
+          {tool.title}
+        </h1>
+        <p className="lead">{tool.introduction}</p>
+      </header>
+      <div className="toolBody">{children}</div>
+      <div className="articleGrid">
         <section className="articleSection">
-          <h2>こんな用途に</h2>
+          <h2>使い方</h2>
+          <ol>
+            {tool.usage.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ol>
+        </section>
+        {seoText && (
+          <section className="articleSection">
+            <h2>こんな用途に</h2>
+            <ul>
+              {seoText.useCases.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+        <section className="articleSection">
+          <h2>仕組み</h2>
           <ul>
-            {seoText.useCases.map((item) => (
+            {tool.mechanism.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
         </section>
-      )}
-      <section className="articleSection">
-        <h2>仕組み</h2>
-        <ul>
-          {tool.mechanism.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </section>
-      {seoText && (
-        <section className="articleSection">
-          <h2>確認ポイント</h2>
-          <ul>
-            {seoText.tips.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </section>
-      )}
+        {seoText && (
+          <section className="articleSection">
+            <h2>確認ポイント</h2>
+            <ul>
+              {seoText.tips.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </section>
+        )}
+      </div>
       {tool.shell.length > 0 && (
         <section className="articleSection">
           <h2>手元でやるには</h2>
@@ -704,25 +720,8 @@ export const ToolArticle: FC<{ children: ReactNode; href: string }> = ({
           </div>
         </section>
       )}
-      {relatedTools.length > 0 && (
-        <section className="articleSection">
-          <h2>関連ツール</h2>
-          <div className="relatedToolGrid">
-            {relatedTools.map((relatedTool) => (
-              <Link
-                className="relatedToolLink"
-                href={relatedTool.href}
-                key={relatedTool.href}
-              >
-                <strong>{relatedTool.title}</strong>
-                <span>{relatedTool.description}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
       {seoText && (
-        <section className="articleSection faqSection">
+        <section className="articleSection">
           <h2>よくある質問</h2>
           <div className="faqList">
             {seoText.questions.map((item) => (
@@ -732,6 +731,27 @@ export const ToolArticle: FC<{ children: ReactNode; href: string }> = ({
               </section>
             ))}
           </div>
+        </section>
+      )}
+      {relatedTools.length > 0 && (
+        <section className="relatedSection">
+          <h2>関連ツール</h2>
+          <ul className="toolGrid">
+            {relatedTools.map((relatedTool) => (
+              <li key={relatedTool.href}>
+                <Link className="toolCard" href={relatedTool.href}>
+                  <span className="toolCardIcon">
+                    <Icon name={relatedTool.category} />
+                  </span>
+                  <span className="toolCardBody">
+                    <strong>{relatedTool.title}</strong>
+                    <span>{relatedTool.description}</span>
+                  </span>
+                  <Icon name="arrow" size={16} />
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
       )}
     </div>

@@ -3,7 +3,7 @@
 import { FC, useMemo, useRef, useState } from "react"
 import katex from "katex"
 import "katex/dist/katex.min.css"
-import { ActionButton, Panel, copyText, downloadText } from "components/tools"
+import { Panel, Result, Segmented } from "components/tools"
 
 type MathMode = "inline" | "block"
 
@@ -145,19 +145,19 @@ export const TexHelperTool: FC = () => {
 
   return (
     <Panel title="TeX数式入力補助">
-      <div className="toolbar">
-        <select
-          onChange={(event) => setMode(event.target.value as MathMode)}
-          value={mode}
-        >
-          <option value="inline">インライン数式（$…$）</option>
-          <option value="block">ブロック数式（$$…$$）</option>
-        </select>
-      </div>
+      <Segmented
+        label="出力形式"
+        onChange={setMode}
+        options={[
+          { value: "inline", label: "インライン数式（$…$）" },
+          { value: "block", label: "ブロック数式（$$…$$）" },
+        ]}
+        value={mode}
+      />
       <div className="texSnippetGroups">
         {snippetGroups.map((group) => (
           <div className="texSnippetGroup" key={group.title}>
-            <span className="texSnippetGroupTitle">{group.title}</span>
+            <span className="fieldLabel">{group.title}</span>
             <div className="texSnippetButtons">
               {group.snippets.map((snippet) => (
                 <button
@@ -174,36 +174,36 @@ export const TexHelperTool: FC = () => {
           </div>
         ))}
       </div>
-      <label className="field">
-        <span>TeXコード</span>
-        <textarea
-          onChange={(event) => setTex(event.target.value)}
-          ref={textareaRef}
-          rows={4}
-          spellCheck={false}
-          value={tex}
-        />
-      </label>
-      <div className="texPreview">
-        <span className="texPreviewLabel">プレビュー</span>
-        <div
-          className={mode === "block" ? "texPreviewBlock" : "texPreviewInline"}
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
-        {error && <p className="warn">数式エラー: {error}</p>}
+      <div className="twoColumn">
+        <div className="field">
+          <label className="fieldLabel" htmlFor="tex-input">
+            TeXコード（入力）
+          </label>
+          <textarea
+            id="tex-input"
+            onChange={(event) => setTex(event.target.value)}
+            ref={textareaRef}
+            rows={6}
+            spellCheck={false}
+            value={tex}
+          />
+        </div>
+        <div className="field">
+          <span className="fieldLabel">プレビュー</span>
+          <div className="texPreview" aria-live="polite">
+            <div
+              className={mode === "block" ? "texPreviewBlock" : "texPreviewInline"}
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
+            {error && (
+              <p className="status error" role="alert">
+                数式エラー: {error}
+              </p>
+            )}
+          </div>
+        </div>
       </div>
-      <div className="resultActions">
-        <ActionButton onClick={() => copyText(markdown)} title="Markdownをコピー">
-          コピー
-        </ActionButton>
-        <ActionButton
-          onClick={() => downloadText("formula.md", markdown)}
-          title="Markdownを保存"
-        >
-          保存
-        </ActionButton>
-      </div>
-      <pre>{markdown}</pre>
+      <Result label="Markdown形式（出力）" name="formula.md" value={markdown} />
     </Panel>
   )
 }

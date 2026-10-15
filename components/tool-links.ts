@@ -1,6 +1,19 @@
+export const toolCategories = [
+  { id: "compare", label: "比較・差分" },
+  { id: "text", label: "文字列変換" },
+  { id: "unicode", label: "文字・Unicode" },
+  { id: "web", label: "Web・エンコード" },
+  { id: "time", label: "日時・タイムゾーン" },
+  { id: "dev", label: "開発補助" },
+  { id: "editor", label: "エディタ・数式" },
+] as const
+
+export type ToolCategoryId = (typeof toolCategories)[number]["id"]
+
 export const toolLinks = [
   {
     href: "/text-compare/",
+    category: "compare" as ToolCategoryId,
     title: "テキスト比較",
     description:
       "2つの文字列を行・単語・文字単位で比較。インライン表示と左右表示に対応。",
@@ -25,6 +38,7 @@ export const toolLinks = [
   },
   {
     href: "/json-compare/",
+    category: "compare" as ToolCategoryId,
     title: "JSON比較",
     description: "JSONを検証し、整形表示。キー順を無視して構造比較。",
     introduction:
@@ -48,6 +62,7 @@ export const toolLinks = [
   },
   {
     href: "/jwt-decoder/",
+    category: "web" as ToolCategoryId,
     title: "JWTデコード・解析",
     description:
       "JWT（JSON Web Token）をオンラインでデコードし、Header・Payload・署名を分解表示。exp・iatなど有効期限確認とHS256/HS384/HS512のHMAC署名検証に対応。",
@@ -82,6 +97,7 @@ export const toolLinks = [
   },
   {
     href: "/text-diff/",
+    category: "compare" as ToolCategoryId,
     title: "テキスト差分",
     description:
       "2つのテキストから追加・削除された差分だけをオンラインで抽出。diffの追加行・削除行のみ確認したい変更点洗い出しに。",
@@ -106,6 +122,7 @@ export const toolLinks = [
   },
   {
     href: "/text-normalize/",
+    category: "text" as ToolCategoryId,
     title: "テキスト正規化",
     description: "前後空白削除、連続スペース圧縮、Unicode正規化、改行統一。",
     introduction:
@@ -130,6 +147,7 @@ export const toolLinks = [
   },
   {
     href: "/invisible-character-viewer/",
+    category: "unicode" as ToolCategoryId,
     title: "不可視文字ビューア",
     description: "スペース、タブ、CR、LF、NBSP、ゼロ幅スペースを可視化。",
     introduction:
@@ -154,6 +172,7 @@ export const toolLinks = [
   },
   {
     href: "/line-ending-converter/",
+    category: "text" as ToolCategoryId,
     title: "改行コード変換",
     description:
       "改行コード（LF・CRLF・CR）をオンラインで相互変換。WindowsとmacOS/Linux間の改行トラブル、Gitの差分崩れ解消に。",
@@ -179,6 +198,7 @@ export const toolLinks = [
   },
   {
     href: "/case-converter/",
+    category: "text" as ToolCategoryId,
     title: "ケース変換",
     description:
       "UPPERCASE、lowercase、camelCase、PascalCase、snake_case、kebab-caseへ変換。",
@@ -204,6 +224,7 @@ export const toolLinks = [
   },
   {
     href: "/url-encode-decode/",
+    category: "web" as ToolCategoryId,
     title: "URLエンコード・デコード",
     description:
       "URLやクエリパラメータをオンラインでエンコード・デコード。パーセントエンコーディングと日本語変換に対応。",
@@ -235,6 +256,7 @@ export const toolLinks = [
   },
   {
     href: "/base64/",
+    category: "web" as ToolCategoryId,
     title: "Base64",
     description:
       "Base64文字列をオンラインでエンコード・デコード。UTF-8対応で日本語も文字化けなし。Basic認証やデータURIの確認に。",
@@ -266,6 +288,7 @@ export const toolLinks = [
   },
   {
     href: "/html-escape/",
+    category: "web" as ToolCategoryId,
     title: "HTMLエスケープ",
     description:
       "HTML特殊文字（&・<・>・引用符）をオンラインでエスケープ・アンエスケープ。コード例やテンプレート作成、表示崩れ調査に。",
@@ -297,6 +320,7 @@ export const toolLinks = [
   },
   {
     href: "/html-special-characters/",
+    category: "unicode" as ToolCategoryId,
     title: "HTML特殊文字一覧",
     description:
       "HTML特殊文字と文字参照の対応表。表示文字、名前付き文字参照、数値文字参照、用途を確認。",
@@ -315,6 +339,7 @@ export const toolLinks = [
   },
   {
     href: "/unicode-inspector/",
+    category: "unicode" as ToolCategoryId,
     title: "Unicodeインスペクタ",
     description:
       "文字のUnicodeコードポイント、UTF-8・UTF-16・UTF-32表現、文字名をオンラインで確認。文字化けや異体字、絵文字の調査に。",
@@ -340,6 +365,7 @@ export const toolLinks = [
   },
   {
     href: "/epoch-converter/",
+    category: "time" as ToolCategoryId,
     title: "エポック時間変換",
     description:
       "Unixエポック秒・ミリ秒と日時をオンラインで相互変換。ISO 8601、UTC、ローカル時刻表示に対応。ログのタイムスタンプ調査やAPIレスポンス確認に。",
@@ -371,6 +397,7 @@ export const toolLinks = [
   },
   {
     href: "/timezone-converter/",
+    category: "time" as ToolCategoryId,
     title: "タイムゾーン検索・変換",
     description:
       "IANAタイムゾーン名をオンラインで検索し、基準日時を複数タイムゾーンの現地時刻へ一括変換。UTCオフセット確認や海外拠点との会議調整、サーバーログの時刻確認に。",
@@ -401,6 +428,7 @@ export const toolLinks = [
   },
   {
     href: "/sql-builder/",
+    category: "dev" as ToolCategoryId,
     title: "SQL文簡易作成",
     description:
       "SELECT・INSERT・UPDATE・CREATE TABLE文をオンラインで組み立て。テーブル名、カラム、WHERE条件を入力するだけでSQLクエリを自動生成。値のクォート付与にも対応。",
@@ -426,6 +454,7 @@ export const toolLinks = [
   },
   {
     href: "/json-validator/",
+    category: "dev" as ToolCategoryId,
     title: "JSON構文チェック",
     description:
       "JSONをオンラインで構文検証。構文エラー時はエラー箇所の行番号・列番号を表示し、有効な場合は整形済みJSONを出力。設定ファイルやAPIレスポンスの構文確認に。",
@@ -450,6 +479,7 @@ export const toolLinks = [
   },
   {
     href: "/markdown-editor/",
+    category: "editor" as ToolCategoryId,
     title: "Markdownエディタ",
     description:
       "Markdown文書をオンラインで見たまま編集。見出し・リスト・表・コードブロックに加え、KaTeXによるインライン数式・ブロック数式に対応。",
@@ -468,6 +498,7 @@ export const toolLinks = [
   },
   {
     href: "/tex-helper/",
+    category: "editor" as ToolCategoryId,
     title: "TeX数式入力補助",
     description:
       "ギリシャ文字・演算子・分数・累乗・総和・積分などのTeX記法をボタンで入力。KaTeXでリアルタイムプレビューし、Markdown形式の数式として出力。",
@@ -487,6 +518,7 @@ export const toolLinks = [
   },
   {
     href: "/regex-tester/",
+    category: "dev" as ToolCategoryId,
     title: "正規表現チェック",
     description:
       "正規表現パターンをオンラインでテスト。マッチ箇所・位置・キャプチャグループを一覧表示し、置換結果も確認。バリデーション作成やログ抽出パターンの検証に。",
@@ -511,3 +543,31 @@ export const toolLinks = [
     ],
   },
 ]
+
+export type ToolLink = (typeof toolLinks)[number]
+
+export const popularToolHrefs = [
+  "/text-compare/",
+  "/json-validator/",
+  "/jwt-decoder/",
+  "/base64/",
+  "/regex-tester/",
+  "/epoch-converter/",
+]
+
+export const findTool = (href: string) => toolLinks.find((tool) => tool.href === href)
+
+export const categoryLabel = (id: ToolCategoryId) =>
+  toolCategories.find((category) => category.id === id)?.label ?? ""
+
+// ツール名・説明・URLスラッグの部分一致。空白区切りはAND検索。
+export const searchTools = (query: string, category?: ToolCategoryId) => {
+  const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
+  return toolLinks.filter(
+    (tool) =>
+      (!category || tool.category === category) &&
+      terms.every((term) =>
+        `${tool.title} ${tool.description} ${tool.href}`.toLowerCase().includes(term),
+      ),
+  )
+}

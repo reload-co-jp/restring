@@ -50,6 +50,14 @@ export const terms: Term[] = [
     tool: "/case-converter/",
   },
   {
+    id: "natural-sort",
+    term: "自然順ソート",
+    category: "text",
+    description:
+      "文字列中の数字を数値として比較する並べ替え。通常の辞書順ではitem10がitem2より前になるが、自然順ではitem2、item10の順に並ぶ。",
+    tool: "/line-sort/",
+  },
+  {
     id: "unicode",
     term: "Unicode",
     category: "unicode",
@@ -82,6 +90,14 @@ export const terms: Term[] = [
     tool: "/unicode-inspector/",
   },
   {
+    id: "grapheme-cluster",
+    term: "書記素クラスタ",
+    category: "unicode",
+    description:
+      "利用者が1文字と認識する単位。結合文字付きの「が」（か＋濁点）や、ZWJで結合した家族の絵文字は、複数のコードポイントでも1つの書記素クラスタになる。",
+    tool: "/character-count/",
+  },
+  {
     id: "unicode-normalization",
     term: "Unicode正規化（NFC / NFD / NFKC / NFKD）",
     category: "unicode",
@@ -104,6 +120,30 @@ export const terms: Term[] = [
     description:
       "ファイル先頭に置かれるU+FEFF。UTF-8では不要だが、一部のエディタが付加する。シェルスクリプトやJSONの先頭にあるとエラーの原因になる。",
     tool: "/invisible-character-viewer/",
+  },
+  {
+    id: "shift-jis",
+    term: "Shift_JIS",
+    category: "unicode",
+    description:
+      "日本語の文字コード。ASCIIと半角カタカナを1バイト、ひらがな・漢字などを2バイトで表す。Windowsや古いシステムで使われ、①などの機種依存文字を含むCP932（Windows-31J）が実質的な標準。",
+    tool: "/character-encoding/",
+  },
+  {
+    id: "euc-jp",
+    term: "EUC-JP",
+    category: "unicode",
+    description:
+      "日本語の文字コード。漢字・ひらがなを0xA1〜0xFEの2バイト、半角カタカナを0x8Eに続く2バイトで表す。かつてUNIX系のシステムやWebページで使われた。",
+    tool: "/character-encoding/",
+  },
+  {
+    id: "mojibake",
+    term: "文字化け",
+    category: "unicode",
+    description:
+      "ある文字コードで保存した文字列を、別の文字コードとして読んだときに起きる表示の崩れ。バイト列が失われていなければ、正しい文字コードで読み直すと復元できる。",
+    tool: "/character-encoding/",
   },
   {
     id: "url-encode",
@@ -162,6 +202,22 @@ export const terms: Term[] = [
     tool: "/jwt-decoder/",
   },
   {
+    id: "hash",
+    term: "ハッシュ関数",
+    category: "web",
+    description:
+      "任意の長さのデータから固定長の値（ハッシュ値）を求める関数。同じ入力からは常に同じ値になり、値から入力は逆算できない。改ざん検知やチェックサムに使う。",
+    tool: "/hash-generator/",
+  },
+  {
+    id: "sha-256",
+    term: "SHA-256 / MD5",
+    category: "web",
+    description:
+      "代表的なハッシュ関数。SHA-256は256ビット（16進数64桁）、MD5は128ビット（16進数32桁）の値を出力する。MD5とSHA-1は衝突攻撃が知られており、安全性が必要な用途ではSHA-256以上を使う。",
+    tool: "/hash-generator/",
+  },
+  {
     id: "unix-time",
     term: "UNIX時間（エポック時間）",
     category: "time",
@@ -194,11 +250,35 @@ export const terms: Term[] = [
     tool: "/timezone-converter/",
   },
   {
+    id: "cron",
+    term: "cron式",
+    category: "time",
+    description:
+      "定期実行のスケジュールを「分 時 日 月 曜日」の5つのフィールドで表す記法。「0 9 * * 1-5」は平日の9時0分を表す。*/15のような間隔指定や@dailyなどの省略形がある。",
+    tool: "/cron-parser/",
+  },
+  {
     id: "json",
     term: "JSON",
     category: "dev",
     description:
       "オブジェクト・配列・文字列・数値・真偽値・nullで構成されるデータ形式。キーは必ずダブルクォートで囲み、末尾カンマやコメントは使えない。",
+    tool: "/json-validator/",
+  },
+  {
+    id: "yaml",
+    term: "YAML",
+    category: "dev",
+    description:
+      "インデントで構造を表すデータ形式。JSONの上位互換で、コメントやアンカーを書ける。Kubernetes、GitHub Actions、docker-composeなどの設定ファイルで使われる。インデントにタブは使えない。",
+    tool: "/yaml-json-converter/",
+  },
+  {
+    id: "minify",
+    term: "圧縮（minify）",
+    category: "dev",
+    description:
+      "動作を変えずに空白・改行などを取り除き、データを短くする処理。JSONの圧縮は1行になるため、ログや環境変数への埋め込みに使う。",
     tool: "/json-validator/",
   },
   {
@@ -232,6 +312,14 @@ export const terms: Term[] = [
     description:
       "リレーショナルデータベースを操作する言語。SELECTで取得、INSERTで追加、UPDATEで更新、DELETEで削除する。文字列値はシングルクォートで囲む。",
     tool: "/sql-builder/",
+  },
+  {
+    id: "uuid",
+    term: "UUID",
+    category: "dev",
+    description:
+      "128ビットの一意な識別子。550e8400-e29b-41d4-a716-446655440000のように8-4-4-4-12桁の16進数で表す。v4は乱数、v7は時刻ベースで生成する。GUIDとも呼ばれる。",
+    tool: "/uuid-generator/",
   },
   {
     id: "markdown",

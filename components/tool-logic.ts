@@ -21,7 +21,7 @@ export const normalizeForCompare = (
     ignoreLineBreaks: boolean
     ignoreTabs: boolean
     ignoreCase: boolean
-  },
+  }
 ) => {
   let result = value
 
@@ -41,7 +41,7 @@ export const tokenize = (value: string, unit: CompareUnit) => {
 
 export const buildDiff = (left: string[], right: string[]): DiffPart[] => {
   const dp: number[][] = Array.from({ length: left.length + 1 }, () =>
-    Array.from({ length: right.length + 1 }, () => 0),
+    Array.from({ length: right.length + 1 }, () => 0)
   )
 
   for (let i = left.length - 1; i >= 0; i -= 1) {
@@ -104,7 +104,7 @@ export const stableJson = (value: unknown): unknown => {
     return Object.fromEntries(
       Object.entries(value as Record<string, unknown>)
         .sort(([a], [b]) => a.localeCompare(b))
-        .map(([key, child]) => [key, stableJson(child)]),
+        .map(([key, child]) => [key, stableJson(child)])
     )
   }
   return value
@@ -147,7 +147,9 @@ export const words = (value: string) =>
 
 export const toCase = (value: string, mode: CaseMode) => {
   const list = words(value)
-  const capitalized = list.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+  const capitalized = list.map(
+    (word) => word.charAt(0).toUpperCase() + word.slice(1)
+  )
 
   if (mode === "upper") return value.toUpperCase()
   if (mode === "lower") return value.toLowerCase()
@@ -180,7 +182,7 @@ export const encodeUtf8 = (char: string) =>
 
 export const encodeUtf16 = (char: string) =>
   Array.from({ length: char.length }, (_, index) =>
-    char.charCodeAt(index).toString(16).toUpperCase().padStart(4, "0"),
+    char.charCodeAt(index).toString(16).toUpperCase().padStart(4, "0")
   ).join(" ")
 
 export const unicodeBlock = (codePoint: number) => {
@@ -196,7 +198,11 @@ export const unicodeBlock = (codePoint: number) => {
     [0x1f300, 0x1f5ff, "Miscellaneous Symbols and Pictographs"],
     [0x1f600, 0x1f64f, "Emoticons"],
   ]
-  return blocks.find(([start, end]) => codePoint >= start && codePoint <= end)?.[2] ?? "Unknown"
+  return (
+    blocks.find(
+      ([start, end]) => codePoint >= start && codePoint <= end
+    )?.[2] ?? "Unknown"
+  )
 }
 
 export const unicodeName = (char: string, codePoint: number) => {
@@ -208,7 +214,9 @@ export const unicodeName = (char: string, codePoint: number) => {
     "\u00a0": "NO-BREAK SPACE",
     "\u200b": "ZERO WIDTH SPACE",
   }
-  return names[char] ?? `U+${codePoint.toString(16).toUpperCase().padStart(4, "0")}`
+  return (
+    names[char] ?? `U+${codePoint.toString(16).toUpperCase().padStart(4, "0")}`
+  )
 }
 
 export const copyText = async (value: string) => {
@@ -231,7 +239,10 @@ const attempt = (run: () => string, fallback: string): SafeResult => {
   try {
     return { value: run(), error: "" }
   } catch (error) {
-    return { value: "", error: error instanceof Error ? error.message : fallback }
+    return {
+      value: "",
+      error: error instanceof Error ? error.message : fallback,
+    }
   }
 }
 
@@ -260,7 +271,10 @@ export const safeBase64Decode = (value: string) =>
 
 export const decodeBase64Url = (value: string) => {
   const base64 = value.replace(/-/g, "+").replace(/_/g, "/")
-  const padded = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=")
+  const padded = base64.padEnd(
+    base64.length + ((4 - (base64.length % 4)) % 4),
+    "="
+  )
 
   if (typeof Buffer !== "undefined") {
     return Buffer.from(padded, "base64").toString("utf-8")
@@ -272,7 +286,7 @@ export const decodeBase64Url = (value: string) => {
 
 export const toBase64Url = (bytes: ArrayBuffer) => {
   const chars = Array.from(new Uint8Array(bytes), (byte) =>
-    String.fromCharCode(byte),
+    String.fromCharCode(byte)
   ).join("")
   return btoa(chars).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "")
 }
@@ -310,7 +324,10 @@ export const parseJwt = (value: string) => {
       claims.push(["期限状態", payload.exp < now ? "期限切れ" : "期限内"])
     }
     if (typeof payload.nbf === "number") {
-      claims.push(["開始状態", payload.nbf > now ? "まだ有効化前" : "有効化済み"])
+      claims.push([
+        "開始状態",
+        payload.nbf > now ? "まだ有効化前" : "有効化済み",
+      ])
     }
 
     return {
@@ -354,12 +371,12 @@ export const verifyJwtSignature = async (token: string, secret: string) => {
     new TextEncoder().encode(secret),
     { name: "HMAC", hash },
     false,
-    ["sign"],
+    ["sign"]
   )
   const signature = await crypto.subtle.sign(
     "HMAC",
     key,
-    new TextEncoder().encode(`${parts[0]}.${parts[1]}`),
+    new TextEncoder().encode(`${parts[0]}.${parts[1]}`)
   )
 
   return toBase64Url(signature) === parts[2] ? "署名一致" : "署名不一致"
@@ -404,7 +421,7 @@ export const testRegex = (
   pattern: string,
   flags: string,
   input: string,
-  replacement: string,
+  replacement: string
 ): RegexResult => {
   try {
     const execFlags = flags.includes("g") ? flags : `${flags}g`
@@ -414,7 +431,11 @@ export const testRegex = (
     let guard = 0
 
     while ((match = execRegex.exec(input)) !== null && guard < 1000) {
-      matches.push({ match: match[0], index: match.index, groups: match.slice(1) })
+      matches.push({
+        match: match[0],
+        index: match.index,
+        groups: match.slice(1),
+      })
       if (match[0] === "") execRegex.lastIndex += 1
       guard += 1
     }
@@ -444,22 +465,40 @@ export const locateJsonError = (value: string, message: string) => {
 
   const lineColumnMatch = message.match(/line (\d+) column (\d+)/)
   if (lineColumnMatch) {
-    return { line: Number(lineColumnMatch[1]), column: Number(lineColumnMatch[2]) }
+    return {
+      line: Number(lineColumnMatch[1]),
+      column: Number(lineColumnMatch[2]),
+    }
   }
 
   return null
 }
 
-export const validateJson = (value: string) => {
+export const validateJson = (value: string, indent: number | string = 2) => {
   if (value.trim() === "") {
-    return { valid: false, error: "入力が空", formatted: "", location: null as ReturnType<typeof locateJsonError> }
+    return {
+      valid: false,
+      error: "入力が空",
+      formatted: "",
+      location: null as ReturnType<typeof locateJsonError>,
+    }
   }
   try {
     const data = JSON.parse(value)
-    return { valid: true, error: "", formatted: JSON.stringify(data, null, 2), location: null as ReturnType<typeof locateJsonError> }
+    return {
+      valid: true,
+      error: "",
+      formatted: JSON.stringify(data, null, indent),
+      location: null as ReturnType<typeof locateJsonError>,
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : "JSONが不正"
-    return { valid: false, error: message, formatted: "", location: locateJsonError(value, message) }
+    return {
+      valid: false,
+      error: message,
+      formatted: "",
+      location: locateJsonError(value, message),
+    }
   }
 }
 
@@ -481,7 +520,10 @@ export const parseKeyValueLines = (raw: string) =>
     .map((line) => {
       const index = line.indexOf(":")
       if (index === -1) return null
-      return { key: line.slice(0, index).trim(), value: line.slice(index + 1).trim() }
+      return {
+        key: line.slice(0, index).trim(),
+        value: line.slice(index + 1).trim(),
+      }
     })
     .filter((item): item is { key: string; value: string } => item !== null)
 
@@ -495,12 +537,13 @@ export const buildSelectSql = (
   table: string,
   columns: string,
   where: string,
-  orderBy: string,
+  orderBy: string
 ) => {
   const cols = columns.trim() || "*"
   const whereClauses = parseLines(where)
   const lines = [`SELECT ${cols}`, `FROM ${table.trim() || "table_name"}`]
-  if (whereClauses.length > 0) lines.push(`WHERE ${whereClauses.join("\n  AND ")}`)
+  if (whereClauses.length > 0)
+    lines.push(`WHERE ${whereClauses.join("\n  AND ")}`)
   if (orderBy.trim()) lines.push(`ORDER BY ${orderBy.trim()}`)
   return `${lines.join("\n")};`
 }
@@ -512,14 +555,19 @@ export const buildInsertSql = (table: string, pairsRaw: string) => {
   return `INSERT INTO ${table.trim() || "table_name"} (${columns})\nVALUES (${values});`
 }
 
-export const buildUpdateSql = (table: string, pairsRaw: string, where: string) => {
+export const buildUpdateSql = (
+  table: string,
+  pairsRaw: string,
+  where: string
+) => {
   const pairs = parseKeyValueLines(pairsRaw)
   const setClause = pairs
     .map((pair) => `${pair.key} = ${formatSqlValue(pair.value)}`)
     .join(",\n  ")
   const whereClauses = parseLines(where)
   const lines = [`UPDATE ${table.trim() || "table_name"}`, `SET ${setClause}`]
-  if (whereClauses.length > 0) lines.push(`WHERE ${whereClauses.join("\n  AND ")}`)
+  if (whereClauses.length > 0)
+    lines.push(`WHERE ${whereClauses.join("\n  AND ")}`)
   return `${lines.join("\n")};`
 }
 
@@ -590,27 +638,442 @@ const isObject = (value: unknown): value is Record<string, unknown> =>
   Boolean(value) && typeof value === "object" && !Array.isArray(value)
 
 // キー順を無視した構造差分。配列は添字単位で比較。
-export const diffJson = (left: unknown, right: unknown, path = "$"): JsonDiff[] => {
+export const diffJson = (
+  left: unknown,
+  right: unknown,
+  path = "$"
+): JsonDiff[] => {
   if (isObject(left) && isObject(right)) {
-    const keys = Array.from(new Set([...Object.keys(left), ...Object.keys(right)])).sort()
+    const keys = Array.from(
+      new Set([...Object.keys(left), ...Object.keys(right)])
+    ).sort()
     return keys.flatMap((key) => {
       const childPath = /^[A-Za-z_$][\w$]*$/.test(key)
         ? `${path}.${key}`
         : `${path}[${JSON.stringify(key)}]`
-      if (!(key in right)) return [{ path: childPath, type: "removed" as const, left: left[key] }]
-      if (!(key in left)) return [{ path: childPath, type: "added" as const, right: right[key] }]
+      if (!(key in right))
+        return [{ path: childPath, type: "removed" as const, left: left[key] }]
+      if (!(key in left))
+        return [{ path: childPath, type: "added" as const, right: right[key] }]
       return diffJson(left[key], right[key], childPath)
     })
   }
   if (Array.isArray(left) && Array.isArray(right)) {
-    return Array.from({ length: Math.max(left.length, right.length) }, (_, index) => {
-      const childPath = `${path}[${index}]`
-      if (index >= right.length) return [{ path: childPath, type: "removed" as const, left: left[index] }]
-      if (index >= left.length) return [{ path: childPath, type: "added" as const, right: right[index] }]
-      return diffJson(left[index], right[index], childPath)
-    }).flat()
+    return Array.from(
+      { length: Math.max(left.length, right.length) },
+      (_, index) => {
+        const childPath = `${path}[${index}]`
+        if (index >= right.length)
+          return [
+            { path: childPath, type: "removed" as const, left: left[index] },
+          ]
+        if (index >= left.length)
+          return [
+            { path: childPath, type: "added" as const, right: right[index] },
+          ]
+        return diffJson(left[index], right[index], childPath)
+      }
+    ).flat()
   }
   return JSON.stringify(left) === JSON.stringify(right)
     ? []
     : [{ path, type: "changed", left, right }]
+}
+
+/* ---------- 文字数カウント ---------- */
+
+const segment = (value: string, granularity: "grapheme" | "word") =>
+  Array.from(new Intl.Segmenter("ja", { granularity }).segment(value))
+
+export const countText = (value: string) => {
+  const graphemes = segment(value, "grapheme")
+  return {
+    graphemes: graphemes.length,
+    withoutSpaces: graphemes.filter((item) => !/^\s+$/.test(item.segment))
+      .length,
+    codePoints: Array.from(value).length,
+    utf16: value.length,
+    utf8Bytes: new TextEncoder().encode(value).length,
+    shiftJisBytes: encodeText(value, "shift_jis").bytes.length,
+    lines: value === "" ? 0 : value.split(/\r\n|\r|\n/).length,
+    words: segment(value, "word").filter((item) => item.isWordLike).length,
+  }
+}
+
+/* ---------- 文字コード ---------- */
+
+export type TextEncodingName = "utf-8" | "shift_jis" | "euc-jp" | "windows-1252"
+
+export const textEncodings: Array<{ value: TextEncodingName; label: string }> =
+  [
+    { value: "utf-8", label: "UTF-8" },
+    { value: "shift_jis", label: "Shift_JIS" },
+    { value: "euc-jp", label: "EUC-JP" },
+    { value: "windows-1252", label: "Windows-1252" },
+  ]
+
+// ブラウザのTextDecoderで全バイト列を復号し、逆引き表を作る（TextEncoderはUTF-8専用のため）
+const encodeTables = new Map<TextEncodingName, Map<string, number[]>>()
+
+const byteRange = (from: number, to: number) =>
+  Array.from({ length: to - from + 1 }, (_, index) => from + index)
+
+const encodeTable = (encoding: Exclude<TextEncodingName, "utf-8">) => {
+  const cached = encodeTables.get(encoding)
+  if (cached) return cached
+  const table = new Map<string, number[]>()
+  const decoder = new TextDecoder(encoding, { fatal: true })
+  const add = (bytes: number[]) => {
+    try {
+      const char = decoder.decode(new Uint8Array(bytes))
+      if (!table.has(char)) table.set(char, bytes)
+    } catch {
+      // 未定義のバイト列
+    }
+  }
+  if (encoding === "windows-1252") {
+    byteRange(0x00, 0xff).forEach((byte) => add([byte]))
+  } else {
+    byteRange(0x00, 0x7f).forEach((byte) => add([byte]))
+  }
+  if (encoding === "shift_jis") {
+    byteRange(0xa1, 0xdf).forEach((byte) => add([byte]))
+    // 0xED・0xEEはIBM拡張文字（0xFA〜0xFC）と重複するため、WHATWGの符号化と同じく使わない
+    const leads = [
+      ...byteRange(0x81, 0x9f),
+      ...byteRange(0xe0, 0xec),
+      ...byteRange(0xef, 0xfc),
+    ]
+    const trails = [...byteRange(0x40, 0x7e), ...byteRange(0x80, 0xfc)]
+    leads.forEach((lead) => trails.forEach((trail) => add([lead, trail])))
+  }
+  if (encoding === "euc-jp") {
+    byteRange(0xa1, 0xdf).forEach((byte) => add([0x8e, byte]))
+    byteRange(0xa1, 0xfe).forEach((lead) =>
+      byteRange(0xa1, 0xfe).forEach((trail) => add([lead, trail]))
+    )
+  }
+  encodeTables.set(encoding, table)
+  return table
+}
+
+// 変換できない文字は「?」（0x3F）に置き換え、unmappableに集める
+export const encodeText = (value: string, encoding: TextEncodingName) => {
+  if (encoding === "utf-8") {
+    return {
+      bytes: Array.from(new TextEncoder().encode(value)),
+      unmappable: [] as string[],
+    }
+  }
+  const table = encodeTable(encoding)
+  const bytes: number[] = []
+  const unmappable: string[] = []
+  for (const char of value) {
+    const encoded = table.get(char)
+    if (encoded) {
+      bytes.push(...encoded)
+    } else {
+      bytes.push(0x3f)
+      unmappable.push(char)
+    }
+  }
+  return { bytes, unmappable }
+}
+
+export const decodeBytes = (
+  bytes: number[],
+  encoding: TextEncodingName,
+  fatal = false
+) => new TextDecoder(encoding, { fatal }).decode(new Uint8Array(bytes))
+
+export const toHex = (bytes: ArrayLike<number> | ArrayBuffer) =>
+  Array.from(
+    bytes instanceof ArrayBuffer ? new Uint8Array(bytes) : bytes,
+    (byte) => byte.toString(16).padStart(2, "0")
+  ).join("")
+
+// 「e3 81 82」「%E3%81%82」「0xe3,0x81」「\xe3\x81」などの16進表記を受け付ける
+export const parseHexBytes = (raw: string) => {
+  const hex = raw.replace(/0x|\\x|%|[\s,:]/gi, "")
+  if (!/^[0-9a-f]*$/i.test(hex))
+    throw new Error("16進数以外の文字が含まれている")
+  if (hex.length % 2 !== 0) throw new Error("16進数の桁数が奇数")
+  return Array.from({ length: hex.length / 2 }, (_, index) =>
+    parseInt(hex.slice(index * 2, index * 2 + 2), 16)
+  )
+}
+
+// 文字化けした文字列を「誤って解釈された文字コード」で符号化し直し、「本来の文字コード」で復号する
+export const repairMojibake = (value: string) =>
+  textEncodings.flatMap((wrong) =>
+    textEncodings.flatMap((right) => {
+      if (wrong.value === right.value) return []
+      const { bytes, unmappable } = encodeText(value, wrong.value)
+      if (unmappable.length > 0) return []
+      try {
+        const repaired = decodeBytes(bytes, right.value, true)
+        // C1制御文字や置換文字を含む結果は復元失敗とみなす
+        return repaired === value || /[\u0080-\u009f\ufffd]/.test(repaired)
+          ? []
+          : [{ wrong: wrong.label, right: right.label, value: repaired }]
+      } catch {
+        return []
+      }
+    })
+  )
+
+/* ---------- ハッシュ ---------- */
+
+export type HashAlgorithm = "MD5" | "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512"
+
+export const hashAlgorithms: HashAlgorithm[] = [
+  "MD5",
+  "SHA-1",
+  "SHA-256",
+  "SHA-384",
+  "SHA-512",
+]
+
+const md5Shifts = [7, 12, 17, 22, 5, 9, 14, 20, 4, 11, 16, 23, 6, 10, 15, 21]
+const md5Constants = Array.from(
+  { length: 64 },
+  (_, index) => Math.floor(Math.abs(Math.sin(index + 1)) * 2 ** 32) >>> 0
+)
+
+// Web Crypto APIはMD5に非対応のため、RFC 1321に沿って実装
+export const md5 = (data: Uint8Array) => {
+  const padded = new Uint8Array((((data.length + 8) >> 6) + 1) * 64)
+  padded.set(data)
+  padded[data.length] = 0x80
+  const view = new DataView(padded.buffer)
+  view.setUint32(padded.length - 8, (data.length * 8) >>> 0, true)
+  view.setUint32(padded.length - 4, Math.floor(data.length / 2 ** 29), true)
+  const state = [0x67452301, 0xefcdab89, 0x98badcfe, 0x10325476]
+  for (let offset = 0; offset < padded.length; offset += 64) {
+    let [a, b, c, d] = state
+    for (let index = 0; index < 64; index++) {
+      const round = index >> 4
+      const f = [
+        (b & c) | (~b & d),
+        (d & b) | (~d & c),
+        b ^ c ^ d,
+        c ^ (b | ~d),
+      ][round]
+      const word = [
+        index,
+        (5 * index + 1) % 16,
+        (3 * index + 5) % 16,
+        (7 * index) % 16,
+      ][round]
+      const sum =
+        (a +
+          f +
+          md5Constants[index] +
+          view.getUint32(offset + word * 4, true)) |
+        0
+      const shift = md5Shifts[round * 4 + (index % 4)]
+      ;[a, d, c] = [d, c, b]
+      b = (b + ((sum << shift) | (sum >>> (32 - shift)))) | 0
+    }
+    state[0] = (state[0] + a) | 0
+    state[1] = (state[1] + b) | 0
+    state[2] = (state[2] + c) | 0
+    state[3] = (state[3] + d) | 0
+  }
+  const output = new DataView(new ArrayBuffer(16))
+  state.forEach((value, index) => output.setUint32(index * 4, value, true))
+  return toHex(output.buffer)
+}
+
+export const hashText = async (value: string, algorithm: HashAlgorithm) => {
+  const data = new TextEncoder().encode(value)
+  return algorithm === "MD5"
+    ? md5(data)
+    : toHex(await crypto.subtle.digest(algorithm, data))
+}
+
+/* ---------- 行の並べ替え ---------- */
+
+export type LineOrder = "none" | "asc" | "desc" | "reverse"
+
+export type LineOptions = {
+  order: LineOrder
+  unique: boolean
+  removeEmpty: boolean
+  trim: boolean
+  ignoreCase: boolean
+  natural: boolean
+}
+
+export const processLines = (value: string, options: LineOptions) => {
+  let lines = value === "" ? [] : value.split(/\r\n|\r|\n/)
+  if (options.trim) lines = lines.map((line) => line.trim())
+  if (options.removeEmpty) lines = lines.filter((line) => line.trim() !== "")
+  if (options.unique) {
+    const seen = new Set<string>()
+    lines = lines.filter((line) => {
+      const key = options.ignoreCase ? line.toLowerCase() : line
+      if (seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+  }
+  const collator = new Intl.Collator("ja", {
+    numeric: options.natural,
+    sensitivity: options.ignoreCase ? "accent" : "variant",
+  })
+  if (options.order === "asc") lines.sort(collator.compare)
+  if (options.order === "desc") lines.sort((a, b) => collator.compare(b, a))
+  if (options.order === "reverse") lines.reverse()
+  return lines
+}
+
+/* ---------- cron ---------- */
+
+type CronField = { label: string; min: number; max: number; names?: string[] }
+
+const cronFields: CronField[] = [
+  { label: "分", min: 0, max: 59 },
+  { label: "時", min: 0, max: 23 },
+  { label: "日", min: 1, max: 31 },
+  {
+    label: "月",
+    min: 1,
+    max: 12,
+    names: [
+      "JAN",
+      "FEB",
+      "MAR",
+      "APR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DEC",
+    ],
+  },
+  {
+    label: "曜日",
+    min: 0,
+    max: 7,
+    names: ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
+  },
+]
+
+const cronMacros: Record<string, string> = {
+  "@yearly": "0 0 1 1 *",
+  "@annually": "0 0 1 1 *",
+  "@monthly": "0 0 1 * *",
+  "@weekly": "0 0 * * 0",
+  "@daily": "0 0 * * *",
+  "@midnight": "0 0 * * *",
+  "@hourly": "0 * * * *",
+}
+
+const weekdayLabels = ["日", "月", "火", "水", "木", "金", "土"]
+
+const parseCronField = (raw: string, field: CronField) => {
+  const values = new Set<number>()
+  const toNumber = (token: string) => {
+    const nameIndex = field.names?.indexOf(token.toUpperCase()) ?? -1
+    const value =
+      nameIndex >= 0
+        ? nameIndex + field.min
+        : /^\d+$/.test(token)
+          ? Number(token)
+          : NaN
+    if (!(value >= field.min && value <= field.max)) {
+      throw new Error(
+        `${field.label}の値「${token}」は${field.min}〜${field.max}の範囲外`
+      )
+    }
+    return value
+  }
+  for (const part of raw.split(",")) {
+    const match = part.match(/^(\*|\w+(?:-\w+)?)(?:\/(\d+))?$/)
+    if (!match) throw new Error(`${field.label}の指定「${part}」が不正`)
+    const step = match[2] ? Number(match[2]) : 1
+    const [start, end = match[2] ? field.max : start] =
+      match[1] === "*"
+        ? [field.min, field.max]
+        : match[1].split("-").map(toNumber)
+    if (step < 1 || start > end)
+      throw new Error(`${field.label}の指定「${part}」が不正`)
+    for (let value = start; value <= end; value += step) values.add(value)
+  }
+  return values
+}
+
+export const parseCron = (expression: string) => {
+  const trimmed = expression.trim()
+  const parts = (cronMacros[trimmed.toLowerCase()] ?? trimmed).split(/\s+/)
+  if (parts.length !== 5)
+    throw new Error("5つのフィールド（分 時 日 月 曜日）を空白区切りで指定")
+  const [minute, hour, day, month, weekday] = parts.map((part, index) =>
+    parseCronField(part, cronFields[index])
+  )
+  if (weekday.has(7)) weekday.add(0)
+  weekday.delete(7)
+  // 日と曜日の両方を指定した場合はどちらかに一致すれば実行（Vixie cronの挙動）
+  const dayStar = parts[2].startsWith("*")
+  const weekdayStar = parts[4].startsWith("*")
+  const matchesDay = (date: Date) => {
+    const dayMatch = day.has(date.getDate())
+    const weekdayMatch = weekday.has(date.getDay())
+    if (dayStar || weekdayStar) return dayMatch && weekdayMatch
+    return dayMatch || weekdayMatch
+  }
+  return { parts, minute, hour, day, month, weekday, matchesDay }
+}
+
+export const describeCron = (expression: string) => {
+  const cron = parseCron(expression)
+  const sets = [cron.minute, cron.hour, cron.day, cron.month, cron.weekday]
+  return cronFields.map((field, index) => {
+    const values = Array.from(sets[index]).sort((a, b) => a - b)
+    const isAll =
+      values.length === (index === 4 ? 7 : field.max - field.min + 1)
+    return {
+      label: field.label,
+      raw: cron.parts[index],
+      value: isAll
+        ? "すべて"
+        : values
+            .map((value) =>
+              index === 4 ? weekdayLabels[value] : String(value)
+            )
+            .join(", "),
+    }
+  })
+}
+
+// ブラウザのローカルタイムゾーンで計算。一致しない式でも終わるよう探索は5年先まで
+export const nextCronRuns = (expression: string, from: Date, count: number) => {
+  const cron = parseCron(expression)
+  const date = new Date(from)
+  date.setSeconds(0, 0)
+  date.setMinutes(date.getMinutes() + 1)
+  const limit = new Date(from)
+  limit.setFullYear(limit.getFullYear() + 5)
+  const runs: Date[] = []
+  while (runs.length < count && date < limit) {
+    if (!cron.month.has(date.getMonth() + 1)) {
+      date.setMonth(date.getMonth() + 1, 1)
+      date.setHours(0, 0, 0, 0)
+    } else if (!cron.matchesDay(date)) {
+      date.setDate(date.getDate() + 1)
+      date.setHours(0, 0, 0, 0)
+    } else if (!cron.hour.has(date.getHours())) {
+      date.setHours(date.getHours() + 1, 0, 0, 0)
+    } else if (!cron.minute.has(date.getMinutes())) {
+      date.setMinutes(date.getMinutes() + 1, 0, 0)
+    } else {
+      runs.push(new Date(date))
+      date.setMinutes(date.getMinutes() + 1)
+    }
+  }
+  return runs
 }

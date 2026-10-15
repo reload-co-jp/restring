@@ -542,6 +542,195 @@ export const toolLinks = [
       },
     ],
   },
+  {
+    href: "/character-count/",
+    category: "unicode" as ToolCategoryId,
+    title: "文字数カウント",
+    description:
+      "文字数・バイト数・行数・単語数をカウント。絵文字や結合文字も見た目どおり1文字として数え、UTF-8とShift_JISのバイト数も表示。",
+    introduction:
+      "入力した文字列の文字数を複数の基準で数えるツール。原稿の文字数制限、データベースのカラム長、SNSの投稿文字数の確認に使える。",
+    usage: [
+      "数えたい文字列を入力する。",
+      "見た目の文字数、空白・改行を除いた文字数を確認する。",
+      "システムの制限に合わせてコードポイント数、UTF-16単位数、バイト数を確認する。",
+    ],
+    mechanism: [
+      "Intl.Segmenterで書記素クラスタ（見た目の1文字）と単語に分割して数える。",
+      "UTF-8はTextEncoder、Shift_JISはブラウザのTextDecoderから作った変換表でバイト数を算出。",
+    ],
+    shell: [
+      {
+        label: "文字数・行数・バイト数",
+        environment: "wc（macOS/Linux標準搭載）",
+        command: "wc -m -l -c input.txt",
+      },
+    ],
+  },
+  {
+    href: "/character-encoding/",
+    category: "unicode" as ToolCategoryId,
+    title: "文字コード変換・文字化け復元",
+    description:
+      "文字列とUTF-8・Shift_JIS・EUC-JPのバイト列を相互変換。文字化けした文字列から元の文字列を復元する候補を表示。",
+    introduction:
+      "日本語の文字コードを確認・変換するツール。CSVやメールの文字化け原因の調査、レガシーシステムとの連携時のバイト列確認に使える。",
+    usage: [
+      "文字列を入力し、文字コードを選んでバイト列を確認する。",
+      "16進数のバイト列を入力し、各文字コードで復号した結果を比べる。",
+      "文字化けした文字列を入力し、復元候補から正しいものを選ぶ。",
+    ],
+    mechanism: [
+      "復号はブラウザのTextDecoder（WHATWG Encoding Standard）を使用。",
+      "符号化は全バイト列をTextDecoderで復号して逆引き表を作り、文字ごとに置き換える。",
+      "文字化け復元は、誤って解釈された文字コードでバイト列へ戻し、別の文字コードで読み直す。",
+    ],
+    shell: [
+      {
+        label: "Shift_JISからUTF-8へ変換",
+        environment: "iconv（macOS/Linux標準搭載が多い）",
+        command: "iconv -f SHIFT_JIS -t UTF-8 input.txt > output.txt",
+      },
+      {
+        label: "バイト列を16進数で表示",
+        environment: "xxd（macOS/Linux標準搭載が多い）",
+        command: "printf 'あ' | iconv -t SHIFT_JIS | xxd",
+      },
+    ],
+  },
+  {
+    href: "/hash-generator/",
+    category: "web" as ToolCategoryId,
+    title: "ハッシュ生成",
+    description:
+      "文字列からMD5・SHA-1・SHA-256・SHA-384・SHA-512のハッシュ値を同時に生成。UTF-8対応。",
+    introduction:
+      "文字列のハッシュ値を計算するツール。チェックサムの照合、キャッシュキーやETagの確認、APIの署名検証のデバッグに使える。",
+    usage: [
+      "ハッシュ化したい文字列を入力する。",
+      "各アルゴリズムのハッシュ値を確認し、必要なものをコピーする。",
+    ],
+    mechanism: [
+      "入力をUTF-8バイト列に変換してからハッシュ化。",
+      "SHA系はWeb Crypto API、MD5はWeb Crypto APIが非対応のためRFC 1321に沿った実装で計算。",
+    ],
+    shell: [
+      {
+        label: "SHA-256",
+        environment: "shasum（macOS）、sha256sum（Linux）",
+        command: "printf '%s' 'hello' | shasum -a 256",
+      },
+      {
+        label: "MD5",
+        environment: "md5（macOS）、md5sum（Linux）",
+        command: "printf '%s' 'hello' | md5",
+      },
+    ],
+  },
+  {
+    href: "/line-sort/",
+    category: "text" as ToolCategoryId,
+    title: "行の並べ替え・重複削除",
+    description:
+      "テキストを行単位で並べ替え、重複行・空行を削除。数値順ソートと大文字小文字の無視に対応。",
+    introduction:
+      "行単位でテキストを整理するツール。メールアドレスやIDのリスト、ログ、設定値の重複確認や並べ替えに使える。",
+    usage: [
+      "整理したいテキストを1行1項目で入力する。",
+      "並び順と、重複削除・空行削除などのオプションを選ぶ。",
+      "出力の行数を確認してコピーまたは保存する。",
+    ],
+    mechanism: [
+      "前後の空白削除、空行削除、重複削除、並べ替えの順に処理。",
+      "並べ替えはIntl.Collatorによる日本語の照合順序で、数値順を選ぶとitem2がitem10より前になる。",
+    ],
+    shell: [
+      {
+        label: "並べ替えて重複削除",
+        environment: "sort（macOS/Linux標準搭載）",
+        command: "sort -u input.txt",
+      },
+      {
+        label: "数値順で並べ替え",
+        environment: "GNU sort、macOS sort",
+        command: "sort -V input.txt",
+      },
+    ],
+  },
+  {
+    href: "/cron-parser/",
+    category: "time" as ToolCategoryId,
+    title: "cron式の解説",
+    description:
+      "cron式を分・時・日・月・曜日に分解して実行条件を表示し、次回以降の実行日時を一覧表示。",
+    introduction:
+      "crontabやジョブスケジューラのcron式を確認するツール。設定した式が意図どおりの日時に実行されるかを事前に確認できる。",
+    usage: [
+      "cron式を入力するか、プリセットから選ぶ。",
+      "フィールドごとの実行される値を確認する。",
+      "次回以降の実行日時が意図どおりか確認する。",
+    ],
+    mechanism: [
+      "*、範囲（1-5）、間隔（*/15）、列挙（1,15）、月・曜日の英語名、@dailyなどのマクロを解析。",
+      "日と曜日の両方を指定した場合は、Vixie cronと同じくどちらかに一致すれば実行とみなす。",
+      "実行日時はブラウザのタイムゾーンで計算。",
+    ],
+    shell: [
+      {
+        label: "現在のcrontabを表示",
+        environment: "cron（macOS/Linux）",
+        command: "crontab -l",
+      },
+    ],
+  },
+  {
+    href: "/uuid-generator/",
+    category: "dev" as ToolCategoryId,
+    title: "UUID生成",
+    description: "UUID v4を一括生成。大文字・ハイフンなしの形式に対応。",
+    introduction:
+      "ランダムなUUID v4を生成するツール。データベースの主キー、テストデータ、一意なファイル名の作成に使える。",
+    usage: [
+      "生成数を選ぶ。",
+      "必要に応じて大文字やハイフンなしの形式に切り替える。",
+      "結果をコピーまたは保存する。",
+    ],
+    mechanism: [
+      "crypto.randomUUID()で暗号論的に安全な乱数からUUID v4を生成。",
+      "生成はブラウザ内で完結し、サーバーへ送信しない。",
+    ],
+    shell: [
+      {
+        label: "UUIDを生成",
+        environment: "uuidgen（macOS/Linux標準搭載が多い）",
+        command: "uuidgen | tr 'A-Z' 'a-z'",
+      },
+    ],
+  },
+  {
+    href: "/yaml-json-converter/",
+    category: "dev" as ToolCategoryId,
+    title: "YAML・JSON変換",
+    description: "YAMLとJSONを相互変換。構文エラー時はエラーメッセージを表示。",
+    introduction:
+      "YAMLとJSONを相互に変換するツール。Kubernetesマニフェスト、GitHub Actions、docker-composeなどの設定ファイルの確認や書き換えに使える。",
+    usage: [
+      "変換方向を選び、YAMLまたはJSONを入力する。",
+      "変換結果をコピーまたは保存する。",
+      "変換方向を切り替えると、変換結果が次の入力になる。",
+    ],
+    mechanism: [
+      "YAML 1.2に対応したyamlライブラリで解析・出力。",
+      "JSONはJSON.parseで解析し、YAMLからの変換結果はインデント2で整形。",
+    ],
+    shell: [
+      {
+        label: "YAMLをJSONへ変換",
+        environment: "yq（要インストール）",
+        command: "yq -o=json input.yaml",
+      },
+    ],
+  },
 ]
 
 export type ToolLink = (typeof toolLinks)[number]
@@ -555,7 +744,8 @@ export const popularToolHrefs = [
   "/epoch-converter/",
 ]
 
-export const findTool = (href: string) => toolLinks.find((tool) => tool.href === href)
+export const findTool = (href: string) =>
+  toolLinks.find((tool) => tool.href === href)
 
 export const categoryLabel = (id: ToolCategoryId) =>
   toolCategories.find((category) => category.id === id)?.label ?? ""
@@ -567,7 +757,9 @@ export const searchTools = (query: string, category?: ToolCategoryId) => {
     (tool) =>
       (!category || tool.category === category) &&
       terms.every((term) =>
-        `${tool.title} ${tool.description} ${tool.href}`.toLowerCase().includes(term),
-      ),
+        `${tool.title} ${tool.description} ${tool.href}`
+          .toLowerCase()
+          .includes(term)
+      )
   )
 }

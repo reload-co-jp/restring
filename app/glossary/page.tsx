@@ -13,7 +13,7 @@ import { findTool, toolCategories } from "components/tool-links"
 export const metadata = createPageMetadata({
   title: "用語集",
   description:
-    "Base64、URLエンコード、JWT、Unicode、UTF-8、正規化、改行コード、UNIX時間、正規表現など、文字列処理ツールで使われる用語をまとめて解説。",
+    "Base64、URLエンコード、JWT、Unicode、UTF-8、正規化、改行コード、UNIX時間、正規表現、Shift_JIS、ハッシュ、UUID、cron、YAMLなど、文字列処理ツールで使われる用語をまとめて解説。",
   path: "/glossary/",
 })
 

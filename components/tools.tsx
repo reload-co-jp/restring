@@ -15,6 +15,9 @@ import { Icon, IconName } from "components/icons"
 import {
   CaseMode,
   CompareUnit,
+  HashAlgorithm,
+  LineOptions,
+  TextEncodingName,
   CompareView,
   DiffPart,
   LineEnding,
@@ -27,26 +30,38 @@ import {
   buildUpdateSql,
   convertLineEnding,
   copyText,
+  countText,
+  decodeBytes,
+  describeCron,
   diffJson,
   downloadText,
+  encodeText,
   encodeUtf16,
   encodeUtf8,
   escapeHtml,
   formatEpochResult,
   formatInTimeZone,
   getAllTimeZones,
+  hashAlgorithms,
+  hashText,
+  nextCronRuns,
   normalizeForCompare,
   normalizeText,
   parseFlexibleEpoch,
   parseJson,
+  parseHexBytes,
   parseJwt,
+  processLines,
+  repairMojibake,
   safeBase64Decode,
   safeBase64Encode,
   safeDecodeURIComponent,
   safeEncodeURIComponent,
   stableJson,
   testRegex,
+  textEncodings,
   toCase,
+  toHex,
   tokenize,
   unescapeHtml,
   unicodeBlock,
@@ -128,7 +143,11 @@ export const CopyButton: FC<{
     >
       <Icon name={state === "done" ? "check" : "copy"} size={16} />
       <span aria-live="polite">
-        {state === "done" ? "コピーしました" : state === "error" ? "コピー失敗" : label}
+        {state === "done"
+          ? "コピーしました"
+          : state === "error"
+            ? "コピー失敗"
+            : label}
       </span>
     </button>
   )
@@ -192,7 +211,7 @@ const FieldHead: FC<{
   </div>
 )
 
-const TextArea: FC<{
+export const TextArea: FC<{
   label: string
   value: string
   onChange: (value: string) => void
@@ -201,15 +220,32 @@ const TextArea: FC<{
   sample?: string
   hint?: string
   error?: string
-}> = ({ label, value, onChange, rows = 8, placeholder, sample, hint, error }) => {
+}> = ({
+  label,
+  value,
+  onChange,
+  rows = 8,
+  placeholder,
+  sample,
+  hint,
+  error,
+}) => {
   const id = useId()
   const message = error || hint
 
   return (
     <div className="field">
-      <FieldHead id={id} label={label} meta={`${value.length.toLocaleString()}文字`}>
+      <FieldHead
+        id={id}
+        label={label}
+        meta={`${value.length.toLocaleString()}文字`}
+      >
         {sample !== undefined && (
-          <button className="textButton" onClick={() => onChange(sample)} type="button">
+          <button
+            className="textButton"
+            onClick={() => onChange(sample)}
+            type="button"
+          >
             サンプル
           </button>
         )}
@@ -336,7 +372,7 @@ const useIsClient = () =>
   useSyncExternalStore(
     noopSubscribe,
     () => true,
-    () => false,
+    () => false
   )
 
 /* ---------- 比較・差分 ---------- */
@@ -355,12 +391,25 @@ const useTextDiff = () => {
   const [ignoreCase, setIgnoreCase] = useState(false)
 
   const diff = useMemo(() => {
-    const options = { ignoreWhitespace, ignoreLineBreaks, ignoreTabs, ignoreCase }
+    const options = {
+      ignoreWhitespace,
+      ignoreLineBreaks,
+      ignoreTabs,
+      ignoreCase,
+    }
     return buildDiff(
       tokenize(normalizeForCompare(left, options), unit),
-      tokenize(normalizeForCompare(right, options), unit),
+      tokenize(normalizeForCompare(right, options), unit)
     )
-  }, [left, right, unit, ignoreWhitespace, ignoreLineBreaks, ignoreTabs, ignoreCase])
+  }, [
+    left,
+    right,
+    unit,
+    ignoreWhitespace,
+    ignoreLineBreaks,
+    ignoreTabs,
+    ignoreCase,
+  ])
 
   return {
     diff,
@@ -442,7 +491,11 @@ const CompareControls: FC<{ state: TextDiffState; showView?: boolean }> = ({
         label="改行"
         onChange={state.setIgnoreLineBreaks}
       />
-      <Checkbox checked={state.ignoreTabs} label="タブ" onChange={state.setIgnoreTabs} />
+      <Checkbox
+        checked={state.ignoreTabs}
+        label="タブ"
+        onChange={state.setIgnoreTabs}
+      />
       <Checkbox
         checked={state.ignoreCase}
         label="大文字小文字"
@@ -472,11 +525,11 @@ const DiffSummary: FC<{ diff: DiffPart[] }> = ({ diff }) => {
   )
 }
 
-const DiffView: FC<{ parts: DiffPart[]; unit: CompareUnit; numbered?: boolean }> = ({
-  parts,
-  unit,
-  numbered,
-}) => {
+const DiffView: FC<{
+  parts: DiffPart[]
+  unit: CompareUnit
+  numbered?: boolean
+}> = ({ parts, unit, numbered }) => {
   if (unit !== "line") {
     return (
       <pre className="output diffInline">
@@ -493,7 +546,7 @@ const DiffView: FC<{ parts: DiffPart[]; unit: CompareUnit; numbered?: boolean }>
             </del>
           ) : (
             <span key={index}>{part.text}</span>
-          ),
+          )
         )}
       </pre>
     )
@@ -607,7 +660,8 @@ export const JsonCompareTool: FC = () => {
   const diffs = invalid ? [] : diffJson(leftJson.data, rightJson.data)
   const jsonEqual =
     !invalid &&
-    JSON.stringify(stableJson(leftJson.data)) === JSON.stringify(stableJson(rightJson.data))
+    JSON.stringify(stableJson(leftJson.data)) ===
+      JSON.stringify(stableJson(rightJson.data))
 
   return (
     <>
@@ -689,7 +743,9 @@ export const JsonCompareTool: FC = () => {
             error={rightJson.error}
             label="JSON B"
             name="b.json"
-            value={rightJson.error ? "" : JSON.stringify(rightJson.data, null, 2)}
+            value={
+              rightJson.error ? "" : JSON.stringify(rightJson.data, null, 2)
+            }
           />
         </div>
       </Panel>
@@ -721,7 +777,9 @@ export const JwtDecoderTool: FC = () => {
       })
       .catch((error: unknown) => {
         if (!canceled) {
-          setVerification(error instanceof Error ? error.message : "署名検証失敗")
+          setVerification(
+            error instanceof Error ? error.message : "署名検証失敗"
+          )
         }
       })
 
@@ -761,16 +819,21 @@ export const JwtDecoderTool: FC = () => {
                     <dt>{label}</dt>
                     <dd>
                       {label.endsWith("状態") ? (
-                        <span className={`badge ${claimTone(text)}`}>{text}</span>
+                        <span className={`badge ${claimTone(text)}`}>
+                          {text}
+                        </span>
                       ) : (
                         <>
                           <code>{text}</code>
                           {time && (
                             <span className="hint">
                               ローカル:{" "}
-                              {new Date(Number(time[1]) * 1000).toLocaleString("ja-JP", {
-                                timeZoneName: "short",
-                              })}
+                              {new Date(Number(time[1]) * 1000).toLocaleString(
+                                "ja-JP",
+                                {
+                                  timeZoneName: "short",
+                                }
+                              )}
                             </span>
                           )}
                         </>
@@ -782,10 +845,22 @@ export const JwtDecoderTool: FC = () => {
             </dl>
           )}
           <div className="twoColumn">
-            <Result label="Header" name="jwt-header.json" value={result.header} />
-            <Result label="Payload" name="jwt-payload.json" value={result.payload} />
+            <Result
+              label="Header"
+              name="jwt-header.json"
+              value={result.header}
+            />
+            <Result
+              label="Payload"
+              name="jwt-payload.json"
+              value={result.payload}
+            />
           </div>
-          <Result label="Signature" name="jwt-signature.txt" value={result.signature} />
+          <Result
+            label="Signature"
+            name="jwt-signature.txt"
+            value={result.signature}
+          />
         </Panel>
       )}
       <Panel
@@ -829,7 +904,12 @@ export const TextNormalizeTool: FC = () => {
         </ol>
       </div>
       <div className="twoColumn">
-        <TextArea label="入力" onChange={setValue} sample={sampleNormalize} value={value} />
+        <TextArea
+          label="入力"
+          onChange={setValue}
+          sample={sampleNormalize}
+          value={value}
+        />
         <Result
           label={`出力（${value.length}文字 → ${output.length}文字）`}
           name="normalized.txt"
@@ -857,12 +937,20 @@ export const InvisibleCharacterViewerTool: FC = () => {
   const [value, setValue] = useState(sampleInvisible)
   const chars = Array.from(value)
   const counts = Object.entries(invisibleChars)
-    .map(([char, info]) => ({ ...info, count: chars.filter((c) => c === char).length }))
+    .map(([char, info]) => ({
+      ...info,
+      count: chars.filter((c) => c === char).length,
+    }))
     .filter((item) => item.count > 0)
 
   return (
     <Panel title="不可視文字ビューア">
-      <TextArea label="入力" onChange={setValue} sample={sampleInvisible} value={value} />
+      <TextArea
+        label="入力"
+        onChange={setValue}
+        sample={sampleInvisible}
+        value={value}
+      />
       <div className="field">
         <span className="fieldLabel">可視化表示</span>
         <pre className="output visibleOutput">
@@ -892,7 +980,11 @@ export const InvisibleCharacterViewerTool: FC = () => {
           )}
         </div>
       </div>
-      <Result label="名前置換テキスト" name="visible.txt" value={visibleText(value)} />
+      <Result
+        label="名前置換テキスト"
+        name="visible.txt"
+        value={visibleText(value)}
+      />
     </Panel>
   )
 }
@@ -982,7 +1074,15 @@ const EncodeDecode: FC<{
   fileName: string
   encode: (value: string) => SafeResult
   decode: (value: string) => SafeResult
-}> = ({ title, sample, encodeLabel, decodeLabel, fileName, encode, decode }) => {
+}> = ({
+  title,
+  sample,
+  encodeLabel,
+  decodeLabel,
+  fileName,
+  encode,
+  decode,
+}) => {
   const [value, setValue] = useState(sample)
   const encoded = encode(value)
   const decoded = decode(value)
@@ -992,7 +1092,13 @@ const EncodeDecode: FC<{
       description="入力をエンコードした結果とデコードした結果を同時に表示。"
       title={title}
     >
-      <TextArea label="入力" onChange={setValue} rows={5} sample={sample} value={value} />
+      <TextArea
+        label="入力"
+        onChange={setValue}
+        rows={5}
+        sample={sample}
+        value={value}
+      />
       <div className="twoColumn">
         <Result
           error={encoded.error}
@@ -1097,7 +1203,9 @@ export const UnicodeInspectorTool: FC = () => {
                 <td className="muted">{row.index + 1}</td>
                 <td className="charCell">
                   {invisibleChars[row.char] ? (
-                    <span className="ws">{invisibleChars[row.char].symbol}</span>
+                    <span className="ws">
+                      {invisibleChars[row.char].symbol}
+                    </span>
                   ) : (
                     row.char
                   )}
@@ -1135,11 +1243,15 @@ const ClientOnly: FC<{ children: ReactNode }> = ({ children }) =>
 const epochInterpretation = (value: string) => {
   const trimmed = value.trim()
   if (!/^-?\d+$/.test(trimmed)) return "日時文字列として解釈"
-  return Math.abs(Number(trimmed)) >= 1e12 ? "13桁以上: ミリ秒として解釈" : "秒として解釈"
+  return Math.abs(Number(trimmed)) >= 1e12
+    ? "13桁以上: ミリ秒として解釈"
+    : "秒として解釈"
 }
 
 const EpochConverter: FC = () => {
-  const [value, setValue] = useState(() => Math.floor(Date.now() / 1000).toString())
+  const [value, setValue] = useState(() =>
+    Math.floor(Date.now() / 1000).toString()
+  )
   const ms = parseFlexibleEpoch(value)
   const result = ms === null ? null : formatEpochResult(ms)
   const rows = result
@@ -1170,7 +1282,11 @@ const EpochConverter: FC = () => {
             ? "数値（エポック秒・ミリ秒）または日時文字列（例: 2024-01-01T00:00:00Z）を入力"
             : undefined
         }
-        hint={value.trim() === "" ? "例: 1700000000、1700000000000、2024-01-01T00:00:00Z" : epochInterpretation(value)}
+        hint={
+          value.trim() === ""
+            ? "例: 1700000000、1700000000000、2024-01-01T00:00:00Z"
+            : epochInterpretation(value)
+        }
         label="Unixエポック秒・ミリ秒 または 日時文字列"
         onChange={setValue}
         value={value}
@@ -1208,7 +1324,7 @@ const TimezoneConverter: FC = () => {
   const [query, setQuery] = useState("Tokyo")
   const [dateTimeValue, setDateTimeValue] = useState(utcNowIso)
   const [zonesValue, setZonesValue] = useState(
-    "Asia/Tokyo, America/New_York, Europe/London, UTC",
+    "Asia/Tokyo, America/New_York, Europe/London, UTC"
   )
 
   const matchedZones = useMemo(() => {
@@ -1266,7 +1382,10 @@ const TimezoneConverter: FC = () => {
             </dl>
           ))}
       </Panel>
-      <Panel title="タイムゾーン検索" description="現在時刻を各タイムゾーンで表示。">
+      <Panel
+        title="タイムゾーン検索"
+        description="現在時刻を各タイムゾーンで表示。"
+      >
         <TextInput
           label="タイムゾーン名検索"
           mono={false}
@@ -1287,7 +1406,9 @@ const TimezoneConverter: FC = () => {
                 <button
                   className="textButton"
                   disabled={targetZones.includes(zone)}
-                  onClick={() => setZonesValue([...targetZones, zone].join(", "))}
+                  onClick={() =>
+                    setZonesValue([...targetZones, zone].join(", "))
+                  }
                   type="button"
                 >
                   変換先に追加
@@ -1316,12 +1437,12 @@ export const SqlBuilderTool: FC = () => {
   const [where, setWhere] = useState("status = 'active'")
   const [orderBy, setOrderBy] = useState("created_at DESC")
   const [insertPairs, setInsertPairs] = useState(
-    "name: Restring\nemail: hello@example.com",
+    "name: Restring\nemail: hello@example.com"
   )
   const [updatePairs, setUpdatePairs] = useState("name: Restring")
   const [updateWhere, setUpdateWhere] = useState("id = 1")
   const [columnDefs, setColumnDefs] = useState(
-    "id INT PRIMARY KEY\nname VARCHAR(255) NOT NULL\ncreated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+    "id INT PRIMARY KEY\nname VARCHAR(255) NOT NULL\ncreated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
   )
 
   const sql =
@@ -1412,9 +1533,12 @@ export const SqlBuilderTool: FC = () => {
 
 const sampleJson = '{"name": "Restring", "tools": ["diff", "compare"]}'
 
+const jsonIndents = { "2": 2, "4": 4, tab: "\t", minify: 0 } as const
+
 export const JsonValidatorTool: FC = () => {
   const [value, setValue] = useState(sampleJson)
-  const result = validateJson(value)
+  const [indent, setIndent] = useState<keyof typeof jsonIndents>("2")
+  const result = validateJson(value, jsonIndents[indent])
   const location = result.location
   const errorLine = location ? value.split("\n")[location.line - 1] : undefined
   const gutter = location ? `${location.line} | ` : ""
@@ -1450,7 +1574,22 @@ export const JsonValidatorTool: FC = () => {
       </Panel>
       {result.valid && (
         <Panel title="整形結果">
-          <Result label="整形済みJSON" name="formatted.json" value={result.formatted} />
+          <Segmented
+            label="インデント"
+            onChange={setIndent}
+            options={[
+              { value: "2", label: "スペース2" },
+              { value: "4", label: "スペース4" },
+              { value: "tab", label: "タブ" },
+              { value: "minify", label: "圧縮（1行）" },
+            ]}
+            value={indent}
+          />
+          <Result
+            label={indent === "minify" ? "圧縮JSON" : "整形済みJSON"}
+            name="formatted.json"
+            value={result.formatted}
+          />
         </Panel>
       )}
     </>
@@ -1473,7 +1612,7 @@ export const RegexTesterTool: FC = () => {
     highlighted.push(
       <mark key={index} title={`#${index + 1}`}>
         {item.match}
-      </mark>,
+      </mark>
     )
     cursor = item.index + item.match.length
   })
@@ -1489,19 +1628,31 @@ export const RegexTesterTool: FC = () => {
             onChange={setPattern}
             value={pattern}
           />
-          <TextInput hint="g, i, m, s, u, y" label="フラグ" onChange={setFlags} value={flags} />
+          <TextInput
+            hint="g, i, m, s, u, y"
+            label="フラグ"
+            onChange={setFlags}
+            value={flags}
+          />
         </div>
         <p className="regexPreview">
           <code>
             /{pattern}/{flags}
           </code>
         </p>
-        <TextArea label="テスト文字列" onChange={setInput} rows={5} value={input} />
+        <TextArea
+          label="テスト文字列"
+          onChange={setInput}
+          rows={5}
+          value={input}
+        />
       </Panel>
       {result.valid && (
         <Panel
           actions={
-            <span className={`badge ${result.matches.length > 0 ? "ok" : "neutral"}`}>
+            <span
+              className={`badge ${result.matches.length > 0 ? "ok" : "neutral"}`}
+            >
               {result.matches.length}件マッチ
             </span>
           }
@@ -1537,7 +1688,7 @@ export const RegexTesterTool: FC = () => {
                             {item.groups
                               .map(
                                 (group, groupIndex) =>
-                                  `$${groupIndex + 1}=${group ?? "undefined"}`,
+                                  `$${groupIndex + 1}=${group ?? "undefined"}`
                               )
                               .join(", ")}
                           </code>
@@ -1551,7 +1702,9 @@ export const RegexTesterTool: FC = () => {
               </table>
             </div>
           )}
-          {result.matches.length >= 1000 && <p className="hint">先頭1000件を表示</p>}
+          {result.matches.length >= 1000 && (
+            <p className="hint">先頭1000件を表示</p>
+          )}
         </Panel>
       )}
       <Panel title="置換">
@@ -1561,8 +1714,464 @@ export const RegexTesterTool: FC = () => {
           onChange={setReplacement}
           value={replacement}
         />
-        {result.valid && <Result label="置換結果" name="replaced.txt" value={result.replaced} />}
+        {result.valid && (
+          <Result
+            label="置換結果"
+            name="replaced.txt"
+            value={result.replaced}
+          />
+        )}
       </Panel>
     </>
+  )
+}
+
+/* ---------- 追加ツール ---------- */
+
+const sampleCount = "Restring 文字数カウント👨‍👩‍👧\n2行目"
+
+export const CharacterCountTool: FC = () => {
+  const [value, setValue] = useState(sampleCount)
+  const count = countText(value)
+  const rows = [
+    ["文字数（見た目の文字）", count.graphemes],
+    ["文字数（空白・改行を除く）", count.withoutSpaces],
+    ["コードポイント数", count.codePoints],
+    ["UTF-16単位数（JavaScriptのlength）", count.utf16],
+    ["バイト数（UTF-8）", count.utf8Bytes],
+    ["バイト数（Shift_JIS）", count.shiftJisBytes],
+    ["行数", count.lines],
+    ["単語数", count.words],
+  ] as const
+
+  return (
+    <Panel title="文字数カウント">
+      <TextArea
+        label="入力"
+        onChange={setValue}
+        rows={8}
+        sample={sampleCount}
+        value={value}
+      />
+      <div className="tableWrap">
+        <table className="dataTable">
+          <tbody>
+            {rows.map(([label, number]) => (
+              <tr key={label}>
+                <th scope="row">{label}</th>
+                <td>{number.toLocaleString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Panel>
+  )
+}
+
+export const HashGeneratorTool: FC = () => {
+  const [value, setValue] = useState("hello Restring")
+  const [hashes, setHashes] = useState<Partial<Record<HashAlgorithm, string>>>(
+    {}
+  )
+
+  useEffect(() => {
+    let active = true
+    Promise.all(
+      hashAlgorithms.map((algorithm) => hashText(value, algorithm))
+    ).then((results) => {
+      if (active)
+        setHashes(
+          Object.fromEntries(
+            hashAlgorithms.map((algorithm, index) => [
+              algorithm,
+              results[index],
+            ])
+          )
+        )
+    })
+    return () => {
+      active = false
+    }
+  }, [value])
+
+  return (
+    <Panel
+      description="入力をUTF-8バイト列としてハッシュ化。"
+      title="ハッシュ生成"
+    >
+      <TextArea
+        label="入力"
+        onChange={setValue}
+        rows={5}
+        sample="hello Restring"
+        value={value}
+      />
+      <div className="tableWrap">
+        <table className="dataTable">
+          <tbody>
+            {hashAlgorithms.map((algorithm) => (
+              <tr key={algorithm}>
+                <th scope="row">{algorithm}</th>
+                <td>
+                  <code>{hashes[algorithm] ?? ""}</code>
+                </td>
+                <td>
+                  <CopyButton
+                    disabled={!hashes[algorithm]}
+                    label="コピー"
+                    value={hashes[algorithm] ?? ""}
+                    variant="ghost"
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Panel>
+  )
+}
+
+const UuidGenerator: FC = () => {
+  const [count, setCount] = useState<"1" | "5" | "10" | "50">("5")
+  const [upper, setUpper] = useState(false)
+  const [hyphen, setHyphen] = useState(true)
+  const [seed, setSeed] = useState(0)
+  // seedを変えると再生成
+  const uuids = useMemo(
+    () => Array.from({ length: Number(count) }, () => crypto.randomUUID()),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [count, seed]
+  )
+  const output = uuids
+    .map((uuid) => (hyphen ? uuid : uuid.replaceAll("-", "")))
+    .map((uuid) => (upper ? uuid.toUpperCase() : uuid))
+    .join("\n")
+
+  return (
+    <>
+      <div className="toolbar">
+        <Segmented
+          label="生成数"
+          onChange={setCount}
+          options={["1", "5", "10", "50"].map((item) => ({
+            value: item as typeof count,
+            label: `${item}件`,
+          }))}
+          value={count}
+        />
+        <fieldset className="checkGroup">
+          <legend>形式</legend>
+          <Checkbox checked={upper} label="大文字" onChange={setUpper} />
+          <Checkbox checked={hyphen} label="ハイフン" onChange={setHyphen} />
+        </fieldset>
+        <ActionButton onClick={() => setSeed(seed + 1)} variant="primary">
+          再生成
+        </ActionButton>
+      </div>
+      <Result label="UUID v4" name="uuid.txt" value={output} />
+    </>
+  )
+}
+
+export const UuidGeneratorTool: FC = () => (
+  <Panel
+    description="crypto.randomUUID()で暗号論的に安全な乱数からUUID v4を生成。"
+    title="UUID生成"
+  >
+    <ClientOnly>
+      <UuidGenerator />
+    </ClientOnly>
+  </Panel>
+)
+
+const formatBytes = (bytes: number[], format: "hex" | "percent") =>
+  format === "hex"
+    ? (toHex(bytes).match(/../g) ?? []).join(" ")
+    : (toHex(bytes).match(/../g) ?? [])
+        .map((byte) => `%${byte.toUpperCase()}`)
+        .join("")
+
+export const CharacterEncodingTool: FC = () => {
+  const [text, setText] = useState("あいう ABC")
+  const [encoding, setEncoding] = useState<TextEncodingName>("shift_jis")
+  const [hex, setHex] = useState("82 a0 82 a2 82 a4")
+  const [garbled, setGarbled] = useState("縺薙ｓ縺ｫ縺｡縺ｯ")
+  const encoded = encodeText(text, encoding)
+  let decoded: Array<{ label: string; value: string }> = []
+  let hexError = ""
+  try {
+    const bytes = parseHexBytes(hex)
+    decoded = textEncodings.map((item) => ({
+      label: item.label,
+      value: decodeBytes(bytes, item.value),
+    }))
+  } catch (error) {
+    hexError = error instanceof Error ? error.message : "バイト列が不正"
+  }
+  const repaired = repairMojibake(garbled)
+
+  return (
+    <>
+      <Panel title="文字列 → バイト列">
+        <TextArea label="入力" onChange={setText} rows={3} value={text} />
+        <Segmented
+          label="文字コード"
+          onChange={setEncoding}
+          options={textEncodings}
+          value={encoding}
+        />
+        {encoded.unmappable.length > 0 && (
+          <Status tone="warn">
+            {encoding}で表せない文字を「?」に置換:{" "}
+            {Array.from(new Set(encoded.unmappable)).join(" ")}
+          </Status>
+        )}
+        <div className="twoColumn">
+          <Result
+            label={`16進数（${encoded.bytes.length}バイト）`}
+            name="bytes.txt"
+            value={formatBytes(encoded.bytes, "hex")}
+          />
+          <Result
+            label="パーセントエンコード"
+            name="percent.txt"
+            value={formatBytes(encoded.bytes, "percent")}
+          />
+        </div>
+      </Panel>
+      <Panel
+        description="「82 a0」「%82%A0」「0x82,0xa0」「\\x82\\xa0」形式に対応。"
+        title="バイト列 → 文字列"
+      >
+        <TextArea
+          error={hexError}
+          label="16進数のバイト列"
+          onChange={setHex}
+          rows={3}
+          value={hex}
+        />
+        {!hexError && (
+          <div className="tableWrap">
+            <table className="dataTable">
+              <tbody>
+                {decoded.map((item) => (
+                  <tr key={item.label}>
+                    <th scope="row">{item.label}</th>
+                    <td>{item.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Panel>
+      <Panel
+        description="文字化けした文字列を誤って解釈された文字コードでバイト列へ戻し、別の文字コードで読み直した候補を表示。"
+        title="文字化け復元"
+      >
+        <TextArea
+          label="文字化けした文字列"
+          onChange={setGarbled}
+          rows={3}
+          value={garbled}
+        />
+        {repaired.length === 0 ? (
+          <Status tone="neutral">復元候補なし</Status>
+        ) : (
+          <div className="tableWrap">
+            <table className="dataTable">
+              <thead>
+                <tr>
+                  <th scope="col">誤って読んだ文字コード</th>
+                  <th scope="col">本来の文字コード</th>
+                  <th scope="col">復元結果</th>
+                </tr>
+              </thead>
+              <tbody>
+                {repaired.map((item) => (
+                  <tr key={`${item.wrong}-${item.right}`}>
+                    <td>{item.wrong}</td>
+                    <td>{item.right}</td>
+                    <td>{item.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Panel>
+    </>
+  )
+}
+
+const sampleLines = "banana\napple\nitem10\napple\n\nitem2"
+
+export const LineSortTool: FC = () => {
+  const [value, setValue] = useState(sampleLines)
+  const [options, setOptions] = useState<LineOptions>({
+    order: "asc",
+    unique: true,
+    removeEmpty: true,
+    trim: false,
+    ignoreCase: false,
+    natural: true,
+  })
+  const set =
+    <K extends keyof LineOptions>(key: K) =>
+    (next: LineOptions[K]) =>
+      setOptions({ ...options, [key]: next })
+  const inputCount = value === "" ? 0 : value.split(/\r\n|\r|\n/).length
+  const lines = processLines(value, options)
+
+  return (
+    <Panel title="行の並べ替え・重複削除">
+      <div className="toolbar">
+        <Segmented
+          label="並び順"
+          onChange={set("order")}
+          options={[
+            { value: "none", label: "そのまま" },
+            { value: "asc", label: "昇順" },
+            { value: "desc", label: "降順" },
+            { value: "reverse", label: "逆順" },
+          ]}
+          value={options.order}
+        />
+        <fieldset className="checkGroup">
+          <legend>オプション</legend>
+          <Checkbox
+            checked={options.unique}
+            label="重複削除"
+            onChange={set("unique")}
+          />
+          <Checkbox
+            checked={options.removeEmpty}
+            label="空行削除"
+            onChange={set("removeEmpty")}
+          />
+          <Checkbox
+            checked={options.trim}
+            label="前後の空白削除"
+            onChange={set("trim")}
+          />
+          <Checkbox
+            checked={options.ignoreCase}
+            label="大文字小文字を無視"
+            onChange={set("ignoreCase")}
+          />
+          <Checkbox
+            checked={options.natural}
+            label="数値順（item2 < item10）"
+            onChange={set("natural")}
+          />
+        </fieldset>
+      </div>
+      <div className="twoColumn">
+        <TextArea
+          label="入力"
+          onChange={setValue}
+          sample={sampleLines}
+          value={value}
+        />
+        <Result
+          label={`出力（${inputCount}行 → ${lines.length}行）`}
+          name="lines.txt"
+          value={lines.join("\n")}
+        />
+      </div>
+    </Panel>
+  )
+}
+
+const cronPresets = [
+  { value: "*/5 * * * *", label: "5分ごと" },
+  { value: "0 * * * *", label: "毎時0分" },
+  { value: "0 9 * * 1-5", label: "平日9時" },
+  { value: "0 0 1 * *", label: "毎月1日0時" },
+]
+
+const CronNextRuns: FC<{ expression: string }> = ({ expression }) => {
+  const runs = nextCronRuns(expression, new Date(), 10)
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone
+  return runs.length === 0 ? (
+    <Status tone="warn">5年以内に実行される日時なし</Status>
+  ) : (
+    <Result
+      label={`次回以降の実行日時（${timeZone}）`}
+      name="cron-runs.txt"
+      value={runs
+        .map((date) =>
+          date.toLocaleString("ja-JP", {
+            dateStyle: "medium",
+            timeStyle: "short",
+            weekday: "short",
+          } as Intl.DateTimeFormatOptions)
+        )
+        .join("\n")}
+    />
+  )
+}
+
+export const CronParserTool: FC = () => {
+  const [expression, setExpression] = useState("0 9 * * 1-5")
+  let fields: ReturnType<typeof describeCron> = []
+  let error = ""
+  try {
+    fields = describeCron(expression)
+  } catch (caught) {
+    error = caught instanceof Error ? caught.message : "cron式が不正"
+  }
+
+  return (
+    <Panel title="cron式">
+      <TextInput
+        error={error}
+        hint="分 時 日 月 曜日 の5フィールド。@daily などのマクロにも対応。"
+        label="cron式"
+        onChange={setExpression}
+        value={expression}
+      />
+      <div className="toolbar">
+        {cronPresets.map((preset) => (
+          <ActionButton
+            key={preset.value}
+            onClick={() => setExpression(preset.value)}
+          >
+            {preset.label}
+          </ActionButton>
+        ))}
+      </div>
+      {!error && (
+        <>
+          <div className="tableWrap">
+            <table className="dataTable">
+              <thead>
+                <tr>
+                  <th scope="col">フィールド</th>
+                  <th scope="col">指定</th>
+                  <th scope="col">実行される値</th>
+                </tr>
+              </thead>
+              <tbody>
+                {fields.map((field) => (
+                  <tr key={field.label}>
+                    <th scope="row">{field.label}</th>
+                    <td>
+                      <code>{field.raw}</code>
+                    </td>
+                    <td>{field.value}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <ClientOnly>
+            <CronNextRuns expression={expression} />
+          </ClientOnly>
+        </>
+      )}
+    </Panel>
   )
 }

@@ -14,6 +14,29 @@ type SeoText = {
 }
 
 const relatedToolHrefs: Record<string, string[]> = {
+  "/character-count/": [
+    "/unicode-inspector/",
+    "/invisible-character-viewer/",
+    "/character-encoding/",
+  ],
+  "/character-encoding/": [
+    "/unicode-inspector/",
+    "/url-encode-decode/",
+    "/character-count/",
+  ],
+  "/hash-generator/": ["/base64/", "/jwt-decoder/", "/uuid-generator/"],
+  "/line-sort/": ["/text-normalize/", "/text-compare/", "/case-converter/"],
+  "/cron-parser/": [
+    "/epoch-converter/",
+    "/timezone-converter/",
+    "/regex-tester/",
+  ],
+  "/uuid-generator/": ["/hash-generator/", "/sql-builder/", "/json-validator/"],
+  "/yaml-json-converter/": [
+    "/json-validator/",
+    "/json-compare/",
+    "/text-diff/",
+  ],
   "/text-compare/": [
     "/text-diff/",
     "/text-normalize/",
@@ -76,16 +99,8 @@ const relatedToolHrefs: Record<string, string[]> = {
   "/sql-builder/": ["/json-validator/", "/regex-tester/", "/text-normalize/"],
   "/json-validator/": ["/json-compare/", "/jwt-decoder/", "/sql-builder/"],
   "/regex-tester/": ["/text-compare/", "/case-converter/", "/text-normalize/"],
-  "/markdown-editor/": [
-    "/tex-helper/",
-    "/html-escape/",
-    "/text-compare/",
-  ],
-  "/tex-helper/": [
-    "/markdown-editor/",
-    "/html-escape/",
-    "/text-compare/",
-  ],
+  "/markdown-editor/": ["/tex-helper/", "/html-escape/", "/text-compare/"],
+  "/tex-helper/": ["/markdown-editor/", "/html-escape/", "/text-compare/"],
 }
 
 const seoTextByHref: Record<string, SeoText> = {
@@ -460,6 +475,7 @@ const seoTextByHref: Record<string, SeoText> = {
       "設定ファイルやAPIレスポンスのJSON構文を確認したいとき。",
       "エラー位置の行番号・列番号を見て修正したいとき。",
       "有効なJSONを整形して読みやすくしたいとき。",
+      "JSONを1行に圧縮して、ログや環境変数に貼り付けたいとき。",
     ],
     tips: [
       "末尾カンマ、引用符不足、コメント混入はJSONエラーの原因になりやすい。",
@@ -543,6 +559,172 @@ const seoTextByHref: Record<string, SeoText> = {
         question: "出力先はMarkdownエディタにそのまま貼れる？",
         answer:
           "出力はインライン$…$またはブロック$$…$$のMarkdown形式のため、Markdownエディタなど数式対応のMarkdown文書へそのまま貼り付けられる。",
+      },
+    ],
+  },
+  "/character-count/": {
+    useCases: [
+      "原稿やSNS投稿、メタディスクリプションの文字数制限を確認したいとき。",
+      "データベースのカラム長（VARCHARのバイト数・文字数）に収まるか調べたいとき。",
+      "絵文字を含む文字列で、JavaScriptのlengthと見た目の文字数が違う原因を知りたいとき。",
+    ],
+    tips: [
+      "家族の絵文字や国旗のように、見た目は1文字でも複数のコードポイントで構成される文字がある。",
+      "MySQLのutf8mb4は文字数、Shift_JIS前提の古いシステムはバイト数で制限することが多い。",
+      "Shift_JISで表せない文字（絵文字など）は「?」の1バイトとして数える。",
+    ],
+    questions: [
+      {
+        question: "見た目の文字数とコードポイント数はなぜ違う？",
+        answer:
+          "結合文字や絵文字のZWJシーケンスは複数のコードポイントを組み合わせて1文字に見せるため。見た目の文字数はIntl.Segmenterで書記素クラスタ単位に数えている。",
+      },
+      {
+        question: "日本語1文字は何バイト？",
+        answer:
+          "UTF-8ではひらがな・漢字の多くが3バイト、Shift_JISでは2バイト。半角カタカナはShift_JISで1バイト、UTF-8で3バイトになる。",
+      },
+    ],
+  },
+  "/character-encoding/": {
+    useCases: [
+      "CSVやメール、古いWebページの文字化け原因を調べたいとき。",
+      "Shift_JISやEUC-JPのシステムへ送るバイト列を確認したいとき。",
+      "ログやパケットに出ている16進数のバイト列を文字列に戻したいとき。",
+    ],
+    tips: [
+      "「縺薙ｓ縺ｫ縺｡縺ｯ」のような漢字の羅列は、UTF-8をShift_JISとして読んだ典型的な文字化け。",
+      "「ã“ã‚“」のような記号混じりは、UTF-8をWindows-1252（Latin-1）として読んだ文字化け。",
+      "文字化けした時点で失われたバイトがあると、完全には復元できない。",
+    ],
+    questions: [
+      {
+        question: "文字化けはどうやって復元する？",
+        answer:
+          "文字化けした文字列を、誤って解釈された文字コードでバイト列へ戻し、本来の文字コードで読み直す。組み合わせごとに試し、復元できた候補を表示する。",
+      },
+      {
+        question: "Shift_JISとCP932（Windows-31J）の違いは？",
+        answer:
+          "ブラウザのShift_JISはWHATWG Encoding Standardに従い、①や髙などのNEC・IBM拡張文字を含むCP932相当で扱う。",
+      },
+    ],
+  },
+  "/hash-generator/": {
+    useCases: [
+      "配布ファイルや設定値のチェックサムを照合したいとき。",
+      "キャッシュキーやETag、重複判定用のハッシュ値を確認したいとき。",
+      "API署名やWebhook検証のデバッグで、途中のハッシュ値を確かめたいとき。",
+    ],
+    tips: [
+      "ハッシュ値は改行の有無で変わる。シェルのechoは末尾に改行を付けるため、printfと結果が異なる。",
+      "MD5とSHA-1は衝突攻撃が知られており、改ざん検知や署名にはSHA-256以上を使う。",
+      "パスワードの保存には単純なハッシュではなく、bcryptやArgon2などの専用関数を使う。",
+    ],
+    questions: [
+      {
+        question: "ハッシュ値から元の文字列に戻せる？",
+        answer:
+          "戻せない。ハッシュは一方向の関数で、同じ入力から常に同じ値を得られるが、値から入力を逆算できない。",
+      },
+      {
+        question: "日本語のハッシュ値が他のツールと違う",
+        answer:
+          "入力をUTF-8バイト列としてハッシュ化している。Shift_JISなど別の文字コードで計算したツールとは値が異なる。",
+      },
+    ],
+  },
+  "/line-sort/": {
+    useCases: [
+      "メールアドレスやIDのリストから重複を除きたいとき。",
+      "設定値やimport文、単語リストを並べ替えたいとき。",
+      "ログの行を逆順にして新しい順に読みたいとき。",
+    ],
+    tips: [
+      "数値順を有効にすると、file2がfile10より前に並ぶ自然順ソートになる。",
+      "前後の空白削除を有効にすると、インデントの違いだけの行も重複とみなす。",
+      "大文字小文字を無視した重複削除では、最初に出現した行を残す。",
+    ],
+    questions: [
+      {
+        question: "日本語はどの順で並ぶ？",
+        answer:
+          "Intl.Collatorによる日本語の照合順序で、記号・数字・英字・かな・漢字の順に並ぶ。ひらがなとカタカナは同じ音なら隣り合う。漢字は読み（ふりがな）順にはならない。",
+      },
+      {
+        question: "並び順を変えずに重複だけ削除できる？",
+        answer: "並び順を「そのまま」にして重複削除を有効にする。",
+      },
+    ],
+  },
+  "/cron-parser/": {
+    useCases: [
+      "crontabやGitHub Actionsのscheduleに書くcron式を確認したいとき。",
+      "既存のcron式がいつ実行されるか調べたいとき。",
+      "平日のみ、月初のみなどの指定が意図どおりか確かめたいとき。",
+    ],
+    tips: [
+      "日と曜日の両方を指定すると、どちらかに一致した日に実行される（AND条件ではない）。",
+      "GitHub ActionsやAWSなど多くのサービスはUTCで実行するため、日本時間との9時間差に注意。",
+      "曜日の0と7はどちらも日曜日を表す。",
+    ],
+    questions: [
+      {
+        question: "秒単位の指定（6フィールド）に対応している？",
+        answer:
+          "標準的な5フィールド（分 時 日 月 曜日）のみ対応。Quartzなど秒を含む形式は先頭の秒フィールドを除いて入力する。",
+      },
+      {
+        question: "実行日時はどのタイムゾーン？",
+        answer:
+          "ブラウザのタイムゾーンで計算する。サーバーがUTCで動く場合はタイムゾーン変換ツールで時差を確認する。",
+      },
+    ],
+  },
+  "/uuid-generator/": {
+    useCases: [
+      "データベースの主キーやテストデータ用のIDを用意したいとき。",
+      "一意なファイル名や相関IDを作りたいとき。",
+      "複数のUUIDをまとめて生成したいとき。",
+    ],
+    tips: [
+      "UUID v4は122ビットの乱数で、実用上は重複を気にしなくてよい。",
+      "データベースのインデックス効率を重視する場合は、時刻順に並ぶUUID v7も検討する。",
+    ],
+    questions: [
+      {
+        question: "生成したUUIDは安全？",
+        answer:
+          "crypto.randomUUID()は暗号論的に安全な乱数を使う。生成はブラウザ内で完結し、サーバーへ送信しない。",
+      },
+      {
+        question: "UUIDとGUIDの違いは？",
+        answer:
+          "GUIDはMicrosoftでの呼び名で、形式は同じ。GUIDは大文字や波括弧付きで表記されることが多い。",
+      },
+    ],
+  },
+  "/yaml-json-converter/": {
+    useCases: [
+      "KubernetesマニフェストやGitHub Actionsのワークフローの構造をJSONで確認したいとき。",
+      "APIレスポンスのJSONを設定ファイル用のYAMLに書き換えたいとき。",
+      "YAMLのインデントや記法の誤りを確認したいとき。",
+    ],
+    tips: [
+      "YAMLはJSONの上位互換で、JSONはそのままYAMLとしても読める。",
+      "YAMLのコメントやアンカー（&・*）はJSONへ変換すると失われる。",
+      "YAML 1.2ではyes・noは真偽値ではなく文字列として扱う。",
+    ],
+    questions: [
+      {
+        question: "複数ドキュメント（---区切り）に対応している？",
+        answer:
+          "1ドキュメントのみ対応。複数ある場合はエラーになるため、ドキュメントごとに分けて変換する。",
+      },
+      {
+        question: "タブでインデントしたYAMLはエラーになる？",
+        answer:
+          "YAMLの仕様でインデントにタブは使えないため、スペースに置き換える。",
       },
     ],
   },
@@ -652,7 +834,9 @@ export const ToolArticle: FC<{ children: ReactNode; href: string }> = ({
               <Link href="/">Restring</Link>
             </li>
             <li>
-              <Link href={`/#${tool.category}`}>{categoryLabel(tool.category)}</Link>
+              <Link href={`/#${tool.category}`}>
+                {categoryLabel(tool.category)}
+              </Link>
             </li>
             <li aria-current="page">{tool.title}</li>
           </ol>

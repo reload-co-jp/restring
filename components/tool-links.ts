@@ -966,17 +966,6 @@ export const toolLinks = [
       },
     ],
   },
-]
-
-export type ToolLink = (typeof toolLinks)[number]
-
-export const popularToolHrefs = [
-  "/text-compare/",
-  "/json-validator/",
-  "/jwt-decoder/",
-  "/base64/",
-  "/regex-tester/",
-  "/epoch-converter/",
   {
     href: "/curl-builder/",
     category: "web" as ToolCategoryId,
@@ -1031,6 +1020,17 @@ export const popularToolHrefs = [
       },
     ],
   },
+]
+
+export type ToolLink = (typeof toolLinks)[number]
+
+export const popularToolHrefs = [
+  "/text-compare/",
+  "/json-validator/",
+  "/jwt-decoder/",
+  "/base64/",
+  "/regex-tester/",
+  "/epoch-converter/",
 ]
 
 export const findTool = (href: string) =>

@@ -129,6 +129,7 @@ const relatedToolHrefs: Record<string, string[]> = {
   ],
   "/password-generator/": ["/uuid-generator/", "/hash-generator/", "/base64/"],
   "/url-parser/": ["/url-encode-decode/", "/qr-code-generator/", "/base64/"],
+  "/curl-builder/": ["/url-parser/", "/url-encode-decode/", "/base64/"],
 }
 
 const seoTextByHref: Record<string, SeoText> = {
@@ -824,6 +825,29 @@ const seoTextByHref: Record<string, SeoText> = {
         question: "Math.random()と何が違う？",
         answer:
           "crypto.getRandomValues()は暗号論的に安全な乱数で、出力から次の値を予測できない。",
+      },
+    ],
+  },
+  "/curl-builder/": {
+    useCases: [
+      "APIの動作確認用にリクエストをターミナルから送りたいとき。",
+      "手順書やチャットに再現可能なリクエストを貼りたいとき。",
+      "引用符を含むJSONボディのエスケープに迷ったとき。",
+    ],
+    tips: [
+      "生成されるコマンドはbash/zsh向け。Windowsのコマンドプロンプトでは引用符の扱いが異なる。",
+      "Basic認証は「Authorization: Basic ...」ヘッダーで指定できる。",
+    ],
+    questions: [
+      {
+        question: "GETでボディを送れる？",
+        answer:
+          "GETとHEADではボディ欄を表示しない。curlでは-dを付けるとPOSTに変わるため。",
+      },
+      {
+        question: "-dと--data-rawの違いは？",
+        answer:
+          "-dは先頭が@の値をファイルとして読み込む。--data-rawは値をそのまま送信する。",
       },
     ],
   },

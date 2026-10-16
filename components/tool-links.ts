@@ -977,6 +977,33 @@ export const popularToolHrefs = [
   "/base64/",
   "/regex-tester/",
   "/epoch-converter/",
+  {
+    href: "/curl-builder/",
+    category: "web" as ToolCategoryId,
+    title: "curlコマンド生成",
+    description:
+      "メソッド、URL、ヘッダー、ボディを入力してcurlコマンドを組み立て。値はシェル用に自動でエスケープ。",
+    introduction:
+      "curlコマンドを入力フォームから組み立てるツール。APIの動作確認、手順書やチャットへの貼り付けに使える。",
+    usage: [
+      "メソッドとURLを入力する。",
+      "必要に応じてヘッダーとボディ、オプションを指定する。",
+      "生成されたコマンドをコピーしてターミナルで実行する。",
+    ],
+    mechanism: [
+      "値はシングルクォートで囲み、内部のシングルクォートは'\\''に置き換えてエスケープ。",
+      "ボディは@やファイル指定として解釈されない--data-rawで渡す。",
+      "生成はブラウザ内で完結し、サーバーへ送信しない。",
+    ],
+    shell: [
+      {
+        label: "JSONをPOST",
+        environment: "curl",
+        command:
+          "curl -X POST -H 'Content-Type: application/json' --data-raw '{\"name\":\"test\"}' https://example.com/api",
+      },
+    ],
+  },
 ]
 
 export const findTool = (href: string) =>

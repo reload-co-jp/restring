@@ -1568,3 +1568,49 @@ export const parseUrl = (value: string) => {
     return null
   }
 }
+
+/* ---------- curlコマンド生成 ---------- */
+
+export const curlMethods = [
+  "GET",
+  "POST",
+  "PUT",
+  "PATCH",
+  "DELETE",
+  "HEAD",
+] as const
+export type CurlMethod = (typeof curlMethods)[number]
+
+export type CurlOptions = {
+  follow: boolean
+  insecure: boolean
+  verbose: boolean
+  compressed: boolean
+  multiline: boolean
+}
+
+export const shellQuote = (value: string) =>
+  /^[\w@%+=:,./-]+$/.test(value) ? value : `'${value.replaceAll("'", `'\\''`)}'`
+
+export const buildCurl = (
+  method: CurlMethod,
+  url: string,
+  headers: string,
+  body: string,
+  options: CurlOptions
+) => {
+  const args: string[] = []
+  if (method === "HEAD") args.push("-I")
+  else if (method !== "GET") args.push(`-X ${method}`)
+  if (options.follow) args.push("-L")
+  if (options.insecure) args.push("-k")
+  if (options.verbose) args.push("-v")
+  if (options.compressed) args.push("--compressed")
+  for (const line of headers.split("\n")) {
+    if (line.trim()) args.push(`-H ${shellQuote(line.trim())}`)
+  }
+  if (body && method !== "GET" && method !== "HEAD")
+    args.push(`--data-raw ${shellQuote(body)}`)
+  args.push(shellQuote(url.trim()))
+  return ["curl", ...args].join(options.multiline ? " \\\n  " : " ")
+}

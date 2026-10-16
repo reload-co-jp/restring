@@ -14,6 +14,7 @@ import {
 import { Icon, IconName } from "components/icons"
 import {
   CaseMode,
+  CurlMethod,
   CompareUnit,
   HashAlgorithm,
   LineOptions,
@@ -78,6 +79,8 @@ import {
   convertWidth,
   generatePassword,
   parseRadix,
+  buildCurl,
+  curlMethods,
   parseUrl,
   parseWareki,
   radixes,
@@ -2656,6 +2659,74 @@ export const UrlParserTool: FC = () => {
           </table>
         </div>
       )}
+    </Panel>
+  )
+}
+
+/* ---------- curlコマンド生成 ---------- */
+
+const curlOptionLabels = {
+  follow: "リダイレクトを追従（-L）",
+  insecure: "証明書を検証しない（-k）",
+  verbose: "詳細表示（-v）",
+  compressed: "圧縮レスポンスを展開（--compressed）",
+  multiline: "改行して表示",
+} as const
+
+export const CurlBuilderTool: FC = () => {
+  const [method, setMethod] = useState<CurlMethod>("POST")
+  const [url, setUrl] = useState("https://api.example.com/users")
+  const [headers, setHeaders] = useState(
+    "Content-Type: application/json\nAuthorization: Bearer TOKEN"
+  )
+  const [body, setBody] = useState('{"name": "山田", "note": "it\'s ok"}')
+  const [options, setOptions] = useState({
+    follow: false,
+    insecure: false,
+    verbose: false,
+    compressed: false,
+    multiline: true,
+  })
+  const hasBody = method !== "GET" && method !== "HEAD"
+
+  return (
+    <Panel title="curlコマンド生成">
+      <Segmented
+        label="メソッド"
+        onChange={setMethod}
+        options={curlMethods.map((item) => ({ value: item, label: item }))}
+        value={method}
+      />
+      <TextInput label="URL" onChange={setUrl} value={url} />
+      <TextArea
+        hint="1行に1つ「名前: 値」の形式で入力"
+        label="ヘッダー"
+        onChange={setHeaders}
+        rows={4}
+        value={headers}
+      />
+      {hasBody && (
+        <TextArea label="ボディ" onChange={setBody} rows={6} value={body} />
+      )}
+      <fieldset className="checkGroup">
+        <legend>オプション</legend>
+        {(Object.keys(curlOptionLabels) as Array<keyof typeof options>).map(
+          (key) => (
+            <Checkbox
+              checked={options[key]}
+              key={key}
+              label={curlOptionLabels[key]}
+              onChange={(checked) => setOptions({ ...options, [key]: checked })}
+            />
+          )
+        )}
+      </fieldset>
+      <Result
+        error={url.trim() === "" ? "URLを入力" : undefined}
+        label="curlコマンド"
+        name="curl.sh"
+        value={buildCurl(method, url, headers, body, options)}
+      />
     </Panel>
   )
 }

@@ -1,6 +1,7 @@
 import { test } from "node:test"
 import assert from "node:assert/strict"
 import {
+  buildCurl,
   buildDiff,
   buildInsertSql,
   convertLineEnding,
@@ -515,4 +516,28 @@ test("url parsing", () => {
     ["q", "2"],
   ])
   assert.equal(parseUrl("not a url"), null)
+})
+
+test("curl building", () => {
+  const options = {
+    follow: true,
+    insecure: false,
+    verbose: false,
+    compressed: false,
+    multiline: false,
+  }
+  assert.equal(
+    buildCurl(
+      "POST",
+      "https://a.example/x?q=1&r=2",
+      "Accept: */*\n\n",
+      "it's",
+      options
+    ),
+    "curl -X POST -L -H 'Accept: */*' --data-raw 'it'\\''s' 'https://a.example/x?q=1&r=2'"
+  )
+  assert.equal(
+    buildCurl("GET", "https://a.example/", "", "ignored", options),
+    "curl -L https://a.example/"
+  )
 })

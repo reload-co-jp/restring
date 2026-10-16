@@ -6,6 +6,7 @@ import {
   buildInsertSql,
   convertLineEnding,
   diffJson,
+  jsonToTypeScript,
   escapeHtml,
   normalizeText,
   parseFlexibleEpoch,
@@ -540,4 +541,29 @@ test("curl building", () => {
     buildCurl("GET", "https://a.example/", "", "ignored", options),
     "curl -L https://a.example/"
   )
+})
+
+test("json to typescript", () => {
+  assert.equal(
+    jsonToTypeScript({
+      id: 1,
+      "user-name": null,
+      tags: ["a", 1],
+      items: [{ a: 1 }, { a: 2, b: true }],
+      empty: [],
+    }),
+    `export interface Root {
+  id: number
+  "user-name": null
+  tags: (string | number)[]
+  items: ItemsItem[]
+  empty: unknown[]
+}
+
+export interface ItemsItem {
+  a: number
+  b?: boolean
+}`
+  )
+  assert.equal(jsonToTypeScript([1, 2]), "export type Root = number[]")
 })

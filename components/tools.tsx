@@ -81,6 +81,7 @@ import {
   parseRadix,
   buildCurl,
   curlMethods,
+  jsonToTypeScript,
   parseUrl,
   parseWareki,
   radixes,
@@ -2726,6 +2727,47 @@ export const CurlBuilderTool: FC = () => {
         label="curlコマンド"
         name="curl.sh"
         value={buildCurl(method, url, headers, body, options)}
+      />
+    </Panel>
+  )
+}
+
+/* ---------- JSONからTypeScript型生成 ---------- */
+
+const sampleTypeJson = `{
+  "id": 1,
+  "name": "山田太郎",
+  "email": null,
+  "tags": ["admin", "editor"],
+  "profile": { "age": 30, "city": "東京" },
+  "posts": [
+    { "id": 10, "title": "はじめまして" },
+    { "id": 11, "title": "近況", "draft": true }
+  ]
+}`
+
+export const JsonToTypeScriptTool: FC = () => {
+  const [value, setValue] = useState(sampleTypeJson)
+  const [rootName, setRootName] = useState("Root")
+  const parsed = parseJson(value)
+  const error = value.trim() === "" ? "JSONを入力" : parsed.error || undefined
+
+  return (
+    <Panel title="JSONからTypeScript型生成">
+      <TextArea
+        label="JSON"
+        onChange={setValue}
+        sample={sampleTypeJson}
+        value={value}
+      />
+      <TextInput label="ルートの型名" onChange={setRootName} value={rootName} />
+      <Result
+        error={error}
+        label="TypeScript"
+        name="types.ts"
+        value={
+          error ? "" : jsonToTypeScript(parsed.data, rootName.trim() || "Root")
+        }
       />
     </Panel>
   )

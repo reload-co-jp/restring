@@ -1614,3 +1614,64 @@ export const buildCurl = (
   args.push(shellQuote(url.trim()))
   return ["curl", ...args].join(options.multiline ? " \\\n  " : " ")
 }
+
+/* ---------- JSONからTypeScript型生成 ---------- */
+
+const toPascalCase = (value: string) =>
+  value
+    .replace(/[^A-Za-z0-9]+(.)?/g, (_, c: string | undefined) =>
+      c ? c.toUpperCase() : ""
+    )
+    .replace(/^[a-z]/, (c) => c.toUpperCase())
+    .replace(/^(\d|$)/, "T$1")
+
+export const jsonToTypeScript = (value: unknown, rootName = "Root") => {
+  const interfaces: string[] = []
+  const usedNames = new Set<string>()
+  const uniqueName = (base: string) => {
+    let name = toPascalCase(base)
+    for (let i = 2; usedNames.has(name); i++) name = `${toPascalCase(base)}${i}`
+    usedNames.add(name)
+    return name
+  }
+
+  // 同じ位置にある複数の値（配列要素など）を1つの型にまとめる
+  const typeFor = (values: unknown[], name: string): string => {
+    const objects = values.filter(isPlainObject)
+    const arrays = values.filter(Array.isArray)
+    const types = new Set<string>(
+      values
+        .filter((v) => !isPlainObject(v) && !Array.isArray(v))
+        .map((v) => (v === null ? "null" : typeof v))
+    )
+    if (objects.length > 0) types.add(interfaceFor(objects, name))
+    if (arrays.length > 0) {
+      const items = arrays.flat()
+      const item = items.length > 0 ? typeFor(items, `${name}Item`) : "unknown"
+      types.add(item.includes(" | ") ? `(${item})[]` : `${item}[]`)
+    }
+    return [...types].join(" | ") || "unknown"
+  }
+
+  const interfaceFor = (objects: Record<string, unknown>[], base: string) => {
+    const name = uniqueName(base)
+    const keys = [...new Set(objects.flatMap(Object.keys))]
+    const fields = keys.map((key) => {
+      const present = objects.filter((o) => key in o).map((o) => o[key])
+      const optional = present.length < objects.length ? "?" : ""
+      const prop = /^[A-Za-z_$][\w$]*$/.test(key) ? key : JSON.stringify(key)
+      return `  ${prop}${optional}: ${typeFor(present, key)}`
+    })
+    interfaces.push(`export interface ${name} {\n${fields.join("\n")}\n}`)
+    return name
+  }
+
+  if (isPlainObject(value)) {
+    interfaceFor([value], rootName)
+  } else {
+    const root = uniqueName(rootName)
+    interfaces.push(`export type ${root} = ${typeFor([value], `${root}Item`)}`)
+  }
+  // 子が先に登録されるため逆順でルートを先頭にする
+  return interfaces.reverse().join("\n\n")
+}

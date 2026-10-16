@@ -130,6 +130,11 @@ const relatedToolHrefs: Record<string, string[]> = {
   "/password-generator/": ["/uuid-generator/", "/hash-generator/", "/base64/"],
   "/url-parser/": ["/url-encode-decode/", "/qr-code-generator/", "/base64/"],
   "/curl-builder/": ["/url-parser/", "/url-encode-decode/", "/base64/"],
+  "/json-to-typescript/": [
+    "/json-validator/",
+    "/json-compare/",
+    "/yaml-json-converter/",
+  ],
 }
 
 const seoTextByHref: Record<string, SeoText> = {
@@ -825,6 +830,29 @@ const seoTextByHref: Record<string, SeoText> = {
         question: "Math.random()と何が違う？",
         answer:
           "crypto.getRandomValues()は暗号論的に安全な乱数で、出力から次の値を予測できない。",
+      },
+    ],
+  },
+  "/json-to-typescript/": {
+    useCases: [
+      "APIレスポンスのサンプルから型定義を作りたいとき。",
+      "設定ファイルやモックデータに型を付けたいとき。",
+      "深くネストしたJSONの構造を把握したいとき。",
+    ],
+    tips: [
+      "nullしか現れないキーはnull型になる。実際の型を手で追記する。",
+      "空配列はunknown[]になる。要素を1つ入れたJSONで生成すると型が付く。",
+      "配列に複数の要素を入れると、オプショナルなキーを判定できる。",
+    ],
+    questions: [
+      {
+        question: "typeではなくinterfaceで出力するのはなぜ？",
+        answer:
+          "オブジェクトの型は拡張しやすいinterfaceで出力する。ルートが配列やプリミティブの場合はtypeで出力する。",
+      },
+      {
+        question: "日付文字列はDate型になる？",
+        answer: "ならない。JSONの日付は文字列のため、string型として出力する。",
       },
     ],
   },

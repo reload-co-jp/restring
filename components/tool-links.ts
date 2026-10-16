@@ -1004,6 +1004,33 @@ export const popularToolHrefs = [
       },
     ],
   },
+  {
+    href: "/json-to-typescript/",
+    category: "dev" as ToolCategoryId,
+    title: "JSONからTypeScript型生成",
+    description:
+      "JSONを貼り付けてTypeScriptのinterfaceを生成。ネストしたオブジェクトや配列にも対応。",
+    introduction:
+      "JSONの構造からTypeScriptの型定義を作るツール。APIレスポンスの型付けやモックデータの型作成に使える。",
+    usage: [
+      "JSONを入力する。",
+      "必要に応じてルートの型名を変更する。",
+      "生成された型をコピーしてコードに貼り付ける。",
+    ],
+    mechanism: [
+      "ネストしたオブジェクトはキー名をPascalCaseにした別のinterfaceとして出力。",
+      "配列の要素が複数の型を持つ場合はユニオン型にまとめる。",
+      "配列内のオブジェクトはキーを統合し、一部の要素にしかないキーはオプショナル（?）にする。",
+      "生成はブラウザ内で完結し、サーバーへ送信しない。",
+    ],
+    shell: [
+      {
+        label: "JSONから型を生成",
+        environment: "Node.js",
+        command: "npx quicktype --lang ts --just-types data.json",
+      },
+    ],
+  },
 ]
 
 export const findTool = (href: string) =>

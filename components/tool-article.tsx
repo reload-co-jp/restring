@@ -135,6 +135,11 @@ const relatedToolHrefs: Record<string, string[]> = {
     "/json-compare/",
     "/yaml-json-converter/",
   ],
+  "/json-csv-converter/": [
+    "/json-validator/",
+    "/data-converter/",
+    "/character-encoding/",
+  ],
 }
 
 const seoTextByHref: Record<string, SeoText> = {
@@ -994,6 +999,30 @@ const seoTextByHref: Record<string, SeoText> = {
         question: "タブでインデントしたYAMLはエラーになる？",
         answer:
           "YAMLの仕様でインデントにタブは使えないため、スペースに置き換える。",
+      },
+    ],
+  },
+  "/json-csv-converter/": {
+    useCases: [
+      "APIレスポンスのJSONを、ExcelやGoogleスプレッドシートで開きたいとき。",
+      "表計算ソフトで作ったCSVを、テストデータやモック用のJSONにしたいとき。",
+      "データベースからエクスポートしたCSVの中身をJSONで確認したいとき。",
+    ],
+    tips: [
+      "見出しはすべての要素のキーを合わせたもの。キーがない要素のセルは空になる。",
+      "入れ子のオブジェクトや配列はJSON文字列としてセルに入る。",
+      "CSVから変換した値はすべて文字列になる。数値として扱う場合は変換後に型を確認する。",
+    ],
+    questions: [
+      {
+        question: "カンマや改行を含む値はどうなる？",
+        answer:
+          "RFC 4180に沿ってダブルクォートで囲み、値の中の「\"」は「\"\"」と重ねて出力する。読み込み時も同じ規則で解釈する。",
+      },
+      {
+        question: "Excelで作ったCSVは読み込める？",
+        answer:
+          "UTF-8のCSVに対応し、先頭のBOMは自動で除去する。Shift_JISで保存したCSVは、文字コード変換ツールでUTF-8にしてから入力する。",
       },
     ],
   },

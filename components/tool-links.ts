@@ -794,6 +794,33 @@ export const toolLinks = [
     ],
   },
   {
+    href: "/json-csv-converter/",
+    category: "dev" as ToolCategoryId,
+    title: "JSON・CSV変換",
+    description:
+      "JSONとCSVを相互変換。オブジェクトの配列を表に、CSVの見出し行をキーにしたJSONに変換。",
+    introduction:
+      "JSONとCSVを相互に変換するツール。APIレスポンスを表計算ソフトで開いたり、CSVの表データをテストデータ用のJSONにしたりできる。",
+    usage: [
+      "変換方向を選び、JSONまたはCSVを入力する。",
+      "変換結果をコピーまたは保存する。",
+      "「入れ替え」で変換方向を切り替えると、変換結果が次の入力になる。",
+    ],
+    mechanism: [
+      "JSONはオブジェクトの配列を1要素1行とし、全要素のキーを見出し行にする。",
+      "CSVはRFC 4180に沿って引用符と改行を扱い、1行目を見出しとしてオブジェクトの配列にする。",
+      "変換はブラウザ内で完結し、サーバーへ送信しない。",
+    ],
+    shell: [
+      {
+        label: "JSONをCSVへ変換",
+        environment: "jq",
+        command:
+          "jq -r '(.[0] | keys_unsorted) as $k | $k, (.[] | [.[$k[]]]) | @csv' input.json",
+      },
+    ],
+  },
+  {
     href: "/xml-parser/",
     category: "dev" as ToolCategoryId,
     title: "XML解析",

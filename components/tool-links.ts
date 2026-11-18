@@ -483,6 +483,32 @@ export const toolLinks = [
     ],
   },
   {
+    href: "/sql-formatter/",
+    category: "dev" as ToolCategoryId,
+    title: "SQL整形",
+    description:
+      "SQL文をオンラインで整形。SELECT・FROM・WHEREなどの句ごとに改行し、キーワードを大文字に統一。1行に詰まったクエリを読みやすく。",
+    introduction:
+      "1行に詰まったSQL文を読みやすく整形するツール。ログやORMが出力したクエリの確認、レビュー用の見た目の統一に使える。",
+    usage: [
+      "整形するSQL文を入力する。",
+      "キーワードを大文字にするか、そのままにするか選ぶ。",
+      "整形結果をコピーまたは保存する。",
+    ],
+    mechanism: [
+      "文字列・コメント・識別子を保ったまま、SQLを単語と記号に分割。",
+      "SELECT・FROM・WHERE・JOIN・GROUP BY・ORDER BYなどの句の前で改行し、AND・ORとカンマは字下げして改行。",
+      "変換はブラウザ内で完結し、サーバーへ送信しない。",
+    ],
+    shell: [
+      {
+        label: "SQLをsqlformatで整形",
+        environment: "Python 3 (sqlparse)",
+        command: "sqlformat --reindent --keywords upper input.sql",
+      },
+    ],
+  },
+  {
     href: "/json-validator/",
     category: "dev" as ToolCategoryId,
     title: "JSON構文チェック",

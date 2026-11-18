@@ -2,6 +2,7 @@ import { test } from "node:test"
 import assert from "node:assert/strict"
 import {
   buildCurl,
+  formatSql,
   buildDiff,
   buildInsertSql,
   convertLineEnding,
@@ -566,4 +567,28 @@ export interface ItemsItem {
 }`
   )
   assert.equal(jsonToTypeScript([1, 2]), "export type Root = number[]")
+})
+
+test("formatSql", () => {
+  assert.equal(
+    formatSql(
+      "select a,b, count(*) from t left join u on t.id=u.id where x between 1 and 2 and y in (1,2) or z='a''b' group by a order by b desc limit 10;"
+    ),
+    `SELECT a,
+  b,
+  count(*)
+FROM t
+LEFT JOIN u ON t.id = u.id
+WHERE x BETWEEN 1 AND 2
+  AND y IN (1, 2)
+  OR z = 'a''b'
+GROUP BY a
+ORDER BY b DESC
+LIMIT 10;`
+  )
+  assert.equal(
+    formatSql("insert into t (a,b) values (1,2)"),
+    "INSERT INTO t (a, b)\nVALUES (1, 2)"
+  )
+  assert.equal(formatSql("select a -- c\nfrom t"), "SELECT a -- c\nFROM t")
 })

@@ -7,12 +7,7 @@ export type CompareUnit = "line" | "word" | "char"
 export type CompareView = "inline" | "side"
 export type LineEnding = "LF" | "CRLF" | "CR"
 export type CaseMode =
-  | "upper"
-  | "lower"
-  | "camel"
-  | "pascal"
-  | "snake"
-  | "kebab"
+  "upper" | "lower" | "camel" | "pascal" | "snake" | "kebab"
 
 export const normalizeForCompare = (
   value: string,
@@ -1674,4 +1669,92 @@ export const jsonToTypeScript = (value: unknown, rootName = "Root") => {
   }
   // 子が先に登録されるため逆順でルートを先頭にする
   return interfaces.reverse().join("\n\n")
+}
+
+const sqlKeywords = new Set(
+  "SELECT DISTINCT FROM WHERE AND OR NOT IN IS NULL LIKE BETWEEN EXISTS AS ON USING JOIN LEFT RIGHT FULL INNER OUTER CROSS NATURAL GROUP BY ORDER HAVING LIMIT OFFSET UNION ALL INTERSECT EXCEPT INSERT INTO VALUES UPDATE SET DELETE CREATE TABLE ALTER DROP PRIMARY KEY DEFAULT CASE WHEN THEN ELSE END ASC DESC".split(
+    " "
+  )
+)
+const sqlClause =
+  /^(?:SELECT|FROM|WHERE|GROUP BY|ORDER BY|HAVING|LIMIT|OFFSET|UNION ALL|UNION|INTERSECT|EXCEPT|INSERT INTO|VALUES|UPDATE|SET|DELETE FROM|(?:(?:LEFT|RIGHT|FULL|INNER|CROSS|NATURAL)(?: OUTER)? )?JOIN)\b/
+const sqlToken =
+  /'(?:[^']|'')*'|"(?:[^"]|"")*"|`[^`]*`|--[^\n]*|\/\*[\s\S]*?\*\/|[\w$]+|<>|<=|>=|!=|::|[^\s]/g
+
+// ponytail: 括弧内（サブクエリ含む）は整形せず1行のまま。入れ子の改行が必要なら深さ別インデントを追加
+export const formatSql = (value: string, uppercase = true) => {
+  const tokens = [...value.matchAll(sqlToken)].map((match, index, all) => ({
+    text: match[0],
+    space:
+      index > 0 &&
+      match.index > all[index - 1].index + all[index - 1][0].length,
+  }))
+  const lines: string[] = []
+  let line = ""
+  let depth = 0
+  let between = false
+  const flush = () => {
+    if (line) lines.push(line)
+    line = ""
+  }
+  for (let i = 0; i < tokens.length; i++) {
+    let { text } = tokens[i]
+    const { space } = tokens[i]
+    const isWord = /^[\w$]+$/.test(text)
+    const upper = text.toUpperCase()
+    if (isWord && depth === 0) {
+      // 複数語の句は先読みして1つの句として扱う
+      const ahead = tokens
+        .slice(i, i + 3)
+        .map((token) => token.text.toUpperCase())
+        .join(" ")
+      const clause = sqlClause.exec(ahead)?.[0]
+      if (clause) {
+        flush()
+        line = uppercase
+          ? clause
+          : tokens
+              .slice(i, i + clause.split(" ").length)
+              .map((t) => t.text)
+              .join(" ")
+        i += clause.split(" ").length - 1
+        between = false
+        continue
+      }
+      if ((upper === "AND" && !between) || upper === "OR") {
+        flush()
+        line = "  "
+      }
+      between = upper === "BETWEEN" || (between && upper !== "AND")
+    }
+    if (isWord && uppercase && sqlKeywords.has(upper)) text = upper
+    if (text === ";") {
+      line += text
+      flush()
+      lines.push("")
+      depth = 0
+      continue
+    }
+    if (text === "(") depth++
+    if (text === ")") depth = Math.max(depth - 1, 0)
+    const prev = line.slice(-1)
+    const glue =
+      !line.trim() ||
+      prev === "(" ||
+      prev === "." ||
+      text === "," ||
+      text === ")" ||
+      text === "." ||
+      text === "::" ||
+      line.endsWith("::") ||
+      (text === "(" && !space)
+    line += glue ? text : ` ${text}`
+    if (text === "," && depth === 0) {
+      flush()
+      line = "  "
+    }
+    if (text.startsWith("--")) flush()
+  }
+  flush()
+  return lines.join("\n").trim()
 }

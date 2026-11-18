@@ -25,6 +25,7 @@ import {
   SafeResult,
   SqlMode,
   buildCreateTableSql,
+  formatSql,
   buildDiff,
   buildInsertSql,
   buildSelectSql,
@@ -1447,6 +1448,9 @@ export const TimezoneConverterTool: FC = () => (
 
 /* ---------- 開発補助 ---------- */
 
+const sampleSql =
+  "select u.id,u.name,count(o.id) as orders from users u left join orders o on o.user_id=u.id where u.active=1 and u.created_at>'2024-01-01' group by u.id,u.name order by orders desc limit 10;"
+
 export const SqlBuilderTool: FC = () => {
   const [mode, setMode] = useState<SqlMode>("select")
   const [table, setTable] = useState("users")
@@ -1551,6 +1555,40 @@ export const SqlBuilderTool: FC = () => {
 const sampleJson = '{"name": "Restring", "tools": ["diff", "compare"]}'
 
 const jsonIndents = { "2": 2, "4": 4, tab: "\t", minify: 0 } as const
+
+export const SqlFormatterTool: FC = () => {
+  const [value, setValue] = useState(sampleSql)
+  const [uppercase, setUppercase] = useState(true)
+
+  return (
+    <Panel
+      description="SELECT・FROM・WHEREなどの句ごとに改行し、キーワードを大文字にする。括弧内は1行のまま。"
+      title="SQL整形"
+    >
+      <Segmented
+        label="キーワード"
+        onChange={(next) => setUppercase(next === "upper")}
+        options={[
+          { value: "upper", label: "大文字" },
+          { value: "keep", label: "そのまま" },
+        ]}
+        value={uppercase ? "upper" : "keep"}
+      />
+      <TextArea
+        label="整形するSQL"
+        onChange={setValue}
+        rows={10}
+        sample={sampleSql}
+        value={value}
+      />
+      <Result
+        label="整形済みSQL"
+        name="formatted.sql"
+        value={formatSql(value, uppercase)}
+      />
+    </Panel>
+  )
+}
 
 export const JsonValidatorTool: FC = () => {
   const [value, setValue] = useState(sampleJson)
